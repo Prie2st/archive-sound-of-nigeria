@@ -1,0 +1,47 @@
+{
+  "name": "archive-sound-of-nigeria",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "test": "node --no-warnings --test src/config/quality.test.ts src/data/archive.test.ts src/data/content.test.ts src/content/homeStory.test.ts src/state/travel.test.ts src/state/focus.test.ts src/input/pointerActivation.test.ts src/ui/captionModel.test.ts src/audio/audio.test.ts src/audio/spatialMix.test.ts src/stations/platterMotion.test.ts src/stations/tonearmMotion.test.ts src/stations/albumStack.test.ts src/stations/recordChange.test.ts",
+    "check:tonearm": "node --no-warnings scripts/check-tonearm-mechanics.mjs",
+    "check": "tsc --noEmit && eslint . && npm test && npm run check:content",
+    "models": "node --no-warnings scripts/build-models.mjs",
+    "check:hall": "node --no-warnings scripts/check-hall-layout.mjs",
+    "audit:textures": "node --no-warnings scripts/audit-textures.mjs",
+    "audit:geometry": "node --no-warnings scripts/audit-turntable-geometry.mjs",
+    "audio:dev": "node --no-warnings scripts/build-dev-audio.mjs",
+    "artwork:dev": "node --no-warnings scripts/build-dev-artwork.mjs",
+    "check:content": "node --no-warnings scripts/check-content.mjs",
+    "artwork:archive": "node --no-warnings scripts/build-archive-artwork.mjs",
+    "artwork:eras": "node --no-warnings scripts/build-era-worlds.mjs",
+    "check:visuals": "node --no-warnings scripts/check-era-visuals.mjs"
+  },
+  "devDependencies": {
+    "@gltf-transform/core": "4.5.1",
+    "@gltf-transform/extensions": "4.5.1",
+    "@gltf-transform/functions": "4.5.1",
+    "@types/node": "24.19.0",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@types/three": "0.186.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.7",
+    "meshoptimizer": "1.2.0",
+    "sharp": "0.35.5",
+    "typescript": "5.9.3"
+  },
+  "dependencies": {
+    "@react-three/drei": "10.7.9",
+    "@react-three/fiber": "9.8.1",
+    "next": "16.3.7",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "three": "0.186.1",
+    "zustand": "5.0.15"
+  }
+}

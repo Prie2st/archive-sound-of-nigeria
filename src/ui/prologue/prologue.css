@@ -1,0 +1,698 @@
+/* ==========================================================================
+   PROLOGUE (docs/PROLOGUE.md)
+   The scrollable editorial story before the museum. Native document scroll; motion is CSS only
+   (IntersectionObserver toggles .is-in / data-steps; scroll-driven animations where supported).
+   Typography is the composition: OJUJU for display, the existing functional sans for everything else.
+   ========================================================================== */
+
+/* While the story is open the document scrolls (the museum keeps html / body locked otherwise). */
+html.archive-prologue {
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: #0e0d0c;
+}
+
+html.archive-prologue body {
+  height: auto;
+  overflow: visible;
+  background: #0e0d0c;
+}
+
+.pro {
+  /* grid + space */
+  --pro-margin: clamp(16px, 4.4vw, 72px);
+  --pro-gutter: clamp(12px, 1.6vw, 28px);
+  --pro-left: max(var(--pro-margin), env(safe-area-inset-left));
+  --pro-right: max(var(--pro-margin), env(safe-area-inset-right));
+  --space-xs: clamp(6px, 0.5vw, 8px);
+  --space-sm: clamp(12px, 1vw, 16px);
+  --space-md: clamp(20px, 2vw, 32px);
+  --space-lg: clamp(32px, 4vw, 64px);
+  --space-xl: clamp(44px, 5vw, 84px);
+  --space-2xl: clamp(56px, 6.2vw, 104px);
+  --space-section: clamp(64px, 8vh, 110px);
+  /* reserved for the fixed ENTER ARCHIVE control at the bottom edge */
+  --pro-cta-zone: calc(44px + clamp(16px, 2.6vw, 40px) + env(safe-area-inset-bottom));
+
+  /* faces */
+  --f-display: var(--font-ojuju), "Ojuju", var(--ui-font-text);
+  --f-text: var(--ui-font-text);
+
+  /* type scale — sized from OJUJU's measured glyphs (cap height 0.70 em, accented caps 0.87 em,
+     average capital 0.60 em wide), not from a generic ratio */
+  --t-title: clamp(3.4rem, 12.6vw, 15.5rem);
+  --t-mega: clamp(3.4rem, 14vw, 15rem);
+  --t-display: clamp(2.7rem, 8.6vw, 9.6rem);
+  --t-headline: clamp(2.2rem, 5.8vw, 6.4rem);
+  --t-statement: clamp(1.75rem, 3.9vw, 4.2rem);
+  --t-sub: clamp(1.2rem, 1.25vw + 0.7rem, 1.9rem);
+  --t-body: clamp(1rem, 0.3vw + 0.9rem, 1.16rem);
+  --t-small: 0.8125rem;
+  --t-micro: 0.6875rem;
+
+  /* tracking by scale */
+  --tr-title: -0.035em;
+  --tr-mega: -0.035em;
+  --tr-display: -0.028em;
+  --tr-headline: -0.02em;
+  --tr-statement: -0.012em;
+  --tr-sub: -0.005em;
+  --tr-micro: 0.14em;
+
+  /* tone */
+  --ink: #efe7da;
+  --ink-soft: rgba(239, 231, 218, 0.7);
+  --ink-faint: rgba(239, 231, 218, 0.42);
+  --rule: rgba(239, 231, 218, 0.2);
+  --accent: #c98f4e;
+
+  /* motion */
+  --pro-ease: cubic-bezier(0.19, 1, 0.22, 1);
+  --pro-ease-io: cubic-bezier(0.76, 0, 0.24, 1);
+  --pro-open: 1.5s;
+  --pro-leave: 0.95s;
+
+  position: relative;
+  z-index: 30;
+  overflow-x: clip;
+  color: var(--ink);
+  background: #0e0d0c;
+  font: 400 var(--t-body) / 1.6 var(--f-text);
+  font-kerning: normal;
+  font-feature-settings: "kern" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Zero-specificity resets, so every composition's own margins / grid padding win. */
+.pro :where(p, ul, ol, dl, dd, figure, h1, h2, h3) {
+  margin: 0;
+  padding: 0;
+}
+
+.pro :where(ul, ol) {
+  list-style: none;
+}
+
+.pro i {
+  font-style: normal;
+}
+
+/* --- grid ---------------------------------------------------------------- */
+
+.pro-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--pro-gutter);
+  padding-inline: var(--pro-left) var(--pro-right);
+}
+
+.pro-chapter {
+  position: relative;
+}
+
+/* --- type primitives ------------------------------------------------------- */
+
+.pro-display {
+  font-family: var(--f-display);
+  font-weight: 300;
+  font-synthesis: none;
+  text-transform: uppercase;
+  letter-spacing: var(--tr-display);
+  line-height: 0.84;
+}
+
+.pro-display--title {
+  font-size: var(--t-title);
+  font-weight: 250;
+  letter-spacing: var(--tr-title);
+  line-height: 0.82;
+}
+
+.pro-display--mega {
+  font-size: var(--t-mega);
+  letter-spacing: var(--tr-mega);
+  line-height: 0.8;
+}
+
+.pro-display--display {
+  font-size: var(--t-display);
+}
+
+.pro-display--headline {
+  font-size: var(--t-headline);
+  font-weight: 400;
+  letter-spacing: var(--tr-headline);
+  line-height: 0.88;
+}
+
+.pro-display--statement {
+  font-size: var(--t-statement);
+  font-weight: 400;
+  letter-spacing: var(--tr-statement);
+  line-height: 0.95;
+}
+
+/* One authored line: a mask (vertical only, so deliberate horizontal crops still bleed) that is taller than the
+   line box, so accents (0.87 em) and the rise animation are never cut. --shift indents by twelfths. */
+.pro-line {
+  display: block;
+  white-space: nowrap;
+  overflow-x: visible;
+  overflow-y: clip;
+  padding-block: 0.16em 0.06em;
+  margin-block: -0.16em -0.06em;
+  padding-inline-start: calc(var(--shift, 0) * (100% + var(--pro-gutter)) / 12);
+}
+
+.pro-line__inner {
+  display: inline-block;
+}
+
+/* The authored phone break (" | " in the data): a plain space on wider screens. */
+.pro-br {
+  display: inline;
+}
+
+.pro-micro {
+  font: 600 var(--t-micro) / 1.3 var(--f-text);
+  letter-spacing: var(--tr-micro);
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.pro-sub {
+  font: 400 var(--t-sub) / 1.28 var(--f-display);
+  letter-spacing: var(--tr-sub);
+}
+
+.pro-body {
+  max-width: 46ch;
+  font: 400 var(--t-body) / 1.62 var(--f-text);
+  color: var(--ink-soft);
+}
+
+.pro-body + .pro-body {
+  margin-top: 0.7em;
+}
+
+.pro-eramark {
+  display: flex;
+  gap: 1.4em;
+  align-items: baseline;
+}
+
+.pro-eramark span:first-child {
+  color: var(--ink);
+}
+
+/* --- media ----------------------------------------------------------------- */
+
+.pro-media {
+  position: relative;
+  display: grid;
+  gap: var(--space-xs);
+  align-content: start;
+  /* the archive card: paper on dark grounds, ink on light grounds (.pro-tone-light flips it) */
+  --card-bg: #ece5d6;
+  --card-ink: #1b1813;
+  --card-line: rgba(27, 24, 19, 0.22);
+}
+
+.pro-tone-light .pro-media {
+  --card-bg: #1b1813;
+  --card-ink: #ece5d6;
+  --card-line: rgba(236, 229, 214, 0.24);
+}
+
+.pro-media__frame {
+  position: relative;
+  aspect-ratio: var(--aspect);
+  overflow: hidden;
+  container-type: inline-size;
+  background: var(--card-bg);
+}
+
+.pro-media__img {
+  transition: transform 1.6s var(--pro-ease);
+}
+
+/* A pending image: an archive card in the slot's final ratio. The small cross marks where the subject will sit
+   (the slot's object-position), so the crop is already composed for the real photograph. */
+.pro-media__slot {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 8px;
+  padding: clamp(10px, 5cqi, 22px);
+  color: var(--card-ink);
+  background:
+    radial-gradient(circle at var(--focus), transparent 0 5px, var(--card-line) 5px 6px, transparent 6px),
+    linear-gradient(var(--card-line), var(--card-line)) var(--focus) / 1px 22px no-repeat,
+    linear-gradient(var(--card-line), var(--card-line)) var(--focus) / 22px 1px no-repeat,
+    repeating-linear-gradient(0deg, rgba(127, 110, 85, 0.05) 0 1px, transparent 1px 3px),
+    var(--card-bg);
+}
+
+.pro-media__slot::after {
+  content: "";
+  position: absolute;
+  inset: clamp(5px, 2.4cqi, 10px);
+  border: 1px solid var(--card-line);
+  pointer-events: none;
+}
+
+.pro-media__slot-kicker {
+  display: flex;
+  gap: 0.6em;
+  align-items: center;
+  font: 600 10px/1.2 var(--f-text);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.pro-media__slot-kicker::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+}
+
+.pro-media__slot-title {
+  align-self: end;
+  font: 300 clamp(1.1rem, 13cqi, 4.6rem) / 0.9 var(--f-display);
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.pro-media__slot-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--card-line);
+  font: 600 9.5px/1.3 var(--f-text);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+/* reused evidence in the lineage: a quiet contact sheet, not nine bright cards */
+.pro-media--fragment {
+  --card-bg: #1d1a16;
+  --card-ink: #d9cfbd;
+  --card-line: rgba(217, 207, 189, 0.2);
+}
+
+.pro-media--fragment .pro-media__slot {
+  padding: 8px;
+}
+
+.pro-media--fragment .pro-media__slot-kicker {
+  display: none;
+}
+
+.pro-media--fragment .pro-media__slot-title {
+  font-size: clamp(0.62rem, 16cqi, 0.95rem);
+  letter-spacing: 0;
+}
+
+.pro-media__caption {
+  display: grid;
+  gap: 2px;
+  max-width: 42ch;
+  font: 400 var(--t-small) / 1.45 var(--f-text);
+  color: var(--ink-soft);
+}
+
+.pro-media__credit {
+  font: 600 10px/1.4 var(--f-text);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* --- records (one data shape, several typographic treatments) ------------- */
+
+.pro-record {
+  display: grid;
+}
+
+.pro-record__number {
+  font: 600 10px/1.3 var(--f-text);
+  letter-spacing: 0.14em;
+  color: var(--ink-faint);
+}
+
+.pro-record__artist {
+  font-family: var(--f-display);
+  text-transform: uppercase;
+}
+
+.pro-record__title {
+  color: var(--ink-soft);
+}
+
+.pro-record__date {
+  font: 600 11px/1.3 var(--f-text);
+  letter-spacing: 0.1em;
+  color: var(--ink-faint);
+}
+
+/* --- the fixed ENTER ARCHIVE control --------------------------------------- */
+
+.pro-enter {
+  --cta-bg: #efe7da;
+  --cta-fg: #14120f;
+  --cta-where: rgba(239, 231, 218, 0.78);
+  position: fixed;
+  right: var(--pro-right);
+  bottom: max(clamp(16px, 2.6vw, 40px), calc(env(safe-area-inset-bottom) + 10px));
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 1.4vw, 20px);
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.6s var(--pro-ease) 0.9s;
+}
+
+.pro[data-tone="light"] .pro-enter {
+  --cta-bg: #15130f;
+  --cta-fg: #f3eee4;
+  --cta-where: rgba(20, 18, 14, 0.72);
+}
+
+.pro-enter__where {
+  display: flex;
+  gap: 0.9em;
+  font: 600 var(--t-micro) / 1 var(--f-text);
+  letter-spacing: var(--tr-micro);
+  text-transform: uppercase;
+  color: var(--cta-where);
+  white-space: nowrap;
+  transition:
+    color 0.5s ease,
+    opacity 0.4s ease;
+}
+
+.pro-enter__number {
+  font-variant-numeric: tabular-nums;
+}
+
+.pro-enter__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9em;
+  min-height: 44px;
+  padding: 0 16px 0 20px;
+  font: 600 11px/1 var(--f-text);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--cta-fg);
+  background: var(--cta-bg);
+  transition:
+    background-color 0.5s ease,
+    color 0.5s ease,
+    min-height 0.7s var(--pro-ease),
+    padding 0.7s var(--pro-ease),
+    font-size 0.7s var(--pro-ease),
+    letter-spacing 0.7s var(--pro-ease);
+}
+
+.pro-enter__arrow {
+  display: inline-block;
+  font-family: var(--f-display);
+  font-size: 1.35em;
+  letter-spacing: 0;
+  transition: transform 0.35s var(--pro-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pro-enter:not(:disabled):hover .pro-enter__pill {
+    background: var(--accent-cta, #c98f4e);
+    color: #14120f;
+  }
+
+  .pro-enter:not(:disabled):hover .pro-enter__arrow {
+    transform: translateX(5px);
+  }
+}
+
+.pro-enter:focus-visible {
+  outline: none;
+}
+
+.pro-enter:focus-visible .pro-enter__pill {
+  outline: 2px solid var(--cta-bg);
+  outline-offset: 4px;
+}
+
+.pro-enter:not(:disabled):active .pro-enter__pill {
+  transform: translateY(1px);
+}
+
+.pro-enter:disabled {
+  cursor: default;
+}
+
+/* Near the end the control becomes the composition's last word. */
+.pro-enter.is-final .pro-enter__where {
+  opacity: 0;
+}
+
+.pro-enter.is-final .pro-enter__pill {
+  min-height: clamp(64px, 6.4vw, 100px);
+  padding: 0 clamp(26px, 2.6vw, 44px);
+  font-size: clamp(13px, 0.55vw + 9px, 17px);
+  letter-spacing: 0.26em;
+}
+
+.pro--loading .pro-enter {
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+}
+
+/* --- loader: the first moment ----------------------------------------------- */
+
+.pro-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  color: var(--ink);
+  background: #0d0c0b;
+  clip-path: inset(0 0 0 0);
+}
+
+.pro-loader__inner {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+  padding: max(var(--pro-margin), env(safe-area-inset-top)) var(--pro-right) max(var(--pro-margin), env(safe-area-inset-bottom)) var(--pro-left);
+}
+
+.pro-loader__title {
+  align-self: center;
+  display: grid;
+  font: 250 clamp(2.4rem, 6.4vw, 6.6rem) / 0.86 var(--f-display);
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(0.18em);
+  transition:
+    opacity 1.1s var(--pro-ease),
+    transform 1.4s var(--pro-ease);
+}
+
+.pro-loader.is-type .pro-loader__title {
+  opacity: 1;
+  transform: none;
+}
+
+.pro-loader__title span:last-child {
+  padding-inline-start: 1.6em;
+}
+
+.pro-loader__foot {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: clamp(14px, 2vw, 32px);
+  align-items: center;
+}
+
+.pro-loader__track {
+  position: relative;
+  height: 1px;
+  overflow: hidden;
+  background: rgba(239, 231, 218, 0.16);
+}
+
+.pro-loader__track span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 14%;
+  background: var(--ink);
+  animation: pro-seek 2.4s var(--pro-ease-io) infinite;
+}
+
+@keyframes pro-seek {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(720%);
+  }
+}
+
+/* Ready: the line completes, then the whole loader lifts away like a gallery shutter. */
+.pro:not(.pro--loading) .pro-loader__track span {
+  width: 100%;
+  animation: none;
+  transform: none;
+  transition: width 0.45s var(--pro-ease);
+}
+
+.pro:not(.pro--loading) .pro-loader {
+  clip-path: inset(0 0 100% 0);
+  pointer-events: none;
+  transition: clip-path 0.95s var(--pro-ease-io) 0.3s;
+}
+
+/* --- reveals (IntersectionObserver adds .is-in once) ----------------------- */
+
+.pro [data-reveal=""] {
+  transition:
+    opacity 0.9s var(--pro-ease) var(--delay, 0ms),
+    transform 1.1s var(--pro-ease) var(--delay, 0ms);
+}
+
+.pro [data-reveal=""]:not(.is-in) {
+  opacity: 0;
+  transform: translateY(26px);
+}
+
+.pro [data-reveal="lines"] .pro-line__inner {
+  transition: transform 1.15s var(--pro-ease) calc(var(--i, 0) * 75ms + var(--delay, 0ms));
+}
+
+.pro [data-reveal="lines"]:not(.is-in) .pro-line__inner {
+  transform: translateY(112%);
+}
+
+.pro [data-reveal="list"] > * {
+  transition:
+    opacity 0.8s var(--pro-ease) calc(var(--i, 0) * 70ms),
+    transform 1s var(--pro-ease) calc(var(--i, 0) * 70ms);
+}
+
+.pro [data-reveal="list"]:not(.is-in) > * {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.pro [data-reveal="mask"] .pro-media__frame {
+  transition: clip-path 1.3s var(--pro-ease);
+}
+
+.pro [data-reveal="mask"]:not(.is-in) .pro-media__frame {
+  clip-path: inset(100% 0 0 0);
+}
+
+.pro [data-reveal="mask"]:not(.is-in) .pro-media__img {
+  transform: scale(1.08);
+}
+
+.pro [data-reveal="mask"] .pro-media__caption,
+.pro [data-reveal="fade"] {
+  transition: opacity 0.9s var(--pro-ease) 0.35s;
+}
+
+.pro [data-reveal="mask"]:not(.is-in) .pro-media__caption,
+.pro [data-reveal="fade"]:not(.is-in) {
+  opacity: 0;
+}
+
+/* Reduced motion: content and hierarchy stay; only opacity changes. */
+.pro--reduced [data-reveal=""]:not(.is-in),
+.pro--reduced [data-reveal="list"]:not(.is-in) > * {
+  transform: none;
+}
+
+.pro--reduced [data-reveal="lines"] .pro-line__inner,
+.pro--reduced [data-reveal="lines"]:not(.is-in) .pro-line__inner {
+  transform: none;
+  transition: none;
+}
+
+.pro--reduced [data-reveal="lines"] {
+  transition: opacity 0.4s ease;
+}
+
+.pro--reduced [data-reveal="lines"]:not(.is-in) {
+  opacity: 0;
+}
+
+.pro--reduced [data-reveal="mask"]:not(.is-in) .pro-media__frame {
+  clip-path: none;
+  opacity: 0;
+}
+
+.pro--reduced [data-reveal="mask"] .pro-media__frame {
+  transition: opacity 0.4s ease;
+}
+
+.pro--reduced [data-reveal] {
+  transition-duration: 0.4s !important;
+}
+
+.pro--reduced .pro-loader__title {
+  transform: none;
+}
+
+.pro--reduced .pro-loader__track span {
+  animation-duration: 6s;
+}
+
+.pro--reduced:not(.pro--loading) .pro-loader {
+  clip-path: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* --- leaving: the story steps aside, the museum is already there ----------- */
+
+.pro--leaving .pro-story {
+  opacity: 0;
+  transform: translateY(-1.5vh);
+  transition:
+    opacity var(--pro-leave) var(--pro-ease-io),
+    transform var(--pro-leave) var(--pro-ease-io);
+}
+
+.pro--leaving {
+  background: transparent;
+  pointer-events: none;
+}
+
+.pro--leaving .pro-enter {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.pro--reduced.pro--leaving .pro-story {
+  transform: none;
+  transition-duration: 0.25s;
+}

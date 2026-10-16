@@ -1,0 +1,5 @@
+/gallery.glb filter=lfs diff=lfs merge=lfs -text
+/marble-gallery.glb filter=lfs diff=lfs merge=lfs -text
+/table.glb filter=lfs diff=lfs merge=lfs -text
+/turntable.glb filter=lfs diff=lfs merge=lfs -text
+/vinyl.glb filter=lfs diff=lfs merge=lfs -text

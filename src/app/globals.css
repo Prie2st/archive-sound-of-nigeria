@@ -1,0 +1,963 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: #1d1d1f;
+  color: #e8e4dc;
+}
+
+/* The stage (canvas layer) is fixed; the museum shell stays in flow so the prologue (docs/PROLOGUE.md) can use
+   native document scroll above it. Every museum overlay positions itself (fixed). */
+.museum-stage {
+  position: fixed;
+  inset: 0;
+}
+
+/* Travel input owns vertical gestures on the museum (no browser panning / pull-to-refresh). */
+.museum-canvas {
+  touch-action: none;
+}
+
+/* Development inspector (development builds only; never mounted in production) */
+.dev-panel {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+  max-width: min(460px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  padding: 10px 12px;
+  display: grid;
+  gap: 4px;
+  font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: #e8e4dc;
+  background: rgba(15, 15, 16, 0.82);
+  border: 1px solid #3a3a3c;
+  pointer-events: auto;
+}
+
+.dev-panel:not([open]) {
+  padding-bottom: 10px;
+}
+
+.dev-panel summary {
+  cursor: pointer;
+}
+
+.dev-panel pre {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+}
+
+.dev-panel a {
+  color: #9a968e;
+  margin-right: 8px;
+}
+
+.dev-panel a.active {
+  color: #ffc94d;
+}
+
+.dev-panel .muted {
+  color: #9a968e;
+}
+
+.dev-panel__section {
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid #3a3a3c;
+}
+
+.dev-panel__toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: center;
+}
+
+.dev-panel__toggles label {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.dev-panel__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.dev-panel button {
+  font: inherit;
+  color: #e8e4dc;
+  background: #2a2a2c;
+  border: 1px solid #3a3a3c;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+
+.dev-panel button.active {
+  color: #1d1d1f;
+  background: #ffc94d;
+  border-color: #ffc94d;
+}
+
+.dev-panel__slider {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+/* ==========================================================================
+   PRODUCTION INTERFACE (docs/FINAL_UI.md)
+   Intro · travel HUD · sound control · focus caption. Typography-led, quiet; the 3D hall and the
+   turntable stay the interface. No blur / backdrop filters (cost), no per-era layout changes —
+   eras only tint thin accents through --era-accent.
+   ========================================================================== */
+
+:root {
+  /* colour */
+  --ui-ink: #1d1a16;
+  --ui-ink-soft: rgba(29, 26, 22, 0.74);
+  --ui-ink-faint: rgba(29, 26, 22, 0.5);
+  --ui-line: rgba(29, 26, 22, 0.2);
+  --ui-paper: #f6f2ea;
+  --ui-plate: rgba(247, 243, 235, 0.93);
+  --ui-night: #161514;
+  --ui-night-text: #ede7dc;
+  --ui-night-soft: rgba(237, 231, 220, 0.66);
+  --ui-halo: 0 0 10px rgba(250, 247, 240, 0.92), 0 0 2px rgba(250, 247, 240, 0.9);
+  --era-accent: #c98f4e;
+
+  /* type: one editorial serif + one functional sans (system stacks, no font download) */
+  --ui-font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --ui-font-text: "Segoe UI", ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --ui-size-archive-title: clamp(46px, 7.2vw, 108px);
+  --ui-size-era-name: clamp(24px, 2.6vw, 36px);
+  --ui-size-era-years: 13px;
+  --ui-size-track: clamp(21px, 1.9vw, 28px);
+  --ui-size-byline: 15px;
+  --ui-size-note: 14px;
+  --ui-size-micro: 10.5px;
+  --ui-size-control: 11px;
+  --ui-track-micro: 0.24em;
+
+  /* space (safe areas included) */
+  --ui-gutter: clamp(16px, 3vw, 44px);
+  --ui-top: max(var(--ui-gutter), env(safe-area-inset-top));
+  --ui-right: max(var(--ui-gutter), env(safe-area-inset-right));
+  --ui-bottom: max(var(--ui-gutter), env(safe-area-inset-bottom));
+  --ui-left: max(var(--ui-gutter), env(safe-area-inset-left));
+
+  /* motion */
+  --ui-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ui-fade: 0.55s;
+  --ui-intro-exit: 0.9s;
+}
+
+.ui-visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ui-micro {
+  margin: 0;
+  font: 600 var(--ui-size-micro) / 1.4 var(--ui-font-text);
+  letter-spacing: var(--ui-track-micro);
+  text-transform: uppercase;
+}
+
+/* --- buttons (all states visible without hover: focus-visible, active, disabled) --- */
+
+.ui-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: 36px;
+  padding: 0 14px;
+  font: 600 var(--ui-size-control) / 1 var(--ui-font-text);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ui-ink);
+  background: transparent;
+  border: 1px solid var(--ui-ink);
+  border-radius: 0;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    opacity 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ui-button:not(:disabled):hover {
+    color: var(--ui-paper);
+    background: var(--ui-ink);
+  }
+}
+
+.ui-button:focus-visible {
+  outline: 2px solid var(--ui-ink);
+  outline-offset: 3px;
+}
+
+.ui-button:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.ui-button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.ui-button.is-busy:not(:disabled) {
+  opacity: 0.6;
+}
+
+.ui-button[data-queued] {
+  box-shadow: inset 0 -3px 0 var(--era-accent);
+  opacity: 1;
+}
+
+.ui-button--quiet {
+  border-color: var(--ui-line);
+}
+
+.ui-button--primary {
+  min-height: 48px;
+  padding: 0 30px;
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  color: var(--ui-night-text);
+  border-color: var(--ui-night-text);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ui-button--primary:not(:disabled):hover {
+    color: var(--ui-night);
+    background: var(--ui-night-text);
+  }
+}
+
+.ui-button--primary:focus-visible {
+  outline-color: var(--ui-night-text);
+}
+
+/* --- intro / loading / fallback --- */
+
+.ui-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  padding: var(--ui-top) var(--ui-right) var(--ui-bottom) var(--ui-left);
+  color: var(--ui-night-text);
+  background:
+    radial-gradient(120% 90% at 78% 40%, rgba(201, 143, 78, 0.08), transparent 60%),
+    linear-gradient(160deg, #1b1a18 0%, var(--ui-night) 70%);
+  opacity: 1;
+  transition: opacity var(--ui-intro-exit) var(--ui-ease);
+}
+
+.ui-intro.is-leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ui-intro__body {
+  width: min(640px, 100%);
+  margin-left: clamp(0px, 9vw, 160px);
+  transition: transform var(--ui-intro-exit) var(--ui-ease);
+}
+
+.ui-intro.is-leaving .ui-intro__body {
+  transform: translateY(-14px);
+}
+
+.ui-intro__kicker {
+  font-size: 12px;
+  letter-spacing: 0.5em;
+  color: var(--ui-night-soft);
+}
+
+.ui-intro__title {
+  margin: 18px 0 0;
+  font: 400 var(--ui-size-archive-title) / 0.98 var(--ui-font-display);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.ui-intro__years {
+  margin: 22px 0 0;
+  font: 400 15px/1.4 var(--ui-font-text);
+  letter-spacing: 0.32em;
+  color: var(--ui-night-soft);
+}
+
+.ui-intro__premise {
+  margin: 28px 0 0;
+  font: italic 400 clamp(18px, 1.7vw, 23px) / 1.45 var(--ui-font-display);
+}
+
+.ui-intro__thesis {
+  margin-top: 26px;
+  color: var(--ui-night-soft);
+  letter-spacing: 0.2em;
+}
+
+.ui-intro__action {
+  min-height: 92px;
+  margin-top: 44px;
+}
+
+.ui-intro__note {
+  margin: 14px 0 0;
+  font: 400 13px/1.4 var(--ui-font-text);
+  color: var(--ui-night-soft);
+}
+
+.ui-intro__loading {
+  display: grid;
+  gap: 12px;
+  color: var(--ui-night-soft);
+}
+
+.ui-intro__bar {
+  width: min(220px, 60vw);
+  height: 1px;
+  background: rgba(237, 231, 220, 0.18);
+  overflow: hidden;
+}
+
+.ui-intro__bar span {
+  display: block;
+  height: 100%;
+  background: var(--ui-night-text);
+  transform-origin: left center;
+  transition: transform 0.35s ease;
+}
+
+.ui-intro--fallback .ui-intro__premise {
+  font-style: normal;
+}
+
+/* --- travel HUD --- */
+
+.ui-hud {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  color: var(--ui-ink);
+  text-shadow: var(--ui-halo);
+  animation: ui-fade-in 0.8s var(--ui-ease) both;
+}
+
+/* Soft light scrims behind the edge text keep it legible over dark era graphics (no blur). */
+.ui-hud::before,
+.ui-hud::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.ui-hud::before {
+  top: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, rgba(246, 242, 234, 0.45), transparent);
+}
+
+.ui-hud::after {
+  bottom: 0;
+  height: 170px;
+  background: linear-gradient(to top, rgba(246, 242, 234, 0.55), transparent);
+  transition: opacity var(--ui-fade) ease;
+}
+
+.ui-hud.is-focused::after {
+  opacity: 0;
+}
+
+.ui-hud p {
+  margin: 0;
+}
+
+.ui-hud__brand {
+  position: absolute;
+  top: var(--ui-top);
+  left: var(--ui-left);
+  z-index: 1;
+}
+
+.ui-hud__brand-mark {
+  letter-spacing: 0.42em;
+}
+
+.ui-hud__brand-name {
+  margin-top: 3px !important;
+  font: 400 15px/1.2 var(--ui-font-display);
+  letter-spacing: 0.04em;
+}
+
+.ui-hud__era,
+.ui-hud__loop,
+.ui-hud__hints {
+  position: absolute;
+  z-index: 1;
+  bottom: var(--ui-bottom);
+  transition:
+    opacity var(--ui-fade) ease,
+    visibility 0s linear 0s;
+}
+
+.ui-hud.is-focused .ui-hud__era,
+.ui-hud.is-focused .ui-hud__loop,
+.ui-hud.is-focused .ui-hud__hints {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--ui-fade) ease,
+    visibility 0s linear var(--ui-fade);
+}
+
+.ui-hud__era {
+  left: var(--ui-left);
+}
+
+.ui-hud__era-inner {
+  animation: ui-rise 0.6s var(--ui-ease) both;
+}
+
+.ui-hud__era-inner .ui-micro {
+  display: flex;
+  gap: 14px;
+}
+
+.ui-hud__stage {
+  color: var(--ui-ink-soft);
+  font-weight: 500;
+}
+
+.ui-hud__era-name {
+  margin-top: 6px !important;
+  padding-top: 8px;
+  font: 400 var(--ui-size-era-name) / 1.05 var(--ui-font-display);
+  letter-spacing: 0.06em;
+  border-top: 2px solid var(--era-accent);
+  display: inline-block;
+}
+
+.ui-hud__era-years {
+  margin-top: 6px !important;
+  font: 500 var(--ui-size-era-years) / 1.3 var(--ui-font-text);
+  letter-spacing: 0.24em;
+}
+
+.ui-hud__loop {
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0 0 6px;
+  list-style: none;
+  transform: translateX(-50%);
+}
+
+.ui-hud__loop li {
+  width: 16px;
+  height: 2px;
+  background: var(--ui-ink-faint);
+  transition:
+    width 0.6s var(--ui-ease),
+    background-color 0.6s ease;
+}
+
+.ui-hud__loop li.is-current {
+  width: 36px;
+  height: 3px;
+  background: var(--era-accent);
+  box-shadow: 0 0 0 1px rgba(250, 247, 240, 0.6);
+}
+
+.ui-hud__hints {
+  right: var(--ui-right);
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  text-align: right;
+}
+
+.ui-hud__hint {
+  transition: opacity 1.2s ease;
+}
+
+.ui-hud__hint:not(.is-on):not(.ui-hud__hint--travel) {
+  opacity: 0;
+}
+
+.ui-hud__hint--travel {
+  color: var(--ui-ink-soft);
+}
+
+.ui-hud__hint--travel.is-retired {
+  opacity: 0;
+}
+
+/* --- sound control --- */
+
+.ui-sound-slot {
+  position: fixed;
+  top: var(--ui-top);
+  right: var(--ui-right);
+  z-index: 7;
+  animation: ui-fade-in 0.8s var(--ui-ease) both;
+}
+
+.ui-sound {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 0 14px;
+  font: 600 var(--ui-size-control) / 1 var(--ui-font-text);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ui-ink);
+  background: var(--ui-plate);
+  border: 1px solid var(--ui-line);
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ui-sound:not(:disabled):hover {
+    color: var(--ui-paper);
+    background: var(--ui-ink);
+  }
+}
+
+.ui-sound:focus-visible {
+  outline: 2px solid var(--ui-ink);
+  outline-offset: 3px;
+}
+
+.ui-sound:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.ui-sound__glyph {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 10px;
+}
+
+.ui-sound__glyph i {
+  width: 2px;
+  background: currentColor;
+  transition: height 0.3s ease;
+}
+
+.ui-sound__glyph i:nth-child(1) {
+  height: 5px;
+}
+.ui-sound__glyph i:nth-child(2) {
+  height: 10px;
+}
+.ui-sound__glyph i:nth-child(3) {
+  height: 7px;
+}
+
+.ui-sound[data-state="muted"] .ui-sound__glyph i,
+.ui-sound[data-state="off"] .ui-sound__glyph i,
+.ui-sound[data-state="unavailable"] .ui-sound__glyph i {
+  height: 2px;
+}
+
+.ui-sound[data-state="off"] {
+  border-color: var(--ui-ink);
+}
+
+/* --- focus caption (archival label plate) --- */
+
+.ui-caption {
+  position: fixed;
+  z-index: 6;
+  right: var(--ui-right);
+  top: 50%;
+  width: min(372px, 31vw);
+  max-height: calc(100vh - var(--ui-top) - var(--ui-bottom) - 64px);
+  max-height: calc(100dvh - var(--ui-top) - var(--ui-bottom) - 64px);
+  /* A column: when space runs short only the record text scrolls — the controls never leave the plate. */
+  display: flex;
+  flex-direction: column;
+  padding: 20px 22px 16px;
+  color: var(--ui-ink);
+  background: var(--ui-plate);
+  border: 1px solid var(--ui-line);
+  border-top: 3px solid var(--era-accent);
+  opacity: 0;
+  transform: translate(10px, -50%);
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s var(--ui-ease);
+  pointer-events: none;
+}
+
+.ui-caption.is-visible {
+  opacity: 1;
+  transform: translate(0, -50%);
+  pointer-events: auto;
+}
+
+.ui-caption p,
+.ui-caption h2 {
+  margin: 0;
+}
+
+.ui-caption__era {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  color: var(--ui-ink-soft);
+}
+
+.ui-caption__record {
+  touch-action: pan-y;
+  overscroll-behavior-y: contain;
+  min-height: 0;
+  overflow-y: auto;
+  margin-top: 16px;
+  animation: ui-rise 0.5s var(--ui-ease) both;
+  transition: opacity 0.4s ease;
+}
+
+.ui-caption.is-changing .ui-caption__record {
+  opacity: 0.72;
+}
+
+.ui-caption__catalogue {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.ui-caption__number {
+  padding-bottom: 2px;
+  border-bottom: 2px solid var(--era-accent);
+}
+
+.ui-caption__position {
+  color: var(--ui-ink-soft);
+}
+
+.ui-caption__title {
+  margin-top: 14px !important;
+  font: 400 var(--ui-size-track) / 1.12 var(--ui-font-display);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.ui-caption__byline {
+  margin-top: 6px !important;
+  font: 400 var(--ui-size-byline) / 1.35 var(--ui-font-text);
+}
+
+.ui-caption__kicker {
+  margin-top: 2px !important;
+  font: italic 400 14px/1.35 var(--ui-font-display);
+  color: var(--ui-ink-soft);
+}
+
+.ui-caption__meta {
+  margin-top: 10px !important;
+  color: var(--ui-ink-soft);
+}
+
+.ui-caption__note {
+  margin-top: 14px !important;
+  padding-top: 12px;
+  font: 400 var(--ui-size-note) / 1.55 var(--ui-font-display);
+  color: var(--ui-ink-soft);
+  border-top: 1px solid var(--ui-line);
+}
+
+.ui-caption__dna {
+  margin-top: 10px !important;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: var(--ui-ink-soft);
+}
+
+.ui-caption__dna-label {
+  font-weight: 700;
+  color: var(--ui-ink);
+  margin-right: 6px;
+}
+
+.ui-caption__status {
+  flex: none;
+  min-height: 1.4em;
+  margin-top: 12px !important;
+  color: var(--ui-ink-soft);
+}
+
+.ui-caption__controls {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.ui-caption__close {
+  margin-left: auto;
+}
+
+.ui-caption__keys {
+  margin-top: 12px !important;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--ui-ink-faint);
+}
+
+/* --- motion --- */
+
+@keyframes ui-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes ui-rise {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+}
+
+/* --- responsive --- */
+
+/* Caption placement follows the locked focus framing (measured by projecting the record, sleeve and deck
+   bounds at 1920×1080 … 390×844, docs/FINAL_UI.md §11): in LANDSCAPE windows the deck spans ≈31–63 % of
+   the width with the sleeve at the lower left, so the caption takes the right column; in PORTRAIT / square
+   windows the deck starts at ≈42 % of the height, so the caption takes the top band and ends above it. */
+
+/* Landscape but narrow: keep the right column, compact. */
+@media (max-width: 899px) and (min-aspect-ratio: 1001/1000) {
+  .ui-caption {
+    width: min(320px, 36vw);
+    padding: 14px 16px 12px;
+  }
+
+  .ui-caption__title {
+    font-size: 20px;
+  }
+
+  .ui-caption__note {
+    font-size: 13px;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .ui-caption__dna,
+  .ui-caption__keys {
+    display: none;
+  }
+}
+
+/* Portrait / square: the top band, ending above the deck. */
+@media (max-aspect-ratio: 1/1) {
+  .ui-caption {
+    left: var(--ui-left);
+    right: var(--ui-right);
+    top: calc(var(--ui-top) + 52px);
+    width: auto;
+    max-width: 620px;
+    max-height: calc(41vh - var(--ui-top) - 52px);
+    max-height: calc(41dvh - var(--ui-top) - 52px);
+    padding: 14px 16px 12px;
+    transform: translateY(-6px);
+  }
+
+  .ui-caption.is-visible {
+    transform: none;
+  }
+
+  .ui-caption__record {
+    margin-top: 10px;
+  }
+
+  .ui-caption__title {
+    margin-top: 8px !important;
+    font-size: clamp(18px, 4.6vw, 24px);
+  }
+
+  .ui-caption__note {
+    margin-top: 10px !important;
+    padding-top: 8px;
+    font-size: 13px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .ui-caption__dna,
+  .ui-caption__keys {
+    display: none;
+  }
+
+  .ui-caption__status {
+    margin-top: 8px !important;
+  }
+}
+
+/* Phones (portrait): the most compact caption — byline / kicker / meta tighten; the full note stays in the scrolling record pane. */
+@media (max-aspect-ratio: 1/1) and (max-width: 480px) {
+  .ui-caption {
+    padding: 12px 14px 10px;
+  }
+
+  .ui-caption__byline {
+    font-size: 14px;
+  }
+
+  .ui-caption__note {
+    /* The record pane scrolls: the full significance remains available, not permanently clamped. */
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+  }
+
+  .ui-caption__controls .ui-button {
+    padding: 0 10px;
+    letter-spacing: 0.14em;
+  }
+}
+
+@media (max-width: 640px) {
+  .ui-button,
+  .ui-sound {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .ui-intro {
+    height: 100dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .ui-intro__body {
+    margin-left: 0;
+  }
+
+  .ui-hud__loop {
+    left: var(--ui-left);
+    bottom: auto;
+    top: calc(var(--ui-top) + 46px);
+    transform: none;
+    padding: 0;
+  }
+
+  .ui-hud__hints {
+    max-width: 46vw;
+  }
+
+  .ui-hud__brand-name {
+    font-size: 13px;
+  }
+
+  .ui-sound span:last-child {
+    letter-spacing: 0.14em;
+  }
+}
+
+/* Short landscape phones retain the intro's content and entry button inside the safe viewport. */
+@media (max-height: 600px) {
+  .ui-intro {
+    align-items: flex-start;
+    overflow-y: auto;
+    height: 100dvh;
+  }
+}
+
+@media (pointer: coarse) {
+  .ui-caption__keys {
+    display: none;
+  }
+
+  .ui-button,
+  .ui-sound {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ui-intro-exit: 0.2s;
+    --ui-fade: 0.2s;
+  }
+
+  .ui-hud,
+  .ui-sound-slot,
+  .ui-hud__era-inner,
+  .ui-caption__record {
+    animation: none;
+  }
+
+  .ui-intro.is-leaving .ui-intro__body,
+  .ui-caption,
+  .ui-caption.is-visible {
+    transform: none;
+  }
+
+  @media (min-aspect-ratio: 1001/1000) {
+    .ui-caption,
+    .ui-caption.is-visible {
+      transform: translateY(-50%);
+    }
+  }
+
+  .ui-hud__loop li,
+  .ui-intro__bar span,
+  .ui-hud__hint {
+    transition: none;
+  }
+
+  .ui-button:not(:disabled):active {
+    transform: none;
+  }
+}
