@@ -34,6 +34,7 @@ import { TonearmMotionSystem } from "@/stations/tonearmMotion";
 import type { StationRig } from "@/stations/ListeningStation";
 import { ArchiveErrorBoundary, ArchiveFallback, supportsWebGL } from "@/ui/ArchiveFallback";
 import { FocusOverlay } from "@/ui/FocusOverlay";
+import { ExitArchive } from "@/ui/ExitArchive";
 import { SoundToggle } from "@/ui/SoundToggle";
 import { TravelHud } from "@/ui/TravelHud";
 import { DevPanel } from "@/ui/dev/DevPanel";
@@ -74,6 +75,7 @@ function MuseumExperience() {
   const [entered, setEntered] = useState(!config.intro);
   const [introGone, setIntroGone] = useState(!config.intro);
   const [covered, setCovered] = useState(false);
+  const [returningHome, setReturningHome] = useState(false);
   const handleEnter = useCallback(() => {
     setCovered(false);
     setEntered(true);
@@ -160,6 +162,14 @@ function MuseumExperience() {
     };
   });
   const { platters, tonearms, records } = deck;
+  const handleExit = useCallback(() => {
+    if (records.controller.changing) return;
+    audio.stop();
+    setReturningHome(true);
+    setEntered(false);
+    setIntroGone(false);
+    setCovered(true);
+  }, [audio, records]);
   // Focus exit is locked while a record is being changed (remembered, then honoured once stable).
   useEffect(() => {
     focus.setExitGuard(() => records.controller.allowFocusExit());
@@ -208,7 +218,7 @@ function MuseumExperience() {
       <div className="museum-stage">
         <Canvas
           className="museum-canvas"
-          dpr={[0, QUALITY_SETTINGS[config.quality].maxDpr]}
+          dpr={[1, QUALITY_SETTINGS[config.quality].maxDpr]}
           frameloop={covered && !entered ? "demand" : "always"}
           camera={{ fov: 50, near: 0.05, far: 1000, position: [40, 30, 40] }}
           gl={{ antialias: QUALITY_SETTINGS[config.quality].antialias }}
@@ -228,7 +238,7 @@ function MuseumExperience() {
                 qualityOverride={lodOverride}
                 statsRef={config.inspector ? stationStatsRef : undefined}
                 logAlignment={config.stationLog}
-                interaction={cameraMode === "travel" ? { focus, travel, showVolume: hallOptions.volumes } : undefined}
+                interaction={cameraMode === "travel" && entered ? { focus, travel, showVolume: hallOptions.volumes } : undefined}
                 platters={platters}
                 rotationMarker={config.platterMarker}
                 tonearms={tonearms}
@@ -270,13 +280,14 @@ function MuseumExperience() {
         />
       )}
       {cameraMode === "travel" && entered && <TravelHud activeEra={activeEra} focus={focus} />}
-      {cameraMode === "travel" && <FocusOverlay focus={focus} audio={audio} records={records.controller} />}
+      {cameraMode === "travel" && entered && <FocusOverlay focus={focus} audio={audio} records={records.controller} />}
       {entered && (
         <div className="ui-sound-slot">
+          {introGone && <ExitArchive records={records.controller} onExit={handleExit} />}
           <SoundToggle audio={audio} />
         </div>
       )}
-      {!introGone && <Prologue audio={audio} isSceneReady={isSceneReady} onEnter={handleEnter} onExited={handleIntroExited} onCoverChange={setCovered} />}
+      {!introGone && <Prologue returningHome={returningHome} audio={audio} isSceneReady={isSceneReady} onEnter={handleEnter} onExited={handleIntroExited} onCoverChange={setCovered} />}
     </>
   );
 }

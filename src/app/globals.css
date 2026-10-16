@@ -141,8 +141,8 @@ body {
   --ui-halo: 0 0 10px rgba(250, 247, 240, 0.92), 0 0 2px rgba(250, 247, 240, 0.9);
   --era-accent: #c98f4e;
 
-  /* type: one editorial serif + one functional sans (system stacks, no font download) */
-  --ui-font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  /* Shared with the home story: self-hosted Ojuju display + functional system sans. */
+  --ui-font-display: var(--font-ojuju), "Ojuju", var(--ui-font-text);
   --ui-font-text: "Segoe UI", ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
   --ui-size-archive-title: clamp(46px, 7.2vw, 108px);
   --ui-size-era-name: clamp(24px, 2.6vw, 36px);
@@ -317,7 +317,7 @@ body {
 
 .ui-intro__premise {
   margin: 28px 0 0;
-  font: italic 400 clamp(18px, 1.7vw, 23px) / 1.45 var(--ui-font-display);
+  font: 400 clamp(18px, 1.7vw, 23px) / 1.45 var(--ui-font-display);
 }
 
 .ui-intro__thesis {
@@ -534,7 +534,16 @@ body {
   top: var(--ui-top);
   right: var(--ui-right);
   z-index: 7;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   animation: ui-fade-in 0.8s var(--ui-ease) both;
+}
+
+.ui-exit {
+  min-height: 36px;
+  background: var(--ui-plate);
+  white-space: nowrap;
 }
 
 .ui-sound {
@@ -693,7 +702,7 @@ body {
 
 .ui-caption__kicker {
   margin-top: 2px !important;
-  font: italic 400 14px/1.35 var(--ui-font-display);
+  font: 400 14px/1.35 var(--ui-font-display);
   color: var(--ui-ink-soft);
 }
 
@@ -867,6 +876,33 @@ body {
 }
 
 @media (max-width: 640px) {
+  .ui-sound-slot {
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ui-sound-slot .ui-button,
+  .ui-sound-slot .ui-sound {
+    padding-inline: 10px;
+    letter-spacing: 0.1em;
+    justify-content: center;
+  }
+
+  /* Keep both actions in the existing top band, clear of the listening caption. The
+     sound button retains its full accessible state label and title when compact. */
+  .ui-sound-slot .ui-sound {
+    width: 44px;
+    padding-inline: 12px;
+  }
+
+  .ui-sound-slot .ui-sound > span:last-child {
+    display: none;
+  }
+
+  .ui-hud__brand-name {
+    max-width: calc(100vw - 220px);
+  }
+
   .ui-button,
   .ui-sound {
     min-width: 44px;

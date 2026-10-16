@@ -1,0 +1,623 @@
+{
+  "tile": 512,
+  "padding": 8,
+  "atlas": {
+    "width": 2048,
+    "height": 1024
+  },
+  "font": "Ojuju",
+  "tiles": [
+    {
+      "id": "roots",
+      "title": "ROOTS",
+      "number": "01",
+      "years": "1900–1919",
+      "illustrationSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"512\" height=\"512\" viewBox=\"0 0 512 512\"><defs><linearGradient id=\"chrome\"><stop stop-color=\"#f9fafb\"/><stop offset=\".3\" stop-color=\"#83919e\"/><stop offset=\".54\" stop-color=\"#f4f5f7\"/><stop offset=\".76\" stop-color=\"#91aab1\"/><stop offset=\"1\" stop-color=\"#d4d5e2\"/></linearGradient><clipPath id=\"lower\"><rect x=\"0\" y=\"290\" width=\"512\" height=\"205\"/></clipPath></defs><clipPath id=\"shape\"><path d=\"M16 8H496V482L480 496H32L16 482Z\"/></clipPath><g clip-path=\"url(#shape)\"><path d=\"M16 8H496V482L480 496H32L16 482Z\" fill=\"#3a2a1f\"/><path d=\"M36 38L474 38\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M18 312l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M54 312l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M90 312l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M126 312l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M162 312l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M198 312l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M234 312l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M270 312l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M306 312l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M342 312l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M378 312l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M414 312l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M450 312l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M18 340l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M54 340l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M90 340l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M126 340l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M162 340l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M198 340l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M234 340l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M270 340l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M306 340l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M342 340l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M378 340l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M414 340l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M450 340l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M18 368l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M54 368l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M90 368l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M126 368l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M162 368l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M198 368l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M234 368l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M270 368l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M306 368l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M342 368l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M378 368l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M414 368l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M450 368l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M18 396l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M54 396l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M90 396l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M126 396l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M162 396l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M198 396l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M234 396l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M270 396l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M306 396l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M342 396l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M378 396l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M414 396l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M450 396l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M18 424l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M54 424l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M90 424l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M126 424l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M162 424l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M198 424l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M234 424l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M270 424l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M306 424l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M342 424l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M378 424l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M414 424l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M450 424l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M18 452l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M54 452l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M90 452l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M126 452l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M162 452l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M198 452l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M234 452l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M270 452l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M306 452l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M342 452l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M378 452l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M414 452l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M450 452l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#f0e5d3\" stroke-width=\"3\"/><path d=\"M18 480l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M54 480l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M90 480l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M126 480l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M162 480l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M198 480l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M234 480l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M270 480l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M306 480l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M342 480l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M378 480l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M414 480l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M450 480l18 -14 18 14 -18 14z\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"3\"/><path d=\"M24 484L24 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M34 484L34 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M44 484L44 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M54 484L54 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M64 484L64 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M74 484L74 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M84 484L84 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M94 484L94 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M104 484L104 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M114 484L114 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M124 484L124 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M134 484L134 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M144 484L144 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M154 484L154 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M164 484L164 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M174 484L174 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M184 484L184 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M194 484L194 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M204 484L204 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M214 484L214 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M224 484L224 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M234 484L234 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M244 484L244 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M254 484L254 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M264 484L264 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M274 484L274 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M284 484L284 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M294 484L294 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M304 484L304 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M314 484L314 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M324 484L324 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M334 484L334 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M344 484L344 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M354 484L354 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M364 484L364 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M374 484L374 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M384 484L384 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M394 484L394 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M404 484L404 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M414 484L414 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M424 484L424 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M434 484L434 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M444 484L444 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M454 484L454 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M464 484L464 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M474 484L474 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M484 484L484 500\" fill=\"none\" stroke=\"#c98f4e\" stroke-width=\"2\" /><path d=\"M212 326Q256 355 300 326L281 451Q256 432 231 451Z\" fill=\"#f0e5d3\"/><ellipse cx=\"256\" cy=\"327\" rx=\"45\" ry=\"12\" fill=\"#c98f4e\"/><path d=\"M214 330L232 449\" fill=\"none\" stroke=\"#3a2a1f\" stroke-width=\"2\" /><path d=\"M228 330L240 449\" fill=\"none\" stroke=\"#3a2a1f\" stroke-width=\"2\" /><path d=\"M242 330L248 449\" fill=\"none\" stroke=\"#3a2a1f\" stroke-width=\"2\" /><path d=\"M256 330L256 449\" fill=\"none\" stroke=\"#3a2a1f\" stroke-width=\"2\" /><path d=\"M270 330L264 449\" fill=\"none\" stroke=\"#3a2a1f\" stroke-width=\"2\" /><path d=\"M284 330L272 449\" fill=\"none\" stroke=\"#3a2a1f\" stroke-width=\"2\" /><path d=\"M298 330L280 449\" fill=\"none\" stroke=\"#3a2a1f\" stroke-width=\"2\" /></g></svg>",
+      "texts": [
+        {
+          "text": "BEFORE RECORDS,",
+          "x": 36,
+          "baseline": 166,
+          "size": 27,
+          "weight": 700,
+          "color": "#f0e5d3",
+          "spacing": -0.5,
+          "width": 225.83687605272797,
+          "rotation": null
+        },
+        {
+          "text": "NIGERIA ALREADY HAD",
+          "x": 36,
+          "baseline": 197,
+          "size": 27,
+          "weight": 700,
+          "color": "#f0e5d3",
+          "spacing": -0.5,
+          "width": 279.06205254485536,
+          "rotation": null
+        },
+        {
+          "text": "HUNDREDS OF MUSICAL",
+          "x": 36,
+          "baseline": 228,
+          "size": 27,
+          "weight": 700,
+          "color": "#f0e5d3",
+          "spacing": -0.5,
+          "width": 286.5466977297693,
+          "rotation": null
+        },
+        {
+          "text": "LANGUAGES.",
+          "x": 36,
+          "baseline": 259,
+          "size": 27,
+          "weight": 700,
+          "color": "#f0e5d3",
+          "spacing": -0.5,
+          "width": 149.3818138044673,
+          "rotation": null
+        },
+        {
+          "text": "01",
+          "x": 36,
+          "baseline": 70,
+          "size": 19,
+          "weight": 400,
+          "color": "#f0e5d3",
+          "spacing": 0,
+          "width": 18.60925453118057,
+          "rotation": null
+        },
+        {
+          "text": "ROOTS",
+          "x": 36,
+          "baseline": 121,
+          "size": 49,
+          "weight": 700,
+          "color": "#f0e5d3",
+          "spacing": -1.5,
+          "width": 145.32607860368608,
+          "rotation": null
+        }
+      ]
+    },
+    {
+      "id": "recording",
+      "title": "RECORDING",
+      "number": "02",
+      "years": "1920–1944",
+      "illustrationSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"512\" height=\"512\" viewBox=\"0 0 512 512\"><defs><linearGradient id=\"chrome\"><stop stop-color=\"#f9fafb\"/><stop offset=\".3\" stop-color=\"#83919e\"/><stop offset=\".54\" stop-color=\"#f4f5f7\"/><stop offset=\".76\" stop-color=\"#91aab1\"/><stop offset=\"1\" stop-color=\"#d4d5e2\"/></linearGradient><clipPath id=\"lower\"><rect x=\"0\" y=\"290\" width=\"512\" height=\"205\"/></clipPath></defs><clipPath id=\"shape\"><path d=\"M20 16H472L492 36V492H20Z\"/></clipPath><g clip-path=\"url(#shape)\"><path d=\"M20 16H472L492 36V492H20Z\" fill=\"#e3d6bb\"/><path d=\"M36 38L474 38\" fill=\"none\" stroke=\"#9c754d\" stroke-width=\"2\" /><rect x=\"24\" y=\"291\" width=\"464\" height=\"189\" fill=\"#f1ead9\" /><path d=\"M36 309L476 309\" fill=\"none\" stroke=\"#9c754d\" stroke-width=\"1\" opacity=\".28\"/><path d=\"M36 330L476 330\" fill=\"none\" stroke=\"#9c754d\" stroke-width=\"1\" opacity=\".28\"/><path d=\"M36 351L476 351\" fill=\"none\" stroke=\"#9c754d\" stroke-width=\"1\" opacity=\".28\"/><path d=\"M36 372L476 372\" fill=\"none\" stroke=\"#9c754d\" stroke-width=\"1\" opacity=\".28\"/><path d=\"M36 393L476 393\" fill=\"none\" stroke=\"#9c754d\" stroke-width=\"1\" opacity=\".28\"/><path d=\"M36 414L476 414\" fill=\"none\" stroke=\"#9c754d\" stroke-width=\"1\" opacity=\".28\"/><path d=\"M36 435L476 435\" fill=\"none\" stroke=\"#9c754d\" stroke-width=\"1\" opacity=\".28\"/><path d=\"M36 456L476 456\" fill=\"none\" stroke=\"#9c754d\" stroke-width=\"1\" opacity=\".28\"/><circle cx=\"315\" cy=\"390\" r=\"86\" fill=\"#171615\" /><circle cx=\"315\" cy=\"390\" r=\"35\" fill=\"none\" stroke=\"#938372\" stroke-width=\".7\"/><circle cx=\"315\" cy=\"390\" r=\"42\" fill=\"none\" stroke=\"#938372\" stroke-width=\".7\"/><circle cx=\"315\" cy=\"390\" r=\"49\" fill=\"none\" stroke=\"#938372\" stroke-width=\".7\"/><circle cx=\"315\" cy=\"390\" r=\"56\" fill=\"none\" stroke=\"#938372\" stroke-width=\".7\"/><circle cx=\"315\" cy=\"390\" r=\"63\" fill=\"none\" stroke=\"#938372\" stroke-width=\".7\"/><circle cx=\"315\" cy=\"390\" r=\"70\" fill=\"none\" stroke=\"#938372\" stroke-width=\".7\"/><circle cx=\"315\" cy=\"390\" r=\"77\" fill=\"none\" stroke=\"#938372\" stroke-width=\".7\"/><circle cx=\"315\" cy=\"390\" r=\"28\" fill=\"#9c754d\" /><circle cx=\"315\" cy=\"390\" r=\"3\" fill=\"#f1ead9\" /><path d=\"M47 375L171 375\" fill=\"none\" stroke=\"#9c754d\" stroke-width=\"2\" /><path d=\"M47 386L150 386\" fill=\"none\" stroke=\"#9c754d\" stroke-width=\"2\" /></g></svg>",
+      "texts": [
+        {
+          "text": "MUSIC BECOMES",
+          "x": 36,
+          "baseline": 166,
+          "size": 31,
+          "weight": 700,
+          "color": "#312b25",
+          "spacing": -0.5,
+          "width": 232.3221882094471,
+          "rotation": null
+        },
+        {
+          "text": "REPRODUCIBLE.",
+          "x": 36,
+          "baseline": 201,
+          "size": 31,
+          "weight": 700,
+          "color": "#312b25",
+          "spacing": -0.5,
+          "width": 227.22717380690833,
+          "rotation": null
+        },
+        {
+          "text": "02",
+          "x": 36,
+          "baseline": 70,
+          "size": 19,
+          "weight": 400,
+          "color": "#312b25",
+          "spacing": 0,
+          "width": 21.331640931993505,
+          "rotation": null
+        },
+        {
+          "text": "RECORDING",
+          "x": 36,
+          "baseline": 121,
+          "size": 43,
+          "weight": 700,
+          "color": "#312b25",
+          "spacing": -1.5,
+          "width": 226.7372386183327,
+          "rotation": null
+        },
+        {
+          "text": "78",
+          "x": 303.5709778460411,
+          "baseline": 398,
+          "size": 22,
+          "weight": 400,
+          "color": "#312b25",
+          "spacing": 0,
+          "width": 22.858044307917798,
+          "rotation": null
+        },
+        {
+          "text": "CAT.",
+          "x": 47,
+          "baseline": 334,
+          "size": 17,
+          "weight": 400,
+          "color": "#312b25",
+          "spacing": 0,
+          "width": 32.44102973000634,
+          "rotation": null
+        },
+        {
+          "text": "A02",
+          "x": 47,
+          "baseline": 359,
+          "size": 31,
+          "weight": 400,
+          "color": "#312b25",
+          "spacing": 0,
+          "width": 53.023503595799866,
+          "rotation": null
+        }
+      ]
+    },
+    {
+      "id": "highlife",
+      "title": "HIGH-LIFE",
+      "number": "03",
+      "years": "1945–1966",
+      "illustrationSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"512\" height=\"512\" viewBox=\"0 0 512 512\"><defs><linearGradient id=\"chrome\"><stop stop-color=\"#f9fafb\"/><stop offset=\".3\" stop-color=\"#83919e\"/><stop offset=\".54\" stop-color=\"#f4f5f7\"/><stop offset=\".76\" stop-color=\"#91aab1\"/><stop offset=\"1\" stop-color=\"#d4d5e2\"/></linearGradient><clipPath id=\"lower\"><rect x=\"0\" y=\"290\" width=\"512\" height=\"205\"/></clipPath></defs><clipPath id=\"shape\"><path d=\"M16 106Q16 8 115 8H397Q496 8 496 106V492H16Z\"/></clipPath><g clip-path=\"url(#shape)\"><path d=\"M16 106Q16 8 115 8H397Q496 8 496 106V492H16Z\" fill=\"#114340\"/><path d=\"M36 38L474 38\" fill=\"none\" stroke=\"#e1b24f\" stroke-width=\"2\" /><path d=\"M36 490V398a220 120 0 0 1 440 0V490\" fill=\"none\" stroke=\"#ead8ac\" stroke-width=\"12\"/><path d=\"M64 490V382a192 106 0 0 1 384 0V490\" fill=\"none\" stroke=\"#e1b24f\" stroke-width=\"12\"/><path d=\"M92 490V366a164 92 0 0 1 328 0V490\" fill=\"none\" stroke=\"#ead8ac\" stroke-width=\"12\"/><path d=\"M120 490V350a136 78 0 0 1 272 0V490\" fill=\"none\" stroke=\"#e1b24f\" stroke-width=\"12\"/><path d=\"M148 490V334a108 64 0 0 1 216 0V490\" fill=\"none\" stroke=\"#ead8ac\" stroke-width=\"12\"/><path d=\"M176 490V318a80 50 0 0 1 160 0V490\" fill=\"none\" stroke=\"#e1b24f\" stroke-width=\"12\"/><path d=\"M80 435L337 347l77 -40 -6 89 -68 -28 -237 90Z\" fill=\"#e1b24f\"/><circle cx=\"406\" cy=\"352\" r=\"34\" fill=\"#114340\" stroke=\"#f3ecdb\" stroke-width=\"5\"/></g></svg>",
+      "texts": [
+        {
+          "text": "THE SOUNDTRACK OF A",
+          "x": 36,
+          "baseline": 166,
+          "size": 31,
+          "weight": 700,
+          "color": "#f3ecdb",
+          "spacing": -0.5,
+          "width": 321.53815269132195,
+          "rotation": null
+        },
+        {
+          "text": "COUNTRY BECOMING",
+          "x": 36,
+          "baseline": 201,
+          "size": 31,
+          "weight": 700,
+          "color": "#f3ecdb",
+          "spacing": -0.5,
+          "width": 290.6134940192848,
+          "rotation": null
+        },
+        {
+          "text": "MODERN.",
+          "x": 36,
+          "baseline": 236,
+          "size": 31,
+          "weight": 700,
+          "color": "#f3ecdb",
+          "spacing": -0.5,
+          "width": 131.80278109361652,
+          "rotation": null
+        },
+        {
+          "text": "03",
+          "x": 36,
+          "baseline": 70,
+          "size": 19,
+          "weight": 400,
+          "color": "#f3ecdb",
+          "spacing": 0,
+          "width": 20.758947731587035,
+          "rotation": null
+        },
+        {
+          "text": "HIGH-LIFE",
+          "x": 36,
+          "baseline": 121,
+          "size": 49,
+          "weight": 700,
+          "color": "#f3ecdb",
+          "spacing": -1.5,
+          "width": 231.28959019895038,
+          "rotation": null
+        }
+      ]
+    },
+    {
+      "id": "explosion",
+      "title": "EXPLOSION",
+      "number": "04",
+      "years": "1967–1989",
+      "illustrationSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"512\" height=\"512\" viewBox=\"0 0 512 512\"><defs><linearGradient id=\"chrome\"><stop stop-color=\"#f9fafb\"/><stop offset=\".3\" stop-color=\"#83919e\"/><stop offset=\".54\" stop-color=\"#f4f5f7\"/><stop offset=\".76\" stop-color=\"#91aab1\"/><stop offset=\"1\" stop-color=\"#d4d5e2\"/></linearGradient><clipPath id=\"lower\"><rect x=\"0\" y=\"290\" width=\"512\" height=\"205\"/></clipPath></defs><clipPath id=\"shape\"><path d=\"M24 8L486 20 496 485 14 496Z\"/></clipPath><g clip-path=\"url(#shape)\"><path d=\"M24 8L486 20 496 485 14 496Z\" fill=\"#7b2416\"/><path d=\"M36 38L474 38\" fill=\"none\" stroke=\"#f0c63a\" stroke-width=\"2\" /><g clip-path=\"url(#lower)\"><path d=\"M256 395L546 395L542.2959121789318 441.20227991813135Z\" fill=\"#f0c63a\"/><path d=\"M256 395L507.14736709748723 540L480.8383929875279 578.1603042113272Z\" fill=\"#183c2b\"/><path d=\"M256 395L401 646.1473670974872L359.13560796760464 666.0406729056592Z\" fill=\"#f0c63a\"/><path d=\"M256 395L256 685L209.7977200818687 681.2959121789318Z\" fill=\"#183c2b\"/><path d=\"M256 395L111.00000000000006 646.1473670974872L72.83969578867277 619.838392987528Z\" fill=\"#f0c63a\"/><path d=\"M256 395L4.852632902512767 540L-15.040672905659278 498.1356079676045Z\" fill=\"#183c2b\"/><path d=\"M256 395L-34 395.00000000000006L-30.295912178931815 348.79772008186865Z\" fill=\"#f0c63a\"/><path d=\"M256 395L4.852632902512738 250.00000000000009L31.161607012472018 211.83969578867277Z\" fill=\"#183c2b\"/><path d=\"M256 395L110.99999999999986 143.85263290251285L152.86439203239536 123.95932709434078Z\" fill=\"#f0c63a\"/><path d=\"M256 395L255.99999999999994 105L302.2022799181313 108.70408782106819Z\" fill=\"#183c2b\"/><path d=\"M256 395L401 143.8526329025128L439.16030421132734 170.1616070124721Z\" fill=\"#f0c63a\"/><path d=\"M256 395L507.1473670974871 249.99999999999986L527.0406729056592 291.86439203239536Z\" fill=\"#183c2b\"/><g transform=\"rotate(-7 110 348)\"><rect x=\"28\" y=\"296\" width=\"156\" height=\"91\" fill=\"#f7efdf\" /><path d=\"M40 349L162 349\" fill=\"none\" stroke=\"#7b2416\" stroke-width=\"2\" /><path d=\"M40 358L151 358\" fill=\"none\" stroke=\"#7b2416\" stroke-width=\"2\" /></g><g transform=\"rotate(8 380 354)\"><rect x=\"310\" y=\"298\" width=\"175\" height=\"104\" fill=\"#183c2b\" /></g><circle cx=\"255\" cy=\"420\" r=\"67\" fill=\"#7b2416\" stroke=\"#f7efdf\" stroke-width=\"5\"/><circle cx=\"255\" cy=\"420\" r=\"28\" fill=\"#f0c63a\" /><circle cx=\"255\" cy=\"420\" r=\"5\" fill=\"#183c2b\" /></g></g></svg>",
+      "texts": [
+        {
+          "text": "EVERYTHING EXPLODES.",
+          "x": 36,
+          "baseline": 166,
+          "size": 31,
+          "weight": 700,
+          "color": "#f7efdf",
+          "spacing": -0.5,
+          "width": 342.80960252654705,
+          "rotation": null
+        },
+        {
+          "text": "04",
+          "x": 36,
+          "baseline": 70,
+          "size": 19,
+          "weight": 400,
+          "color": "#f7efdf",
+          "spacing": 0,
+          "width": 22.76746839923223,
+          "rotation": null
+        },
+        {
+          "text": "EXPLOSION",
+          "x": 36,
+          "baseline": 121,
+          "size": 49,
+          "weight": 700,
+          "color": "#f7efdf",
+          "spacing": -1.5,
+          "width": 249.86553625045775,
+          "rotation": null
+        },
+        {
+          "text": "JÙJÚ",
+          "x": 40,
+          "baseline": 335,
+          "size": 29,
+          "weight": 700,
+          "color": "#7b2416",
+          "spacing": 0,
+          "width": 63.26497778591482,
+          "rotation": {
+            "angle": -7,
+            "x": 110,
+            "y": 348
+          }
+        },
+        {
+          "text": "AFROBEAT",
+          "x": 319,
+          "baseline": 331,
+          "size": 22,
+          "weight": 700,
+          "color": "#f7efdf",
+          "spacing": 0,
+          "width": 108.31991077749299,
+          "rotation": {
+            "angle": 8,
+            "x": 380,
+            "y": 354
+          }
+        },
+        {
+          "text": "FÚJÌ / FUNK",
+          "x": 319,
+          "baseline": 367,
+          "size": 21,
+          "weight": 400,
+          "color": "#f0c63a",
+          "spacing": 0,
+          "width": 110.16641689722657,
+          "rotation": {
+            "angle": 8,
+            "x": 380,
+            "y": 354
+          }
+        }
+      ]
+    },
+    {
+      "id": "transition",
+      "title": "TRANSITION",
+      "number": "05",
+      "years": "1990–1999",
+      "illustrationSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"512\" height=\"512\" viewBox=\"0 0 512 512\"><defs><linearGradient id=\"chrome\"><stop stop-color=\"#f9fafb\"/><stop offset=\".3\" stop-color=\"#83919e\"/><stop offset=\".54\" stop-color=\"#f4f5f7\"/><stop offset=\".76\" stop-color=\"#91aab1\"/><stop offset=\"1\" stop-color=\"#d4d5e2\"/></linearGradient><clipPath id=\"lower\"><rect x=\"0\" y=\"290\" width=\"512\" height=\"205\"/></clipPath></defs><clipPath id=\"shape\"><path d=\"M48 8H464L496 40V460L464 492H48L16 460V40Z\"/></clipPath><g clip-path=\"url(#shape)\"><path d=\"M48 8H464L496 40V460L464 492H48L16 460V40Z\" fill=\"#273758\"/><path d=\"M36 38L474 38\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"2\" /><rect x=\"25\" y=\"290\" width=\"462\" height=\"193\" fill=\"#161e32\" rx=\"31\" stroke=\"#8c879e\" stroke-width=\"5\"/><rect x=\"44\" y=\"308\" width=\"424\" height=\"112\" fill=\"#78658e\" rx=\"15\"/><path d=\"M48 312L464 312\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 317L464 317\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 322L464 322\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 327L464 327\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 332L464 332\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 337L464 337\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 342L464 342\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 347L464 347\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 352L464 352\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 357L464 357\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 362L464 362\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 367L464 367\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 372L464 372\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 377L464 377\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 382L464 382\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 387L464 387\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 392L464 392\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 397L464 397\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 402L464 402\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 407L464 407\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 412L464 412\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M48 417L464 417\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"1\" opacity=\".35\"/><path d=\"M63 370Q148 320 248 365T448 361\" fill=\"none\" stroke=\"#86b9dc\" stroke-width=\"3\"/><rect x=\"145\" y=\"369\" width=\"218\" height=\"99\" fill=\"#b6b4be\" rx=\"8\"/><rect x=\"162\" y=\"385\" width=\"184\" height=\"47\" fill=\"#273758\" rx=\"7\"/><circle cx=\"193\" cy=\"408\" r=\"19\" fill=\"#e0e4e6\" /><circle cx=\"193\" cy=\"408\" r=\"10\" fill=\"#78658e\" /><circle cx=\"193\" cy=\"408\" r=\"4\" fill=\"#e0e4e6\" /><circle cx=\"315\" cy=\"408\" r=\"19\" fill=\"#e0e4e6\" /><circle cx=\"315\" cy=\"408\" r=\"10\" fill=\"#78658e\" /><circle cx=\"315\" cy=\"408\" r=\"4\" fill=\"#e0e4e6\" /><path d=\"M175 456l14 -19h134l14 19Z\" fill=\"#78658e\"/></g></svg>",
+      "texts": [
+        {
+          "text": "A NEW GENERATION ASKS",
+          "x": 36,
+          "baseline": 166,
+          "size": 27,
+          "weight": 700,
+          "color": "#e0e4e6",
+          "spacing": -0.5,
+          "width": 309.65878194800445,
+          "rotation": null
+        },
+        {
+          "text": "WHAT NIGERIAN YOUTH",
+          "x": 36,
+          "baseline": 197,
+          "size": 27,
+          "weight": 700,
+          "color": "#e0e4e6",
+          "spacing": -0.5,
+          "width": 286.6484412303186,
+          "rotation": null
+        },
+        {
+          "text": "MUSIC SHOULD SOUND",
+          "x": 36,
+          "baseline": 228,
+          "size": 27,
+          "weight": 700,
+          "color": "#e0e4e6",
+          "spacing": -0.5,
+          "width": 268.2320082387403,
+          "rotation": null
+        },
+        {
+          "text": "LIKE.",
+          "x": 36,
+          "baseline": 259,
+          "size": 27,
+          "weight": 700,
+          "color": "#e0e4e6",
+          "spacing": -0.5,
+          "width": 63.564396924203606,
+          "rotation": null
+        },
+        {
+          "text": "05",
+          "x": 36,
+          "baseline": 70,
+          "size": 19,
+          "weight": 400,
+          "color": "#e0e4e6",
+          "spacing": 0,
+          "width": 20.628695597606374,
+          "rotation": null
+        },
+        {
+          "text": "TRANSITION",
+          "x": 36,
+          "baseline": 121,
+          "size": 49,
+          "weight": 700,
+          "color": "#e0e4e6",
+          "spacing": -1.5,
+          "width": 270.6418136213842,
+          "rotation": null
+        },
+        {
+          "text": "90",
+          "x": 58,
+          "baseline": 462,
+          "size": 28,
+          "weight": 400,
+          "color": "#86b9dc",
+          "spacing": 2,
+          "width": 35.15204027992527,
+          "rotation": null
+        }
+      ]
+    },
+    {
+      "id": "naija",
+      "title": "NAIJA",
+      "number": "06",
+      "years": "2000–2009",
+      "illustrationSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"512\" height=\"512\" viewBox=\"0 0 512 512\"><defs><linearGradient id=\"chrome\"><stop stop-color=\"#f9fafb\"/><stop offset=\".3\" stop-color=\"#83919e\"/><stop offset=\".54\" stop-color=\"#f4f5f7\"/><stop offset=\".76\" stop-color=\"#91aab1\"/><stop offset=\"1\" stop-color=\"#d4d5e2\"/></linearGradient><clipPath id=\"lower\"><rect x=\"0\" y=\"290\" width=\"512\" height=\"205\"/></clipPath></defs><clipPath id=\"shape\"><path d=\"M16 8H496V492H16Z\"/></clipPath><g clip-path=\"url(#shape)\"><path d=\"M16 8H496V492H16Z\" fill=\"#ced4db\"/><path d=\"M36 38L474 38\" fill=\"none\" stroke=\"#245df0\" stroke-width=\"2\" /><rect x=\"22\" y=\"290\" width=\"468\" height=\"188\" fill=\"#0c392d\" rx=\"6\"/><rect x=\"30\" y=\"298\" width=\"452\" height=\"23\" fill=\"#245df0\" /><path d=\"M36 459l126 -116h94L130 459Z\" fill=\"#51b788\" opacity=\".6\"/><circle cx=\"326\" cy=\"397\" r=\"79\" fill=\"url(#chrome)\" stroke=\"#fff\" stroke-width=\"2\"/><circle cx=\"326\" cy=\"397\" r=\"19\" fill=\"none\" stroke=\"#f6faff\" stroke-opacity=\".4\"/><circle cx=\"326\" cy=\"397\" r=\"26\" fill=\"none\" stroke=\"#f6faff\" stroke-opacity=\".4\"/><circle cx=\"326\" cy=\"397\" r=\"33\" fill=\"none\" stroke=\"#f6faff\" stroke-opacity=\".4\"/><circle cx=\"326\" cy=\"397\" r=\"40\" fill=\"none\" stroke=\"#f6faff\" stroke-opacity=\".4\"/><circle cx=\"326\" cy=\"397\" r=\"47\" fill=\"none\" stroke=\"#f6faff\" stroke-opacity=\".4\"/><circle cx=\"326\" cy=\"397\" r=\"54\" fill=\"none\" stroke=\"#f6faff\" stroke-opacity=\".4\"/><circle cx=\"326\" cy=\"397\" r=\"61\" fill=\"none\" stroke=\"#f6faff\" stroke-opacity=\".4\"/><circle cx=\"326\" cy=\"397\" r=\"68\" fill=\"none\" stroke=\"#f6faff\" stroke-opacity=\".4\"/><circle cx=\"326\" cy=\"397\" r=\"75\" fill=\"none\" stroke=\"#f6faff\" stroke-opacity=\".4\"/><path d=\"M326 397l-55 -57 70 -21z\" fill=\"#71cbd7\" opacity=\".65\"/><path d=\"M326 397l52 59 -60 22z\" fill=\"#a586d1\" opacity=\".7\"/><circle cx=\"326\" cy=\"397\" r=\"15\" fill=\"#0c392d\" /><circle cx=\"326\" cy=\"397\" r=\"7\" fill=\"#f3f5ed\" /><path d=\"M56 403L184 403\" fill=\"none\" stroke=\"#245df0\" stroke-width=\"6\" /><path d=\"M56 424L142 424\" fill=\"none\" stroke=\"#51b788\" stroke-width=\"6\" /></g></svg>",
+      "texts": [
+        {
+          "text": "NIGERIAN POP NO LONGER",
+          "x": 36,
+          "baseline": 166,
+          "size": 31,
+          "weight": 700,
+          "color": "#0c392d",
+          "spacing": -0.5,
+          "width": 372.5080307579642,
+          "rotation": null
+        },
+        {
+          "text": "NEEDS SOMEBODY ELSE'S",
+          "x": 36,
+          "baseline": 201,
+          "size": 31,
+          "weight": 700,
+          "color": "#0c392d",
+          "spacing": -0.5,
+          "width": 348.46631111924825,
+          "rotation": null
+        },
+        {
+          "text": "GENRE.",
+          "x": 36,
+          "baseline": 236,
+          "size": 31,
+          "weight": 700,
+          "color": "#0c392d",
+          "spacing": -0.5,
+          "width": 103.13973068473088,
+          "rotation": null
+        },
+        {
+          "text": "06",
+          "x": 36,
+          "baseline": 70,
+          "size": 19,
+          "weight": 400,
+          "color": "#0c392d",
+          "spacing": 0,
+          "width": 22.49602733280643,
+          "rotation": null
+        },
+        {
+          "text": "NAIJA",
+          "x": 36,
+          "baseline": 121,
+          "size": 49,
+          "weight": 700,
+          "color": "#0c392d",
+          "spacing": -1.5,
+          "width": 132.2863251556207,
+          "rotation": null
+        },
+        {
+          "text": "MUSIC / TV",
+          "x": 40,
+          "baseline": 315,
+          "size": 14,
+          "weight": 400,
+          "color": "#f3f5ed",
+          "spacing": 0,
+          "width": 68.202223841299,
+          "rotation": null
+        },
+        {
+          "text": "×",
+          "x": 462,
+          "baseline": 315,
+          "size": 17,
+          "weight": 400,
+          "color": "#f3f5ed",
+          "spacing": 0,
+          "width": 7.130317157288606,
+          "rotation": null
+        },
+        {
+          "text": "NG",
+          "x": 55,
+          "baseline": 383,
+          "size": 46,
+          "weight": 700,
+          "color": "#f3f5ed",
+          "spacing": 0,
+          "width": 59.02406371292567,
+          "rotation": null
+        }
+      ]
+    },
+    {
+      "id": "afrobeats",
+      "title": "AFROBEATS",
+      "number": "07",
+      "years": "2010–2019",
+      "illustrationSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"512\" height=\"512\" viewBox=\"0 0 512 512\"><defs><linearGradient id=\"chrome\"><stop stop-color=\"#f9fafb\"/><stop offset=\".3\" stop-color=\"#83919e\"/><stop offset=\".54\" stop-color=\"#f4f5f7\"/><stop offset=\".76\" stop-color=\"#91aab1\"/><stop offset=\"1\" stop-color=\"#d4d5e2\"/></linearGradient><clipPath id=\"lower\"><rect x=\"0\" y=\"290\" width=\"512\" height=\"205\"/></clipPath></defs><clipPath id=\"shape\"><path d=\"M16 8H336V22H496V492H16Z\"/></clipPath><g clip-path=\"url(#shape)\"><path d=\"M16 8H336V22H496V492H16Z\" fill=\"#3a1333\"/><path d=\"M36 38L474 38\" fill=\"none\" stroke=\"#ff9f62\" stroke-width=\"2\" /><rect x=\"18\" y=\"292\" width=\"476\" height=\"191\" fill=\"#3a1333\" /><path d=\"M20 475L92 310H150L111 475ZM338 475L381 310H430L468 475Z\" fill=\"#176d70\" opacity=\".7\"/><rect x=\"30\" y=\"350\" width=\"21\" height=\"130\" fill=\"#642952\" /><rect x=\"61\" y=\"369\" width=\"21\" height=\"111\" fill=\"#176d70\" /><rect x=\"66\" y=\"377\" width=\"3\" height=\"4\" fill=\"#ff9f62\" /><rect x=\"92\" y=\"388\" width=\"21\" height=\"92\" fill=\"#176d70\" /><rect x=\"97\" y=\"396\" width=\"3\" height=\"4\" fill=\"#ff9f62\" /><rect x=\"123\" y=\"407\" width=\"21\" height=\"73\" fill=\"#642952\" /><rect x=\"154\" y=\"426\" width=\"21\" height=\"54\" fill=\"#176d70\" /><rect x=\"159\" y=\"434\" width=\"3\" height=\"4\" fill=\"#ff9f62\" /><rect x=\"185\" y=\"368\" width=\"21\" height=\"112\" fill=\"#176d70\" /><rect x=\"190\" y=\"376\" width=\"3\" height=\"4\" fill=\"#ff9f62\" /><rect x=\"216\" y=\"387\" width=\"21\" height=\"93\" fill=\"#642952\" /><rect x=\"247\" y=\"406\" width=\"21\" height=\"74\" fill=\"#176d70\" /><rect x=\"252\" y=\"414\" width=\"3\" height=\"4\" fill=\"#ff9f62\" /><rect x=\"278\" y=\"425\" width=\"21\" height=\"55\" fill=\"#176d70\" /><rect x=\"283\" y=\"433\" width=\"3\" height=\"4\" fill=\"#ff9f62\" /><rect x=\"309\" y=\"367\" width=\"21\" height=\"113\" fill=\"#642952\" /><rect x=\"340\" y=\"386\" width=\"21\" height=\"94\" fill=\"#176d70\" /><rect x=\"345\" y=\"394\" width=\"3\" height=\"4\" fill=\"#ff9f62\" /><rect x=\"371\" y=\"405\" width=\"21\" height=\"75\" fill=\"#176d70\" /><rect x=\"376\" y=\"413\" width=\"3\" height=\"4\" fill=\"#ff9f62\" /><rect x=\"402\" y=\"424\" width=\"21\" height=\"56\" fill=\"#642952\" /><rect x=\"433\" y=\"366\" width=\"21\" height=\"114\" fill=\"#176d70\" /><rect x=\"438\" y=\"374\" width=\"3\" height=\"4\" fill=\"#ff9f62\" /><rect x=\"464\" y=\"385\" width=\"21\" height=\"95\" fill=\"#176d70\" /><rect x=\"469\" y=\"393\" width=\"3\" height=\"4\" fill=\"#ff9f62\" /><path d=\"M52 459L438 459\" fill=\"none\" stroke=\"#ff9f62\" stroke-width=\"3\" /><path d=\"M130 455L188 346\" fill=\"none\" stroke=\"#ff9f62\" stroke-width=\"4\" /><path d=\"M188 346L301 346\" fill=\"none\" stroke=\"#ff9f62\" stroke-width=\"4\" /><path d=\"M301 346L363 455\" fill=\"none\" stroke=\"#ff9f62\" stroke-width=\"4\" /><path d=\"M172 432l29 -51h102l31 51Z\" fill=\"#3a1333\"/><circle cx=\"257\" cy=\"402\" r=\"12\" fill=\"#fbefe4\" /><rect x=\"249\" y=\"413\" width=\"16\" height=\"31\" fill=\"#fbefe4\" /></g></svg>",
+      "texts": [
+        {
+          "text": "THE WORLD STARTS",
+          "x": 36,
+          "baseline": 166,
+          "size": 31,
+          "weight": 700,
+          "color": "#fbefe4",
+          "spacing": -0.5,
+          "width": 272.3139798608569,
+          "rotation": null
+        },
+        {
+          "text": "LISTENING.",
+          "x": 36,
+          "baseline": 201,
+          "size": 31,
+          "weight": 700,
+          "color": "#fbefe4",
+          "spacing": -0.5,
+          "width": 158.18554058342488,
+          "rotation": null
+        },
+        {
+          "text": "07",
+          "x": 36,
+          "baseline": 70,
+          "size": 19,
+          "weight": 400,
+          "color": "#fbefe4",
+          "spacing": 0,
+          "width": 20.28120533212899,
+          "rotation": null
+        },
+        {
+          "text": "AFROBEATS",
+          "x": 36,
+          "baseline": 121,
+          "size": 49,
+          "weight": 700,
+          "color": "#fbefe4",
+          "spacing": -1.5,
+          "width": 255.29842994019288,
+          "rotation": null
+        }
+      ]
+    },
+    {
+      "id": "global",
+      "title": "GLOBAL",
+      "number": "08",
+      "years": "2020–2026",
+      "illustrationSvg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"512\" height=\"512\" viewBox=\"0 0 512 512\"><defs><linearGradient id=\"chrome\"><stop stop-color=\"#f9fafb\"/><stop offset=\".3\" stop-color=\"#83919e\"/><stop offset=\".54\" stop-color=\"#f4f5f7\"/><stop offset=\".76\" stop-color=\"#91aab1\"/><stop offset=\"1\" stop-color=\"#d4d5e2\"/></linearGradient><clipPath id=\"lower\"><rect x=\"0\" y=\"290\" width=\"512\" height=\"205\"/></clipPath></defs><clipPath id=\"shape\"><path d=\"M16 8H496V449L443 492H69L16 449Z\"/></clipPath><g clip-path=\"url(#shape)\"><path d=\"M16 8H496V449L443 492H69L16 449Z\" fill=\"#111217\"/><path d=\"M36 38L474 38\" fill=\"none\" stroke=\"#cfa94f\" stroke-width=\"2\" /><circle cx=\"32\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"50\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"68\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"86\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"104\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"122\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"140\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"158\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"176\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"194\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"212\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"230\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"248\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"266\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"284\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"302\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"320\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"338\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"356\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"374\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"392\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"410\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"428\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"446\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"464\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"482\" cy=\"308\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"32\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"50\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"68\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"86\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"104\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"122\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"140\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"158\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"176\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"194\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"212\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"230\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"248\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"266\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"284\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"302\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"320\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"338\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"356\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"374\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"392\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"410\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"428\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"446\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"464\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"482\" cy=\"330\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"32\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"50\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"68\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"86\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"104\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"122\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"140\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"158\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"176\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"194\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"212\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"230\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"248\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"266\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"284\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"302\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"320\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"338\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"356\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"374\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"392\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"410\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"428\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"446\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"464\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"482\" cy=\"352\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.5\"/><circle cx=\"32\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"50\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"68\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"86\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"104\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"122\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"140\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"158\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"176\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"194\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"212\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"230\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"248\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"266\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"284\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"302\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"320\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"338\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"356\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"374\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"392\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"410\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"428\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"446\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"464\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"482\" cy=\"374\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"32\" cy=\"396\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"50\" cy=\"396\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"68\" cy=\"396\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"86\" cy=\"396\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"104\" cy=\"396\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"122\" cy=\"396\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"140\" cy=\"396\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"158\" cy=\"396\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"176\" cy=\"396\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"194\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"212\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"230\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"248\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"266\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"284\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"302\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"320\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"338\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"356\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"374\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"392\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"410\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"428\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"446\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"464\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"482\" cy=\"396\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"32\" cy=\"418\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"50\" cy=\"418\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"68\" cy=\"418\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"86\" cy=\"418\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"104\" cy=\"418\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"122\" cy=\"418\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"140\" cy=\"418\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"158\" cy=\"418\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"176\" cy=\"418\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"194\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"212\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"230\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"248\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"266\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"284\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"302\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"320\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"338\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"356\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"374\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"392\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"410\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"428\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"446\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"464\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"482\" cy=\"418\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"32\" cy=\"440\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"50\" cy=\"440\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"68\" cy=\"440\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"86\" cy=\"440\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"104\" cy=\"440\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"122\" cy=\"440\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"140\" cy=\"440\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"158\" cy=\"440\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"176\" cy=\"440\" r=\"1.7\" fill=\"#cfa94f\" opacity=\"0.9\"/><circle cx=\"194\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"212\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"230\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"248\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"266\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"284\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"302\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"320\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"338\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"356\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"374\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"392\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"410\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"428\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"446\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"464\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><circle cx=\"482\" cy=\"440\" r=\"1.7\" fill=\"#f4efe6\" opacity=\"0.9\"/><path d=\"M42 456L122 350H390L470 456\" fill=\"none\" stroke=\"#f4efe6\" stroke-width=\"4\"/><path d=\"M122 350L122 457\" fill=\"none\" stroke=\"#333943\" stroke-width=\"6\" /><path d=\"M390 350L390 457\" fill=\"none\" stroke=\"#333943\" stroke-width=\"6\" /><rect x=\"169\" y=\"372\" width=\"174\" height=\"65\" fill=\"#333943\" /><rect x=\"182\" y=\"384\" width=\"148\" height=\"40\" fill=\"#111217\" /><path d=\"M209 476L303 476\" fill=\"none\" stroke=\"#cfa94f\" stroke-width=\"3\" /></g></svg>",
+      "texts": [
+        {
+          "text": "NIGERIAN MUSIC DOESN'T",
+          "x": 36,
+          "baseline": 166,
+          "size": 31,
+          "weight": 700,
+          "color": "#f4efe6",
+          "spacing": -0.5,
+          "width": 361.53837257414875,
+          "rotation": null
+        },
+        {
+          "text": "NEED TO CROSS OVER",
+          "x": 36,
+          "baseline": 201,
+          "size": 31,
+          "weight": 700,
+          "color": "#f4efe6",
+          "spacing": -0.5,
+          "width": 300.38428567069445,
+          "rotation": null
+        },
+        {
+          "text": "ANYMORE.",
+          "x": 36,
+          "baseline": 236,
+          "size": 31,
+          "weight": 700,
+          "color": "#f4efe6",
+          "spacing": -0.5,
+          "width": 148.54542151836935,
+          "rotation": null
+        },
+        {
+          "text": "08",
+          "x": 36,
+          "baseline": 70,
+          "size": 19,
+          "weight": 400,
+          "color": "#f4efe6",
+          "spacing": 0,
+          "width": 21.942323199277396,
+          "rotation": null
+        },
+        {
+          "text": "GLOBAL",
+          "x": 36,
+          "baseline": 121,
+          "size": 49,
+          "weight": 700,
+          "color": "#f4efe6",
+          "spacing": -1.5,
+          "width": 165.609984621018,
+          "rotation": null
+        }
+      ]
+    }
+  ]
+}

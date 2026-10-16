@@ -2,14 +2,34 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import sharp from 'sharp';
+import fontkit from 'next/dist/compiled/@next/font/dist/fontkit/index.js';
 import { ERAS } from '../src/data/eras.ts';
 import { ERA_ATLAS, ERA_VISUALS } from '../src/data/eraVisuals.ts';
 const out = path.resolve('public/textures/environment');
+// Next already supplies fontkit; outline the bundled OFL font so the WebGL texture is
+// reproducible on Windows/Linux without depending on installed system fonts.
+const ojuju = fontkit.default(await fs.readFile(new URL('./fonts/Ojuju-Variable.ttf', import.meta.url)));
+const fonts = { 400: ojuju.getVariation({ wght: 400 }), 700: ojuju.getVariation({ wght: 700 }) };
+let textLayers = [];
 const esc = (s) => s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll("'", '&apos;');
 const rect = (x,y,w,h,fill,extra='') => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" ${extra}/>`;
 const line = (x1,y1,x2,y2,c,w=1,extra='') => `<path d="M${x1} ${y1}L${x2} ${y2}" fill="none" stroke="${c}" stroke-width="${w}" ${extra}/>`;
 const circle = (x,y,r,c,extra='') => `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" ${extra}/>`;
-const text = (s,x,y,size,c,extra='') => `<text x="${x}" y="${y}" font-family="Arial, sans-serif" font-size="${size}" fill="${c}" ${extra}>${esc(s)}</text>`;
+const text = (s,x,y,size,c,extra='') => {
+  const weight = extra.includes('bold') ? 700 : 400, font = fonts[weight], scale = size / font.unitsPerEm;
+  const spacing = Number(extra.match(/letter-spacing="([\d.-]+)"/)?.[1] ?? 0);
+  const run = font.layout(s), width = run.positions.reduce((sum,p) => sum + p.xAdvance * scale,0) + Math.max(0,run.glyphs.length-1)*spacing;
+  const left = x - (extra.includes('text-anchor="middle"') ? width/2 : 0);
+  textLayers.push({ text:s, x:left, baseline:y, size, weight, color:c, spacing, width });
+  let pen=left;
+  const paths=run.glyphs.map((glyph,i)=>{
+    const p=run.positions[i];
+    const result=`<path d="${glyph.path.toSVG()}" transform="translate(${pen+p.xOffset*scale} ${y-p.yOffset*scale}) scale(${scale} ${-scale})"/>`;
+    pen+=p.xAdvance*scale+spacing;
+    return result;
+  }).join('');
+  return `<g data-lettering="${esc(s)}" fill="${c}">${paths}</g>`;
+};
 const wrap = (s,limit) => { const lines=[]; let row=''; for(const word of s.split(' ')) { if(row && (row+' '+word).length>limit) { lines.push(row); row=word; } else row+=(row?' ':'')+word; } if(row) lines.push(row); return lines; };
 const motifs = {
   weave: (p) => {
@@ -89,18 +109,28 @@ const shapes = {
   city:'M16 8H336V22H496V492H16Z',
   arena:'M16 8H496V449L443 492H69L16 449Z',
 };
+const designTiles=[];
+const defs=`<defs><linearGradient id="chrome"><stop stop-color="#f9fafb"/><stop offset=".3" stop-color="#83919e"/><stop offset=".54" stop-color="#f4f5f7"/><stop offset=".76" stop-color="#91aab1"/><stop offset="1" stop-color="#d4d5e2"/></linearGradient><clipPath id="lower"><rect x="0" y="290" width="512" height="205"/></clipPath></defs>`;
 const tiles=ERAS.map((era,i)=>{
+  textLayers=[];
   const p=ERA_VISUALS[era.id], darkText=['shellac','disc'].includes(p.motif), ink=darkText?p.secondary:p.paper;
   const rows=wrap(era.headline,22); const font=rows.length>3?27:31; const leading=font+4;
   const statement=rows.map((row,j)=>text(row,36,166+j*leading,font,ink,'font-weight="bold" letter-spacing="-.5"')).join('');
   const graphic=`<path d="${shapes[p.motif]}" fill="${p.primary}"/>${line(36,38,474,38,p.accent,2)}${text(era.number,36,70,19,ink)}${text(era.title,36,121,era.id==='recording'?43:49,ink,'font-weight="bold" letter-spacing="-1.5"')}${statement}${motifs[p.motif](p)}`;
+  const art=graphic.replace(/<g data-lettering="[^"]*"[^>]*>.*?<\/g>/g,'');
+  designTiles.push({ id:era.id, title:era.title, number:era.number, years:era.dateLabel,
+    // Each editable master retains the atlas's 512px logical coordinate system and 8px gutter.
+    illustrationSvg:`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">${defs}<clipPath id="shape"><path d="${shapes[p.motif]}"/></clipPath><g clip-path="url(#shape)">${art}</g></svg>`,
+    texts:textLayers.map(layer=>({...layer, rotation:layer.text==='JÙJÚ'?{angle:-7,x:110,y:348}:['AFROBEAT','FÚJÌ / FUNK'].includes(layer.text)?{angle:8,x:380,y:354}:null})) });
   return `<g transform="translate(${i%4*512+8} ${Math.floor(i/4)*512+8}) scale(.96875)"><clipPath id="tile${i}"><path d="${shapes[p.motif]}"/></clipPath><g clip-path="url(#tile${i})">${graphic}</g></g>`;
 }).join('');
-const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="2048" height="1024" viewBox="0 0 2048 1024"><defs><linearGradient id="chrome"><stop stop-color="#f9fafb"/><stop offset=".3" stop-color="#83919e"/><stop offset=".54" stop-color="#f4f5f7"/><stop offset=".76" stop-color="#91aab1"/><stop offset="1" stop-color="#d4d5e2"/></linearGradient><clipPath id="lower"><rect x="0" y="290" width="512" height="205"/></clipPath></defs>${tiles}</svg>`;
+const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="2048" height="1024" viewBox="0 0 2048 1024">${defs}${tiles}</svg>`;
 await fs.mkdir(out,{recursive:true});
 await fs.writeFile(path.join(out,'era-worlds.svg'),svg);
 await sharp(Buffer.from(svg)).webp({quality:88,alphaQuality:100}).toFile(path.join(out,'era-worlds-v1.webp'));
-const stat=await fs.stat(path.join(out,'era-worlds.webp'));
+await fs.mkdir('design/era-backdrops',{recursive:true});
+await fs.writeFile('design/era-backdrops/figma-data.json',JSON.stringify({ tile:512,padding:8,atlas:{width:2048,height:1024},font:'Ojuju',tiles:designTiles },null,2)+'\n');
+const stat=await fs.stat(path.join(out,'era-worlds-v1.webp'));
 console.log(`Era atlas: ${ERA_ATLAS.width} × ${ERA_ATLAS.height}, ${(stat.size/1024).toFixed(1)} KB, ${(ERA_ATLAS.width*ERA_ATLAS.height*4*4/3/1024/1024).toFixed(2)} MiB incl. mipmaps. Original geometric illustrations; no archival photographs.`);
 
 

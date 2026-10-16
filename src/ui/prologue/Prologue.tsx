@@ -62,6 +62,8 @@ const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 
 interface PrologueProps {
   audio: AudioEngine;
+  /** A warm return keeps the existing scene/context and skips the first-visit loading sequence. */
+  returningHome?: boolean;
   /** Whether the scene itself is complete (hall loaded, every station showing its record art). Polled. */
   isSceneReady: () => boolean;
   /** ENTER ARCHIVE pressed: the museum takes over (HUD, input, rendering). */
@@ -78,12 +80,12 @@ interface PrologueProps {
  * is CSS (IntersectionObserver toggles classes; nothing runs per frame). ENTER ARCHIVE is the one user gesture that
  * unlocks THE AudioContext through the existing engine (startArchiveSound).
  */
-export function Prologue({ audio, isSceneReady, onEnter, onExited, onCoverChange }: PrologueProps) {
+export function Prologue({ audio, returningHome = false, isSceneReady, onEnter, onExited, onCoverChange }: PrologueProps) {
   const archiveReady = useArchiveReady(isSceneReady);
   const fontReady = useDisplayFontReady();
   const reduced = useReducedMotion();
-  const revealed = archiveReady && fontReady;
-  const [settled, setSettled] = useState(false);
+  const revealed = returningHome || (archiveReady && fontReady);
+  const [settled, setSettled] = useState(returningHome);
   const [leaving, setLeaving] = useState(false);
   const [chapter, setChapter] = useState<ChapterMeta>(CHAPTERS[0]);
   const [finale, setFinale] = useState(false);
@@ -99,12 +101,13 @@ export function Prologue({ audio, isSceneReady, onEnter, onExited, onCoverChange
     history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
     html.classList.add(HTML_CLASS);
+    if (returningHome) rootRef.current?.querySelector<HTMLElement>(".pro-story")?.focus({ preventScroll: true });
     return () => {
       html.classList.remove(HTML_CLASS);
       history.scrollRestoration = restoration;
       window.scrollTo(0, 0);
     };
-  }, [revealed]);
+  }, [revealed, returningHome]);
 
   // Opening finished → the story is the whole screen; the museum underneath may pause drawing.
   useEffect(() => {
@@ -209,7 +212,7 @@ export function Prologue({ audio, isSceneReady, onEnter, onExited, onCoverChange
         </span>
       </button>
 
-      <article className="pro-story" aria-label="The Sound of Nigeria, 1900 to 2026 — the story before the archive">
+      <article className="pro-story" tabIndex={-1} aria-label="The Sound of Nigeria, 1900 to 2026 — the story before the archive">
         <Opening />
         <Systems />
         <Record1922 />

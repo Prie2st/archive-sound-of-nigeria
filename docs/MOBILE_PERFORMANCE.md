@@ -8,19 +8,23 @@ Added `src/config/quality.ts`, `src/config/quality.test.ts`, and this document. 
 
 ## Tiers
 
-Selection happens once per page load, before the renderer mounts. Width ≤480 CSS px or an available device-memory hint ≤2 GB selects LOW. Otherwise a coarse pointer or width <1024 selects MEDIUM. A wide fine-pointer desktop selects HIGH. Missing memory information is ignored; there is no hardware score. Resizing/rotating preserves the selected tier and the visit; a reload selects again.
+Updated 16 October 2026: selection happens once per page load, before the renderer mounts. Only an available device-memory hint ≤2 GB selects LOW. Otherwise a coarse pointer or width <1024 selects MEDIUM, including narrow phones and Safari without a memory hint. A wide fine-pointer desktop selects HIGH. Screen width alone no longer removes antialiasing or forces a 1× drawing buffer. Resizing/rotating preserves the selected tier and the visit; a reload selects again.
 
 Development only: `?quality=high`, `?quality=medium`, `?quality=low`. Production ignores overrides. The existing camera/performance readout adds only QUALITY and actual DPR/cap.
 
 | Tier | WebGL DPR cap | Secondary visuals | Antialiasing |
 |---|---:|---|---|
-| HIGH | 1.5 | Current ACTIVE props, neighbouring hints/fragments | Current multisample AA |
-| MEDIUM | 1.25 | Full ACTIVE visuals; neighbouring decorative hints/fragments omitted | Retained |
+| HIGH | 2.0 | Current ACTIVE props, neighbouring hints/fragments | Current multisample AA |
+| MEDIUM | 2.0 | Full ACTIVE visuals; neighbouring decorative hints/fragments omitted | Retained |
 | LOW | 1.0 | Core graphics/identity and active next-era fragment; standalone decorative props omitted | Multisample AA off |
 
-All eight statements, primary palettes/core graphics and the active station light remain on every tier. The shared atlas is unchanged. Station LOD remains the existing **1 ACTIVE / 2 NEARBY / 5 DISTANT**, including GLOBAL↔ROOTS; the ACTIVE/focused turntable keeps its full geometry, materials and texture profile. Desktop HIGH keeps the established art direction and UI. There are no dynamic shadows, postprocessing or continuous decorative animations to reduce; none were added.
+All eight statements, primary palettes/core graphics and the active station light remain on every tier. The shared 2048×1024 atlas now uses outlined Ojuju lettering to match the home and archive UI, without a runtime font dependency for the texture. Station LOD remains **1 ACTIVE / 2 NEARBY / 5 DISTANT**, including GLOBAL↔ROOTS; the ACTIVE/focused turntable keeps its full geometry, materials and texture profile. Existing soft shadow maps, catchers and their per-tier budgets are preserved.
 
-DPR affects the WebGL drawing buffer only, not DOM text/UI resolution. The renderer uses device DPR below the cap. On a device at DPR ≥1.5, LOW shades **44.4% as many pixels as HIGH** (1²/1.5²), as well as avoiding MSAA and decorative draws. The test host's DPR was 1, so its measurements do not exercise that high-DPI saving.
+DPR affects the WebGL drawing buffer only, not DOM text/UI resolution. The renderer follows device DPR from 1 up to its cap of 2. A 390×844 CSS viewport at device DPR ≥2 therefore draws at 780×1688 instead of the previous 390×844 LOW buffer. This shades four times as many pixels; actual phone frame rate needs a device check. LOW retains its 1× cap for constrained-memory devices. The historical measurements below used a desktop host at DPR 1 and do not predict this cost.
+
+## Returning home (16 October)
+
+Exit archive is available beside sound in both travel and listening views, with 44px touch targets on narrow screens. Sound uses a compact icon on phones, retaining its full accessible state label and title, so both actions fit above the listening caption. Exit waits for an in-progress record change to finish before becoming enabled. Exiting stops playback through the existing engine, covers the mounted scene, pauses continuous drawing, resets home scroll and moves keyboard focus to the story. Re-entering skips the cold loader and starts the same engine from the Enter archive gesture. Camera position, current listening view and record selections survive; no new WebGL or AudioContext is created.
 
 ## Touch and responsive UI
 
@@ -54,6 +58,8 @@ Narrow→1440×900→narrow retained MEDIUM, record selection and travel positio
 Memory behaviour is unchanged: entry decoded the current/adjacent three audio files (3 requests / 4.39 MiB), a requested record adds its own label/sleeve and audio on demand, and no 40-file audio/archive preload was introduced. The renderer estimate remains ≈311 MiB, including ≈245 MiB textures. Cache eviction, gallery simplification/instancing and model/texture rebakes are deferred. The existing marble gallery and full ACTIVE deck remain the principal weaker-device risk.
 
 ## Validation / real-device status
+
+16 October update: `npm run check` passes TypeScript, ESLint, **285 tests** and content validation; `npm run build` and `npm run check:visuals` pass. At a 390×844 production viewport, entering, focusing ROOTS, changing Talking Drum → Bàtá, returning home and re-entering preserved the selected record and listening view. Exit was disabled during the swap; returning home reset scroll, moved focus to the story and skipped the cold loader. The production console error log was empty. The final compact sound styling compiled successfully and still needs visual confirmation on a phone. The desktop test host remains DPR 1, so the new 2× phone drawing buffer is covered by policy tests rather than a physical high-DPI device test.
 
 All required commands passed once after implementation: `npm run check` (TypeScript, ESLint, 247 tests), `npm run check:content`, `npm run check:tonearm`, `npm run check:hall`, and `npm run build`. No tests were weakened. Targeted quality/travel tests also passed while editing. A production preview at 390×844 ignored the DEV inspector/intro-skip/quality override parameters, displayed the intro, entered with Sound on, and focused ROOTS with enabled record controls. Its console error log was empty.
 

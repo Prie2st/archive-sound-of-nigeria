@@ -36,7 +36,7 @@ html.archive-prologue body {
   --pro-cta-zone: calc(44px + clamp(16px, 2.6vw, 40px) + env(safe-area-inset-bottom));
 
   /* faces */
-  --f-display: var(--font-ojuju), "Ojuju", var(--ui-font-text);
+  --f-display: var(--ui-font-display);
   --f-text: var(--ui-font-text);
 
   /* type scale — sized from OJUJU's measured glyphs (cap height 0.70 em, accented caps 0.87 em,
