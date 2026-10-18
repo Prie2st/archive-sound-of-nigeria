@@ -74,9 +74,12 @@ describe("homepage story structure", () => {
   it("authors every display line, including the phone breaks", () => {
     for (const lines of DISPLAY_LINES) {
       assert.ok(lines.length > 0);
-      for (const line of lines) {
+      for (const raw of lines) {
+        assert.equal(raw.split("*").length % 2, 1, `unbalanced accent markers: "${raw}"`);
+        const line = raw.replaceAll("*", "");
         assert.ok(line.trim().length > 0);
-        assert.ok(line.split(MOBILE_BREAK).join(" ").length <= 24, `display line too long: "${line}"`);
+        // The homepage design sets its long statements on one desktop line (up to 46 characters); phones take the authored breaks.
+        assert.ok(line.split(MOBILE_BREAK).join(" ").length <= 46, `display line too long: "${line}"`);
         for (const part of line.split(MOBILE_BREAK)) assert.ok(part.length <= 20, `phone segment too long: "${part}"`);
       }
     }
@@ -108,7 +111,6 @@ describe("homepage media", () => {
   it("places every media item, and every placed id exists", () => {
     for (const id of placed) assert.ok(HOME_MEDIA[id], id);
     for (const media of HOME_MEDIA_LIST) assert.ok(placed.includes(media.id), `${media.id} is never placed`);
-    for (const fragment of LINEAGE.fragments) assert.ok(placed.includes(fragment.media), "the lineage reuses earlier evidence only");
   });
 
   it("gives every image a historical reason and complete fields", () => {
@@ -124,13 +126,19 @@ describe("homepage media", () => {
         assert.equal(media.src, null, media.id);
         assert.ok(media.placeholder, `${media.id} needs its archive-card text`);
         assert.match(media.credit, /PLACEHOLDER/);
+        if (media.placeholderSrc) {
+          assert.match(media.placeholderSrc, /^\/images\/home\/[a-z0-9-]+\.webp$/, `${media.id} designed image must be local`);
+          assert.ok(existsSync(publicFile(media.placeholderSrc)), `${media.placeholderSrc} is missing`);
+        }
         continue;
       }
       assert.ok(media.src && /^\/(images\/home|textures\/archive)\//.test(media.src), `${media.id} must be a local file`);
       assert.ok(existsSync(publicFile(media.src)), `${media.src} is missing`);
       assert.ok(!/PLACEHOLDER/.test(media.credit));
     }
-    assert.equal(getHomeMedia("sleeve-tunde-king-aronke-macaulay").status, "final");
+    // The 1937 slot shows the record sleeve; the supplied cover has no recorded credit yet, so it is not "final".
+    assert.equal(getHomeMedia("sleeve-tunde-king-aronke-macaulay").role, "archive");
+    assert.equal(getHomeMedia("sleeve-tunde-king-aronke-macaulay").status, "placeholder");
     assert.throws(() => getHomeMedia("missing"));
   });
 

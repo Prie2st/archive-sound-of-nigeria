@@ -8,8 +8,10 @@ type Vars = CSSProperties & Record<`--${string}`, string | number>;
 /**
  * Display typography with authored line breaks (docs/PROLOGUE.md §5). Each line is its own block inside a mask so
  * it can rise from its baseline; `shifts` indents single lines by twelfths of the block (the line breaks and the
- * offsets ARE the composition). " | " inside a line is the extra break phones take. A space is kept between lines
- * for copy / paste and assistive technology.
+ * offsets ARE the composition). " | " inside a line is the extra break phones take; *…* marks an accent run (styled
+ * per composition). `align` lines up to the end: `true` for every line, or the indices that should (a block can
+ * turn from flush-left to flush-right half way). A space is kept between lines for copy / paste and assistive
+ * technology.
  */
 export function Display({
   lines,
@@ -17,6 +19,7 @@ export function Display({
   className = "",
   id,
   shifts,
+  end,
   reveal = true,
 }: {
   lines: Lines;
@@ -24,17 +27,20 @@ export function Display({
   className?: string;
   id?: string;
   shifts?: readonly number[];
+  /** Lines set flush right: all of them, or these indices. */
+  end?: true | readonly number[];
   reveal?: boolean;
 }) {
+  const atEnd = (index: number) => end === true || (Array.isArray(end) && end.includes(index));
   return (
     <Tag className={`pro-display ${className}`} id={id} data-reveal={reveal ? "lines" : undefined}>
       {lines.map((line, index) => (
-        <span key={index} className="pro-line" style={{ "--i": index, "--shift": shifts?.[index] ?? 0 } as Vars}>
+        <span key={index} className={`pro-line${atEnd(index) ? " pro-line--end" : ""}`} style={{ "--i": index, "--shift": shifts?.[index] ?? 0 } as Vars}>
           <span className="pro-line__inner">
             {line.split(MOBILE_BREAK).map((part, at) => (
               <span key={at}>
                 {at > 0 && <span className="pro-br"> </span>}
-                {part}
+                <Accents text={part} />
               </span>
             ))}
             {index < lines.length - 1 ? " " : ""}
@@ -42,6 +48,16 @@ export function Display({
         </span>
       ))}
     </Tag>
+  );
+}
+
+/** "*…*" runs become accent spans (emphasis carried by colour or weight, per composition). */
+function Accents({ text }: { text: string }) {
+  if (!text.includes("*")) return <>{text}</>;
+  return (
+    <>
+      {text.split("*").map((run, index) => (index % 2 === 1 ? <em key={index} className="pro-accent">{run}</em> : run))}
+    </>
   );
 }
 
@@ -56,9 +72,11 @@ export function Reveal({ as: Tag = "div", className = "", children, delay = 0 }:
 
 /**
  * One homepage image (src/content/homeMedia.ts). Final images render with their crop (`objectPosition`), lazily.
- * Pending ones render as a designed archive card in the same aspect ratio — IMAGE PENDING · title · place · year ·
- * kind — so the composition is final before the asset is. Replacing an image is a mapping change only.
- * `variant="fragment"`: the small reused evidence crops of the lineage beat.
+ * A pending slot with a designed image (`placeholderSrc`) shows that image; photographs carry the archive-card
+ * words over it (title · place · year · kind, in `overlay.ink`), sleeves show the cover alone. A slot with no image
+ * at all renders the archive card itself (IMAGE PENDING …). Replacing an image is a mapping change only.
+ * `children` are extra words laid over the frame by a composition (e.g. a sleeve's printed lettering).
+ * `variant="fragment"`: small reused evidence crops.
  */
 export function Media({
   id,
@@ -67,6 +85,7 @@ export function Media({
   caption = "below",
   reveal = "mask",
   variant = "full",
+  children,
 }: {
   id: string;
   className?: string;
@@ -74,20 +93,41 @@ export function Media({
   caption?: "below" | "none";
   reveal?: "mask" | "fade" | "none";
   variant?: "full" | "fragment";
+  children?: ReactNode;
 }) {
   const media = getHomeMedia(id);
   const pending = media.status === "placeholder";
   const shown = media.src ?? media.placeholderSrc;
+  const words = pending && shown && media.placeholder && media.overlay && variant === "full" ? media.placeholder : null;
   return (
     <figure
       className={`pro-media pro-media--${media.status} pro-media--${media.role} pro-media--${variant} ${className}`}
       data-reveal={reveal === "none" ? undefined : reveal}
       data-slot={pending ? media.label : undefined}
-      style={{ "--aspect": media.aspectRatio.replace("/", " / "), "--focus": media.objectPosition } as Vars}
+      style={
+        {
+          "--aspect": media.aspectRatio.replace("/", " / "),
+          "--focus": media.objectPosition,
+          ...(media.overlay ? { "--over-ink": media.overlay.ink, "--over-scrim": media.overlay.scrim ?? "none" } : {}),
+        } as Vars
+      }
     >
       <div className="pro-media__frame">
         {shown ? (
-          <Image className="pro-media__img" src={shown} alt={media.alt} fill sizes={sizes} style={{ objectFit: "cover", objectPosition: media.objectPosition }} />
+          <>
+            <Image className="pro-media__img" src={shown} alt={media.alt} fill sizes={sizes} style={{ objectFit: "cover", objectPosition: media.objectPosition }} />
+            {words && (
+              <div className="pro-media__over" aria-hidden="true">
+                <span className="pro-media__slot-title">{words.title}</span>
+                <span className="pro-media__slot-foot">
+                  <span>{words.place}</span>
+                  {words.year && <span>{words.year}</span>}
+                  <span>{words.kind}</span>
+                </span>
+              </div>
+            )}
+            {children}
+          </>
         ) : (
           <div className="pro-media__slot" role="img" aria-label={`Image pending: ${media.alt}`}>
             <span className="pro-media__slot-kicker" aria-hidden="true">
@@ -109,7 +149,8 @@ export function Media({
       {caption !== "none" && (
         <figcaption className="pro-media__caption">
           <span>{media.caption}</span>
-          {pending ? <span className="pro-media__credit">Archive image pending</span> : media.credit && <span className="pro-media__credit">{[media.credit, media.source, media.license].filter(Boolean).join(" · ")}</span>}
+          {pending && !shown && <span className="pro-media__credit">Archive image pending</span>}
+          {!pending && media.credit && <span className="pro-media__credit">{[media.credit, media.source, media.license].filter(Boolean).join(" · ")}</span>}
         </figcaption>
       )}
     </figure>

@@ -27,6 +27,7 @@ import {
   YOUTH,
   resolveRecord,
   type BeatId,
+  type RecordRef,
 } from "@/content/homeStory";
 import { ERA_VISUALS } from "@/data/eraVisuals";
 import { getEra } from "@/data/eras";
@@ -72,6 +73,17 @@ function Mark({ id, className = "" }: { id: BeatId; className?: string }) {
   );
 }
 
+/** A sleeve's printed lettering laid over the supplied cover: artist at the top, title at the bottom. */
+function SleeveType({ record: ref }: { record: RecordRef }) {
+  const record = resolveRecord(ref);
+  return (
+    <span className="pro-sleevetype" aria-hidden="true">
+      <span className="pro-sleevetype__artist">{record.artist}</span>
+      <span className="pro-sleevetype__title">{record.title}</span>
+    </span>
+  );
+}
+
 const Body = ({ lines, className = "" }: { lines: readonly string[]; className?: string }) => (
   <Reveal className={`pro-copy ${className}`}>
     {lines.map((line) => (
@@ -88,18 +100,16 @@ export function Opening() {
   return (
     <Beat id="opening" labelledBy="pro-title">
       <div className="pro-grid pro-opening__top">
-        <Micro className="pro-opening__kicker">{OPENING.kicker}</Micro>
-        <Micro className="pro-opening__years">{OPENING.years}</Micro>
+        <span className="pro-wordmark pro-opening__mark" role="img" aria-label="Archive" />
       </div>
       <div className="pro-grid pro-opening__middle">
-        <Display as="p" lines={OPENING.premise} className="pro-opening__premise" />
+        <div className="pro-opening__lead">
+          <Micro className="pro-opening__years">{OPENING.years}</Micro>
+          <Display as="p" lines={OPENING.premise} className="pro-opening__premise" />
+        </div>
       </div>
       <div className="pro-grid pro-opening__foot">
-        <Micro className="pro-opening__cue">
-          {OPENING.cue}
-          <span className="pro-opening__cue-line" aria-hidden="true" />
-        </Micro>
-        <Display as="h1" id="pro-title" lines={OPENING.title} shifts={[0, 3]} className="pro-display--title pro-opening__title" />
+        <Display as="h1" id="pro-title" lines={OPENING.title} end={[1]} className="pro-display--title pro-opening__title" />
       </div>
     </Beat>
   );
@@ -110,8 +120,7 @@ export function Systems() {
   return (
     <Beat id="systems" labelledBy="pro-systems-title">
       <div className="pro-grid pro-systems__head">
-        <Mark id="systems" className="pro-systems__mark" />
-        <Display id="pro-systems-title" lines={SYSTEMS.headline} shifts={[0, 1, 0, 2]} className="pro-display--headline pro-systems__headline" />
+        <Display id="pro-systems-title" lines={SYSTEMS.headline} className="pro-display--headline pro-systems__headline" />
       </div>
       <div className="pro-grid pro-systems__grid">
         <div className="pro-systems__pin">
@@ -138,7 +147,7 @@ export function Systems() {
         </div>
       </div>
       <div className="pro-grid pro-systems__close">
-        <Display lines={SYSTEMS.statement} shifts={[0, 2, 1, 3]} className="pro-display--statement pro-systems__statement" />
+        <Display lines={SYSTEMS.statement} className="pro-display--statement pro-systems__statement" />
       </div>
     </Beat>
   );
@@ -149,15 +158,17 @@ export function Record1922() {
   return (
     <Beat id="record1922" labelledBy="pro-1922-title">
       <div className="pro-grid pro-record1922__top">
-        <Mark id="record1922" className="pro-record1922__mark" />
         <p className="pro-year pro-record1922__year" aria-hidden="true" data-reveal="">
           {RECORD_1922.year}
         </p>
         <Media id={RECORD_1922.media} className="pro-record1922__disc" sizes="(max-width: 760px) 60vw, 26vw" />
       </div>
       <div className="pro-grid pro-record1922__main">
-        <Display id="pro-1922-title" lines={RECORD_1922.headline} shifts={[0, 1]} className="pro-display--display pro-record1922__headline" />
-        <Body lines={RECORD_1922.body} className="pro-record1922__body" />
+        <Display id="pro-1922-title" lines={RECORD_1922.headline} className="pro-display--display pro-record1922__headline" />
+        <Reveal className="pro-copy pro-record1922__body">
+          <p className="pro-body">{RECORD_1922.body[0]}</p>
+          <p className="pro-record1922__key">{RECORD_1922.body[1]}</p>
+        </Reveal>
         <div className="pro-record1922__verbs">
           <Micro>{RECORD_1922.verbsLead}</Micro>
           <WordList words={RECORD_1922.verbs} className="pro-verbs" label="What recording made possible" />
@@ -167,6 +178,11 @@ export function Record1922() {
         <ol className="pro-chain" data-reveal="list" aria-label={RECORD_1922.chain.join(", then ")}>
           {RECORD_1922.chain.map((step, index) => (
             <li key={step} style={{ "--i": index } as Vars}>
+              {index > 0 && (
+                <i className="pro-chain__arrow" aria-hidden="true">
+                  →
+                </i>
+              )}
               {step}
             </li>
           ))}
@@ -181,16 +197,16 @@ export function City() {
   return (
     <Beat id="city" labelledBy="pro-city-title">
       <div className="pro-grid pro-city__head">
-        <Display id="pro-city-title" lines={CITY.headline} shifts={[0, 2]} className="pro-display--display pro-city__headline" />
+        <Display id="pro-city-title" lines={CITY.headline} className="pro-display--display pro-city__headline" />
         <Body lines={CITY.body} className="pro-city__body" />
       </div>
       <ol className="pro-grid pro-strip" aria-label="City, then medium, then record">
         {CITY.sequence.map((step, index) => (
           <li key={step.label} className={`pro-strip__item pro-strip__item--${index}`}>
-            <Micro className="pro-strip__label">
-              <span>{String(index + 1).padStart(2, "0")}</span> {step.label}
-            </Micro>
-            <Media id={step.media} sizes="(max-width: 760px) 80vw, 30vw" caption={index === 2 ? "none" : "below"} />
+            <Micro className="pro-strip__label">{step.label}</Micro>
+            <Media id={step.media} sizes="(max-width: 760px) 80vw, 30vw" caption={index === 2 ? "none" : "below"}>
+              {index === 2 && <SleeveType record={KING_1937.record} />}
+            </Media>
           </li>
         ))}
       </ol>
@@ -204,9 +220,10 @@ export function King1937() {
   return (
     <Beat id="king1937" labelledBy="pro-1937-title">
       <div className="pro-grid pro-king1937__grid">
-        <Media id={KING_1937.media} className="pro-king1937__sleeve" sizes="(max-width: 760px) 80vw, 40vw" caption="none" />
+        <Media id={KING_1937.media} className="pro-king1937__sleeve" sizes="(max-width: 760px) 80vw, 40vw" caption="none">
+          <SleeveType record={KING_1937.record} />
+        </Media>
         <div className="pro-king1937__card">
-          <Mark id="king1937" />
           <p className="pro-year pro-king1937__year" aria-hidden="true" data-reveal="">
             {KING_1937.year}
           </p>
@@ -221,7 +238,7 @@ export function King1937() {
         </div>
       </div>
       <div className="pro-grid pro-king1937__close">
-        <Display lines={KING_1937.keyLine} shifts={[0, 1, 2, 1]} className="pro-display--statement pro-king1937__key" />
+        <Display lines={KING_1937.keyLine} className="pro-display--statement pro-king1937__key" />
       </div>
     </Beat>
   );
@@ -231,8 +248,7 @@ export function Highlife() {
   return (
     <Beat id="highlife" labelledBy="pro-highlife-title">
       <div className="pro-grid pro-highlife__head">
-        <Mark id="highlife" className="pro-highlife__mark" />
-        <Display id="pro-highlife-title" lines={HIGHLIFE.headline} shifts={[0, 2, 4, 1]} className="pro-display--display pro-highlife__headline" />
+        <Display id="pro-highlife-title" lines={HIGHLIFE.headline} className="pro-display--display pro-highlife__headline" />
       </div>
       <div className="pro-grid pro-highlife__grid">
         <Body lines={HIGHLIFE.body} className="pro-highlife__body" />
@@ -242,13 +258,6 @@ export function Highlife() {
           <WordList words={HIGHLIFE.ingredients} className="pro-highlife__ingredients" label="What highlife combined" />
         </div>
       </div>
-      <ul className="pro-grid pro-sleeves pro-highlife__sleeves" aria-label="Highlife records in the archive">
-        {HIGHLIFE.sleeves.map((id) => (
-          <li key={id}>
-            <Media id={id} sizes="(max-width: 760px) 30vw, 16vw" caption="none" reveal="fade" />
-          </li>
-        ))}
-      </ul>
     </Beat>
   );
 }
@@ -261,7 +270,6 @@ export function Independence() {
         <Media id={INDEPENDENCE.media} className="pro-independence__media" sizes="100vw" caption="none" reveal="none" />
         <div className="pro-independence__veil" aria-hidden="true" />
         <div className="pro-grid pro-independence__over">
-          <Mark id="independence" className="pro-independence__mark" />
           <p className="pro-independence__date" data-reveal="">
             <span className="pro-year">{INDEPENDENCE.year}</span>
             <span className="pro-independence__day">{INDEPENDENCE.date}</span>
@@ -270,11 +278,11 @@ export function Independence() {
         </div>
       </div>
       <div className="pro-grid pro-independence__after">
-        <Display lines={INDEPENDENCE.follow} shifts={[0, 1]} className="pro-display--statement pro-independence__follow" />
+        <Display lines={INDEPENDENCE.follow} className="pro-display--statement pro-independence__follow" />
         <Reveal as="p" className="pro-body pro-independence__body">
           {INDEPENDENCE.body}
         </Reveal>
-        <p className="pro-independence__caption pro-media__credit">{getHomeMedia(INDEPENDENCE.media).caption} · Archive image pending</p>
+        <p className="pro-independence__caption pro-media__credit">{getHomeMedia(INDEPENDENCE.media).caption}</p>
       </div>
     </Beat>
   );
@@ -285,20 +293,17 @@ export function War1967() {
   return (
     <Beat id="war1967" labelledBy="pro-1967-title">
       <div className="pro-grid pro-war1967__head">
-        <Mark id="war1967" className="pro-war1967__mark" />
         <p className="pro-year pro-war1967__year" aria-hidden="true" data-reveal="">
           {WAR_1967.year}
         </p>
-        <Display id="pro-1967-title" lines={WAR_1967.headline} shifts={[0, 0, 3, 3]} className="pro-display--headline pro-war1967__headline" />
+        <Display id="pro-1967-title" lines={WAR_1967.headline} end className="pro-display--headline pro-war1967__headline" />
         <Body lines={WAR_1967.body} className="pro-war1967__body" />
       </div>
       <ol className="pro-grid pro-regions" data-reveal="" aria-label="How the popular-music landscape reorganised">
         {WAR_1967.regions.map((region, index) => (
           <li key={region.place} className={`pro-regions__item pro-regions__item--${index}`}>
             <span className="pro-regions__place">{region.place}</span>
-            <span className="pro-regions__arrow" aria-hidden="true">
-              →
-            </span>
+            <span className="ui-visually-hidden">: </span>
             <span className="pro-regions__sound">{region.sound}</span>
           </li>
         ))}
@@ -309,22 +314,21 @@ export function War1967() {
 
 /** Authored positions for the genre field (percent; size 1–4; weight; scroll drift). */
 const FIELD: readonly { x: number; y: number; size: number; weight: number; drift: number }[] = [
-  { x: 2, y: 44, size: 4, weight: 800, drift: -14 },
-  { x: 62, y: 40, size: 3, weight: 500, drift: 8 },
-  { x: 70, y: 55, size: 4, weight: 700, drift: -6 },
-  { x: 4, y: 78, size: 2, weight: 300, drift: 12 },
-  { x: 38, y: 86, size: 3, weight: 600, drift: -10 },
-  { x: 72, y: 80, size: 2, weight: 400, drift: 16 },
-  { x: 44, y: 60, size: 1, weight: 300, drift: -18 },
-  { x: 20, y: 68, size: 1, weight: 500, drift: 6 },
+  { x: 2, y: 48, size: 4, weight: 800, drift: 10 },
+  { x: 62, y: 52, size: 3, weight: 500, drift: 8 },
+  { x: 79.3, y: 60, size: 4, weight: 700, drift: 6 },
+  { x: 4, y: 82, size: 2, weight: 300, drift: 12 },
+  { x: 38, y: 88.6, size: 3, weight: 600, drift: -10 },
+  { x: 72, y: 86, size: 2, weight: 400, drift: 16 },
+  { x: 46.3, y: 73, size: 1, weight: 300, drift: -18 },
+  { x: 20, y: 70.6, size: 1, weight: 500, drift: 6 },
 ];
 
 export function Explosion() {
   return (
     <Beat id="explosion" labelledBy="pro-explosion-title">
       <div className="pro-grid pro-explosion__head">
-        <Mark id="explosion" className="pro-explosion__mark" />
-        <Display id="pro-explosion-title" lines={EXPLOSION.headline} shifts={[0, 1, 2, 0]} className="pro-display--headline pro-explosion__headline" />
+        <Display id="pro-explosion-title" lines={EXPLOSION.headline} className="pro-display--headline pro-explosion__headline" />
         <Body lines={EXPLOSION.body} className="pro-explosion__body" />
       </div>
       <div className="pro-explosion__field">
@@ -338,7 +342,7 @@ export function Explosion() {
             );
           })}
         </ul>
-        <Display lines={EXPLOSION.burst} shifts={[0, 2]} className="pro-display--mega pro-explosion__burst" />
+        <Display lines={EXPLOSION.burst} shifts={[0, 3]} className="pro-display--mega pro-explosion__burst" />
       </div>
     </Beat>
   );
@@ -352,9 +356,9 @@ export function Afrobeat() {
       <div className="pro-grid pro-afrobeat__grid">
         <Media id={AFROBEAT.media} className="pro-afrobeat__fela" sizes="(max-width: 760px) 80vw, 34vw" />
         <div className="pro-afrobeat__copy">
-          <Display id="pro-afrobeat-title" lines={AFROBEAT.name} shifts={[0, 2]} className="pro-display--display pro-afrobeat__name" />
+          <Display id="pro-afrobeat-title" lines={AFROBEAT.name} className="pro-display--display pro-afrobeat__name" />
           <Micro className="pro-afrobeat__record">
-            {record.catalogueNumber} · {record.title} · {record.date}
+            {record.title} · {record.date}
           </Micro>
           <div className="pro-dna" role="group" aria-label={`${AFROBEAT.dna.inputs.join(" plus ")} became ${AFROBEAT.dna.result}`}>
             <p className="pro-dna__inputs" data-reveal="list" aria-hidden="true">
@@ -366,7 +370,7 @@ export function Afrobeat() {
               ))}
             </p>
             <p className="pro-dna__result" aria-hidden="true" data-reveal="">
-              <i>→</i> {AFROBEAT.dna.result}
+              {AFROBEAT.dna.result}
             </p>
           </div>
           <Reveal as="p" className="pro-body pro-afrobeat__note">
@@ -418,7 +422,7 @@ export function Modernities() {
         </article>
       </div>
       <div className="pro-grid pro-modernities__close">
-        <Display lines={MODERNITIES.keyLine} shifts={[0, 1, 2, 0, 1]} className="pro-display--display pro-modernities__key" />
+        <Display lines={MODERNITIES.keyLine} end={[3, 4]} className="pro-display--display pro-modernities__key" />
       </div>
     </Beat>
   );
@@ -428,12 +432,11 @@ export function Festac() {
   return (
     <Beat id="festac" labelledBy="pro-festac-title">
       <div className="pro-grid pro-festac__head">
-        <Mark id="festac" className="pro-festac__mark" />
         <p className="pro-festac__name" data-reveal="">
           <span className="pro-year">{FESTAC.year}</span>
           <span className="pro-festac__word">{FESTAC.name}</span>
         </p>
-        <Display id="pro-festac-title" lines={FESTAC.headline} shifts={[0, 3, 4, 2]} className="pro-display--headline pro-festac__headline" />
+        <Display id="pro-festac-title" lines={FESTAC.headline} end className="pro-display--headline pro-festac__headline" />
       </div>
       <Media id={FESTAC.media} className="pro-festac__media" sizes="100vw" />
       <div className="pro-grid pro-festac__after">
@@ -448,7 +451,7 @@ export function LocalSound() {
   return (
     <Beat id="localsound" labelledBy="pro-localsound-title">
       <div className="pro-grid pro-localsound__head">
-        <Display id="pro-localsound-title" lines={LOCAL_SOUND.headline} shifts={[0, 2, 1]} className="pro-display--display pro-localsound__headline" />
+        <Display id="pro-localsound-title" lines={LOCAL_SOUND.headline} className="pro-display--display pro-localsound__headline" />
       </div>
       <ol className="pro-grid pro-localsound__records" aria-label="Archive records">
         {LOCAL_SOUND.records.map((ref, index) => {
@@ -471,8 +474,7 @@ export function Youth() {
   return (
     <Beat id="youth" labelledBy="pro-youth-title">
       <div className="pro-grid pro-youth__head">
-        <Mark id="youth" className="pro-youth__mark" />
-        <Display id="pro-youth-title" lines={YOUTH.headline} shifts={[0, 1, 0, 1]} className="pro-display--display pro-youth__headline" />
+        <Display id="pro-youth-title" lines={YOUTH.headline} className="pro-display--display pro-youth__headline" />
         <Media id={YOUTH.media} className="pro-youth__tape" sizes="(max-width: 760px) 80vw, 34vw" />
       </div>
       <div className="pro-grid pro-youth__flow">
@@ -489,7 +491,7 @@ export function Youth() {
       </div>
       <div className="pro-grid pro-youth__qa">
         <Display lines={YOUTH.question} className="pro-display--statement pro-youth__question" />
-        <Display lines={YOUTH.answer} shifts={[0, 1, 1, 2]} className="pro-display--headline pro-youth__answer" />
+        <Display lines={YOUTH.answer} end className="pro-display--headline pro-youth__answer" />
       </div>
     </Beat>
   );
@@ -501,14 +503,13 @@ export function Kennis() {
     <Beat id="kennis" labelledBy="pro-kennis-title">
       <div className="pro-grid pro-kennis__grid">
         <div className="pro-kennis__left">
-          <Mark id="kennis" />
           <p className="pro-year pro-kennis__year" aria-hidden="true" data-reveal="">
             {KENNIS.year}
           </p>
           <Display lines={KENNIS.name} className="pro-display--headline pro-kennis__name" />
         </div>
         <div className="pro-kennis__right">
-          <Display id="pro-kennis-title" lines={KENNIS.headline} shifts={[0, 1, 2, 0]} className="pro-display--headline pro-kennis__headline" />
+          <Display id="pro-kennis-title" lines={KENNIS.headline} className="pro-display--headline pro-kennis__headline" />
           <Reveal as="p" className="pro-body pro-kennis__body">
             {KENNIS.body}
           </Reveal>
@@ -529,7 +530,6 @@ export function Naija() {
         {NAIJA.word}
       </p>
       <div className="pro-grid pro-naija__head">
-        <Mark id="naija" className="pro-naija__mark" />
         <Display id="pro-naija-title" lines={NAIJA.headline} className="pro-display--headline pro-naija__headline" />
       </div>
       <div className="pro-grid pro-naija__mix-row">
@@ -572,7 +572,7 @@ export function Naija() {
         })}
       </ul>
       <div className="pro-grid pro-naija__close">
-        <Display lines={NAIJA.keyLine} shifts={[0, 1, 2, 1, 3]} className="pro-display--statement pro-naija__key" />
+        <Display lines={NAIJA.keyLine} className="pro-display--statement pro-naija__key" />
       </div>
     </Beat>
   );
@@ -583,8 +583,7 @@ export function Digital() {
   return (
     <Beat id="digital" labelledBy="pro-digital-title">
       <div className="pro-grid pro-digital__head">
-        <Mark id="digital" className="pro-digital__mark" />
-        <Display id="pro-digital-title" lines={DIGITAL.headline} shifts={[0, 2, 5]} className="pro-display--headline pro-digital__headline" />
+        <Display id="pro-digital-title" lines={DIGITAL.headline} className="pro-display--headline pro-digital__headline" />
         <WordList words={DIGITAL.channels} className="pro-digital__channels" label="Channels" />
         <Body lines={DIGITAL.body} className="pro-digital__body" />
       </div>
@@ -592,13 +591,17 @@ export function Digital() {
         <p className="pro-route__from" aria-hidden="true">
           {DIGITAL.route.from}
         </p>
-        <span className="pro-route__line pro-route__line--1" aria-hidden="true" />
+        <span className="pro-route__arrow" aria-hidden="true">
+          →
+        </span>
         <ul className="pro-route__via" aria-hidden="true">
           {DIGITAL.route.via.map((step) => (
             <li key={step}>{step}</li>
           ))}
         </ul>
-        <span className="pro-route__line pro-route__line--2" aria-hidden="true" />
+        <span className="pro-route__arrow" aria-hidden="true">
+          →
+        </span>
         <ul className="pro-route__to" aria-hidden="true">
           {DIGITAL.route.to.map((place) => (
             <li key={place}>{place}</li>
@@ -652,7 +655,8 @@ export function OneDance() {
   return (
     <Beat id="onedance" labelledBy="pro-onedance-title">
       <div className="pro-grid pro-onedance__grid">
-        <Display id="pro-onedance-title" lines={ONE_DANCE.headline} shifts={[0, 1]} className="pro-display--display pro-onedance__headline" />
+        <Display id="pro-onedance-title" lines={ONE_DANCE.headline} className="pro-display--display pro-onedance__headline" />
+        <Media id={ONE_DANCE.media} className="pro-onedance__sleeve" sizes="(max-width: 760px) 60vw, 22vw" caption="none" />
         <div className="pro-onedance__card" data-reveal="">
           <span className="pro-year">{ONE_DANCE.year}</span>
           <span className="pro-onedance__credit">
@@ -691,7 +695,7 @@ export function Essence() {
         </div>
       </div>
       <div className="pro-grid pro-essence__close">
-        <Display lines={ESSENCE.keyLine} shifts={[0, 2, 1]} className="pro-display--statement pro-essence__key" />
+        <Display lines={ESSENCE.keyLine} end className="pro-display--statement pro-essence__key" />
       </div>
     </Beat>
   );
@@ -706,10 +710,9 @@ export function Global() {
           <Media id={GLOBAL.media.stage} className="pro-global__media" sizes="100vw" caption="none" reveal="none" />
           <div className="pro-global__veil" aria-hidden="true" />
           <div className="pro-grid pro-global__over">
-            <Mark id="global" className="pro-global__mark" />
             <h2 className="pro-display pro-display--display pro-global__headline" id="pro-global-title">
               {GLOBAL.headline.map((line, index) => (
-                <span key={line} className="pro-line pro-global__line" data-step-line={index + 1} style={{ "--shift": [0, 1, 2, 0][index] } as Vars}>
+                <span key={line} className="pro-line pro-global__line" data-step-line={index + 1}>
                   <span className="pro-line__inner">
                     {line}
                     {index < GLOBAL.headline.length - 1 ? " " : ""}
@@ -722,7 +725,7 @@ export function Global() {
                 <span key={line}>{line} </span>
               ))}
             </p>
-            <p className="pro-global__caption pro-media__credit">{getHomeMedia(GLOBAL.media.stage).caption} · Archive image pending</p>
+            <p className="pro-global__caption pro-media__credit">{getHomeMedia(GLOBAL.media.stage).caption}</p>
           </div>
         </div>
         <div className="pro-global__steps" aria-hidden="true">
@@ -740,7 +743,7 @@ export function Global() {
       </div>
       <div className="pro-grid pro-global__home">
         <Media id={GLOBAL.media.home} className="pro-global__ayra" sizes="(max-width: 760px) 80vw, 30vw" />
-        <Display lines={GLOBAL.contrast} shifts={[0, 1, 3]} className="pro-display--display pro-global__contrast" />
+        <Display lines={GLOBAL.contrast} shifts={[3, 3, 6]} className="pro-display--display pro-global__contrast" />
       </div>
     </Beat>
   );
@@ -751,16 +754,8 @@ export function Lineage() {
   return (
     <Beat id="lineage" labelledBy="pro-lineage-title">
       <div className="pro-grid pro-lineage__head">
-        <Display id="pro-lineage-title" lines={LINEAGE.headline} shifts={[0, 2, 1]} className="pro-display--display pro-lineage__headline" />
+        <Display id="pro-lineage-title" lines={LINEAGE.headline} className="pro-display--display pro-lineage__headline" />
       </div>
-      <ol className="pro-grid pro-fragments" aria-label="Evidence from earlier in the story">
-        {LINEAGE.fragments.map((fragment, index) => (
-          <li key={fragment.media} className="pro-fragments__item" data-reveal="" style={{ "--delay": `${index * 70}ms` } as Vars}>
-            <Media id={fragment.media} variant="fragment" sizes="120px" caption="none" reveal="none" />
-            <span className="pro-fragments__label">{fragment.label}</span>
-          </li>
-        ))}
-      </ol>
       <ol className="pro-grid pro-lineages" aria-label="Musical lineages">
         {LINEAGE.lineages.map((lineage, index) => (
           <li key={lineage.steps.join()} className="pro-lineage-item" data-reveal="" style={{ "--delay": `${index * 90}ms` } as Vars}>
@@ -783,7 +778,7 @@ export function Lineage() {
         ))}
       </ol>
       <div className="pro-grid pro-lineage__statement-row">
-        <Display lines={LINEAGE.statement} shifts={[0, 1, 2, 0, 1, 3, 0, 1, 2, 3]} className="pro-display--statement pro-lineage__statement" />
+        <Display lines={LINEAGE.statement} className="pro-display--statement pro-lineage__statement" />
       </div>
       <div className="pro-grid pro-thesis-row">
         <ol className="pro-thesis" data-reveal="list" aria-label={`The archive's thesis: ${LINEAGE.thesis.join(", then ").toLowerCase()}`}>
@@ -803,7 +798,6 @@ export function Finale({ credits }: { credits: ReactNode }) {
   return (
     <Beat id="finale" labelledBy="pro-finale-title">
       <div className="pro-grid pro-finale__grid">
-        <Micro className="pro-finale__years">{FINALE.years}</Micro>
         <dl className="pro-finale__figures" data-reveal="list">
           {FINALE.figures.map((figure, index) => (
             <div key={figure.label} style={{ "--i": index } as Vars}>
@@ -812,10 +806,13 @@ export function Finale({ credits }: { credits: ReactNode }) {
             </div>
           ))}
         </dl>
-        <Display id="pro-finale-title" lines={FINALE.unfinished} shifts={[0, 2, 1]} className="pro-display--display pro-finale__unfinished" />
-        <Display as="p" lines={FINALE.invitation} shifts={[0, 1]} className="pro-display--headline pro-finale__invitation" />
+        <Display id="pro-finale-title" lines={FINALE.unfinished} className="pro-display--display pro-finale__unfinished" />
+        <Display as="p" lines={FINALE.invitation} end className="pro-display--headline pro-finale__invitation" />
       </div>
       <div className="pro-grid pro-finale__foot">{credits}</div>
+      <div className="pro-finale__wordmark" aria-hidden="true">
+        <span className="pro-finale__wordmark-art" />
+      </div>
     </Beat>
   );
 }

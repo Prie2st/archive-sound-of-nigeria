@@ -170,6 +170,12 @@ html.archive-prologue body {
   display: inline-block;
 }
 
+/* A line set flush right (Display `end`): the shift no longer applies. */
+.pro-line--end {
+  text-align: end;
+  padding-inline-start: 0;
+}
+
 /* The authored phone break (" | " in the data): a plain space on wider screens. */
 .pro-br {
   display: inline;
@@ -302,6 +308,33 @@ html.archive-prologue body {
   opacity: 0.72;
 }
 
+/* Words set on a designed image (media.overlay): the same title and foot as the archive card, in the ink the
+   design gave that photograph, over an optional scrim. */
+.pro-media__over {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 8px;
+  padding: clamp(10px, 5cqi, 22px);
+  color: var(--over-ink, #ece5d6);
+  pointer-events: none;
+}
+
+.pro-media__over::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--over-scrim, transparent);
+}
+
+/* the designed photographs keep the card's hairline (no inner frame) */
+.pro-media__over .pro-media__slot-foot {
+  border-top-color: rgba(27, 24, 19, 0.22);
+}
+
 /* reused evidence in the lineage: a quiet contact sheet, not nine bright cards */
 .pro-media--fragment {
   --card-bg: #1d1a16;
@@ -369,10 +402,9 @@ html.archive-prologue body {
 .pro-enter {
   --cta-bg: #efe7da;
   --cta-fg: #14120f;
-  --cta-where: rgba(239, 231, 218, 0.78);
   position: fixed;
   right: var(--pro-right);
-  bottom: max(clamp(16px, 2.6vw, 40px), calc(env(safe-area-inset-bottom) + 10px));
+  top: max(var(--pro-margin), env(safe-area-inset-top));
   z-index: 50;
   display: flex;
   align-items: center;
@@ -390,24 +422,6 @@ html.archive-prologue body {
 .pro[data-tone="light"] .pro-enter {
   --cta-bg: #15130f;
   --cta-fg: #f3eee4;
-  --cta-where: rgba(20, 18, 14, 0.72);
-}
-
-.pro-enter__where {
-  display: flex;
-  gap: 0.9em;
-  font: 600 var(--t-micro) / 1 var(--f-text);
-  letter-spacing: var(--tr-micro);
-  text-transform: uppercase;
-  color: var(--cta-where);
-  white-space: nowrap;
-  transition:
-    color 0.5s ease,
-    opacity 0.4s ease;
-}
-
-.pro-enter__number {
-  font-variant-numeric: tabular-nums;
 }
 
 .pro-enter__pill {
@@ -424,11 +438,7 @@ html.archive-prologue body {
   background: var(--cta-bg);
   transition:
     background-color 0.5s ease,
-    color 0.5s ease,
-    min-height 0.7s var(--pro-ease),
-    padding 0.7s var(--pro-ease),
-    font-size 0.7s var(--pro-ease),
-    letter-spacing 0.7s var(--pro-ease);
+    color 0.5s ease;
 }
 
 .pro-enter__arrow {
@@ -465,18 +475,6 @@ html.archive-prologue body {
 
 .pro-enter:disabled {
   cursor: default;
-}
-
-/* Near the end the control becomes the composition's last word. */
-.pro-enter.is-final .pro-enter__where {
-  opacity: 0;
-}
-
-.pro-enter.is-final .pro-enter__pill {
-  min-height: clamp(64px, 6.4vw, 100px);
-  padding: 0 clamp(26px, 2.6vw, 44px);
-  font-size: clamp(13px, 0.55vw + 9px, 17px);
-  letter-spacing: 0.26em;
 }
 
 .pro--loading .pro-enter {

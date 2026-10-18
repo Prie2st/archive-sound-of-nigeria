@@ -92,7 +92,6 @@ export function Prologue({ audio, returningHome = false, isSceneReady, onEnter, 
   const [settled, setSettled] = useState(returningHome);
   const [leaving, setLeaving] = useState(false);
   const [chapter, setChapter] = useState<ChapterMeta>(CHAPTERS[0]);
-  const [finale, setFinale] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const leavingRef = useRef(false);
   const phase = leaving ? "leaving" : settled ? "story" : revealed ? "opening" : "loading";
@@ -123,7 +122,7 @@ export function Prologue({ audio, returningHome = false, isSceneReady, onEnter, 
     return () => window.clearTimeout(timer);
   }, [revealed, settled, reduced, onCoverChange]);
 
-  // Reveals, the chapter indicator, the GLOBAL step sequence and the finale CTA — all IntersectionObserver.
+  // Reveals, the chapter indicator, and the GLOBAL step sequence — all IntersectionObserver.
   useEffect(() => {
     const root = rootRef.current;
     if (!revealed || !root) return;
@@ -172,12 +171,6 @@ export function Prologue({ audio, returningHome = false, isSceneReady, onEnter, 
     root.querySelectorAll("[data-step]").forEach((element) => steps.observe(element));
     observers.push(steps);
 
-    const finaleSection = root.querySelector('[data-chapter="finale"]');
-    if (finaleSection) {
-      const last = new IntersectionObserver((entries) => setFinale(entries[entries.length - 1].isIntersecting), { threshold: 0.4 });
-      last.observe(finaleSection);
-      observers.push(last);
-    }
     return () => observers.forEach((observer) => observer.disconnect());
   }, [revealed]);
 
@@ -200,14 +193,9 @@ export function Prologue({ audio, returningHome = false, isSceneReady, onEnter, 
     [audio, onEnter, onCoverChange],
   );
 
-  const indicator = chapter.number ? `${chapter.number} / 08` : null;
   return (
     <div ref={rootRef} className={`pro pro--${phase}${reduced ? " pro--reduced" : ""}`} data-tone={chapter.tone} aria-busy={!revealed}>
-      <button type="button" className={`pro-enter${finale ? " is-final" : ""}`} onClick={enter} disabled={leaving || !revealed} aria-label="Enter archive — opens the 3D museum with sound">
-        <span className="pro-enter__where" aria-hidden="true">
-          {indicator && <span className="pro-enter__number">{indicator}</span>}
-          <span className="pro-enter__label">{chapter.label}</span>
-        </span>
+      <button type="button" className="pro-enter" onClick={enter} disabled={leaving || !revealed} aria-label="Enter archive — opens the 3D museum with sound">
         <span className="pro-enter__pill">
           <span className="pro-enter__text">Enter archive</span>
           <span className="pro-enter__arrow" aria-hidden="true">

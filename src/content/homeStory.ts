@@ -4,7 +4,7 @@
  *
  * Rules: conservative wording ("one of the early landmarks", "helped"); no invented dates, firsts or chart claims;
  * records are referenced by archive id and worded by `describeTrack`; artists outside the archive appear as names
- * only. Display lines are authored line by line (" | " = the extra break phones take).
+ * only. Display lines are authored line by line (" | " = the extra break phones take; *…* = an accent run).
  *
  * Plain TypeScript (imported by Node tests): relative imports with ".ts", no enums.
  */
@@ -13,7 +13,7 @@ import { ARCHIVE_ENTRIES, ARCHIVE_TRACKS_BY_ERA } from "../data/tracks.ts";
 import { describeTrack } from "../data/trackDisplay.ts";
 import { ARCHIVE_THESIS, ERA_IDS, type EraId } from "../data/types.ts";
 
-/** Display text, one entry per line as it breaks on screen; " | " marks the extra phone break. */
+/** Display text, one entry per line as it breaks on screen; " | " marks the extra phone break, *…* an accent run. */
 export type Lines = readonly string[];
 export const MOBILE_BREAK = " | ";
 
@@ -108,11 +108,9 @@ export const CHAPTERS: readonly ChapterMeta[] = BEATS.map((beat) => ({
 // Copy
 
 export const OPENING = {
-  kicker: "Archive",
   title: ["The sound", "of Nigeria"] as Lines,
   years: "1900 — 2026",
-  premise: ["126 years of", "rhythm,", "reinvention", "and influence."] as Lines,
-  cue: "Scroll through the story",
+  premise: ["126 years of", "*rhythm,*", "reinvention", "and influence."] as Lines,
 } as const;
 
 export const SYSTEMS = {
@@ -142,12 +140,12 @@ export const RECORD_1922 = {
   ] as Lines,
   verbsLead: "A performance could now be:",
   verbs: ["Recorded", "Reproduced", "Sold", "Replayed", "Circulated"] as Lines,
-  chain: ["Performance", "Record", "Audience", "Popular song", "Star"] as Lines,
+  chain: ["Performance", "Record", "Star", "Popular song", "Audience"] as Lines,
   media: "record-shellac",
 } as const;
 
 export const CITY = {
-  headline: ["The city", "creates | a new sound."] as Lines,
+  headline: ["The city creates", "a new sound."] as Lines,
   body: [
     "As Lagos expanded, traditional Yorùbá musical forms encountered guitars, banjos, church music, drinking-house music and other urban influences.",
     "Palm-wine guitar styles circulated across West Africa.",
@@ -164,7 +162,7 @@ export const CITY = {
 export const KING_1937 = {
   year: "1937",
   record: { id: "tunde-king-aronke-macaulay" } as RecordRef,
-  keyLine: ["A recognisable", "Nigerian urban", "popular music", "was taking shape."] as Lines,
+  keyLine: ["A recognisable | Nigerian urban", "popular music | was taking shape."] as Lines,
   media: "sleeve-tunde-king-aronke-macaulay",
 } as const;
 
@@ -174,7 +172,6 @@ export const HIGHLIFE = {
   records: refs("bobby-benson-taxi-driver", "victor-olaiya-baby-jowo", "rex-lawson-sawale", "victor-uwaifo-joromi", "orlando-julius-jaguar-nana"),
   ingredientsLead: "They combined African rhythms with",
   ingredients: ["Guitars", "Horns", "Jazz", "Dance-band arrangements", "Local languages"] as Lines,
-  sleeves: ["sleeve-bobby-benson-taxi-driver", "sleeve-victor-olaiya-baby-jowo", "sleeve-rex-lawson-sawale", "sleeve-victor-uwaifo-joromi", "sleeve-orlando-julius-jaguar-nana"],
 } as const;
 
 export const INDEPENDENCE = {
@@ -210,10 +207,10 @@ export const EXPLOSION = {
 } as const;
 
 export const AFROBEAT = {
-  name: ["Fela", "Kuti"] as Lines,
+  name: ["Fela Kuti"] as Lines,
   record: { id: "fela-kuti-water-no-get-enemy" } as RecordRef,
   dna: { inputs: ["Highlife", "Jazz", "Funk", "African polyrhythm", "Political resistance"] as Lines, result: "Afrobeat" },
-  note: "Afrobeat was one branch of the expansion — not the whole of it.",
+  note: "Afrobeat was one branch of the expansion, not the whole of it.",
   media: "fela-live",
 } as const;
 
@@ -232,7 +229,7 @@ export const MODERNITIES = {
 export const FESTAC = {
   year: "1977",
   name: "FESTAC",
-  headline: ["Lagos becomes", "a stage", "for the", "Black world."] as Lines,
+  headline: ["Lagos becomes", "a stage for", "the Black world."] as Lines,
   body: [
     "The Second World Black and African Festival of Arts and Culture brought performers, artists and cultural figures from Africa and the African diaspora to Lagos.",
     "Lagos had become not only a Nigerian music centre but part of a much larger global Black cultural network.",
@@ -241,7 +238,7 @@ export const FESTAC = {
 } as const;
 
 export const LOCAL_SOUND = {
-  headline: ["Local sound", "could be", "popular sound."] as Lines,
+  headline: ["Local sound | could be", "popular sound."] as Lines,
   records: refs({ id: "king-sunny-ade-ja-funmi", date: false }, "sikiru-ayinde-barrister-fuji-garbage", "majek-fashek-send-down-the-rain"),
   sleeves: ["sleeve-king-sunny-ade-ja-funmi", "sleeve-sikiru-ayinde-barrister-fuji-garbage", "sleeve-majek-fashek-send-down-the-rain"],
 } as const;
@@ -254,7 +251,7 @@ export const YOUTH = {
   turn: "Instead of simply copying those forms, Nigerian musicians began localising them.",
   vocabulary: ["Pidgin", "Local accents", "Street language", "Nigerian stories", "Indigenous rhythms"] as Lines,
   question: ["The question was", "no longer:", "Can Nigerians rap?"] as Lines,
-  answer: ["It was:", "What does", "Nigerian rap", "sound like?"] as Lines,
+  answer: ["It was:", "What does | Nigerian", "rap sound like?"] as Lines,
   records: refs("the-remedies-shakomo", "junior-and-pretty-monika", "trybesmen-shake-bodi", "daddy-showkey-diana", "adewale-ayuba-bubble"),
   media: "cassette-vhs",
 } as const;
@@ -262,7 +259,7 @@ export const YOUTH = {
 export const KENNIS = {
   year: "1998",
   name: ["Kennis", "Music"] as Lines,
-  headline: ["Nigerian", "youth music", "gets an", "industrial machine."] as Lines,
+  headline: ["Nigerian | youth music", "gets an", "industrial machine."] as Lines,
   body: "The rise of Kennis and related late-1990s structures helped create a stronger commercial platform for Nigeria’s new youth-oriented pop and hip-hop generation.",
   generationLabel: "The late-1990s youth-pop generation included",
   generation: ["The Remedies", "Tony Tetuila", "Eedris Abdulkareem", "Plantashun Boiz"] as Lines,
@@ -277,7 +274,7 @@ export const NAIJA = {
   records: refs("2face-idibia-african-queen", "sound-sultan-mathematics", "dbanj-why-me", "9ice-gongo-aso", "wande-coal-bumper-to-bumper"),
   sleeves: ["sleeve-2face-idibia-african-queen", "sleeve-sound-sultan-mathematics", "sleeve-dbanj-why-me", "sleeve-9ice-gongo-aso", "sleeve-wande-coal-bumper-to-bumper"],
   objects: ["nokia-3310", "cd-disc"],
-  keyLine: ["The sound", "that would later", "travel the world", "was being built", "at home."] as Lines,
+  keyLine: ["The sound that | would later travel", "the world was being | built at home."] as Lines,
 } as const;
 
 export const DIGITAL = {
@@ -307,19 +304,20 @@ export const ONE_DANCE = {
   credit: ["Wizkid", "+ Drake"] as Lines,
   title: "One Dance",
   body: "One of the clearest signs that Nigerian pop was moving deeper into global mainstream visibility.",
+  media: "one-dance-cover",
 } as const;
 
 export const ESSENCE = {
   year: "2020",
   record: { id: "wizkid-tems-essence" } as RecordRef,
   body: "Essence became one of the defining Nigerian crossover records of the period.",
-  keyLine: ["Global success", "stops looking", "like an accident."] as Lines,
+  keyLine: ["Global success stops", "looking like | an accident."] as Lines,
   media: "sleeve-wizkid-tems-essence",
 } as const;
 
 export const GLOBAL = {
   headline: ["Nigerian music", "doesn’t need", "to cross over", "anymore."] as Lines,
-  answer: ["It is already", "part of", "global pop."] as Lines,
+  answer: ["It is already part", "of global pop."] as Lines,
   names: ["Tems", "Rema", "Ayra Starr", "Asake", "Burna Boy", "Wizkid", "Davido", "Omah Lay", "Fireboy", "Seyi Vibez", "Shallipopi"] as Lines,
   genres: ["Afropop", "Afro-R&B", "Afro-fusion", "Street-pop", "Afropiano", "Alté", "Hip-hop", "Fuji-influenced pop"] as Lines,
   fragmentation: "What gets called “Afrobeats” is increasingly an ecosystem rather than one sound.",
@@ -329,37 +327,24 @@ export const GLOBAL = {
 
 export const LINEAGE = {
   headline: ["The new sound", "is never", "entirely new."] as Lines,
-  /** Fragments of earlier evidence, reused — no new images here. */
-  fragments: [
-    { media: "roots-talking-drum", label: "Dùndún" },
-    { media: "record-shellac", label: "1922" },
-    { media: "sleeve-tunde-king-aronke-macaulay", label: "1937" },
-    { media: "independence-1960", label: "1960" },
-    { media: "fela-live", label: "Afrobeat" },
-    { media: "cassette-vhs", label: "1990s" },
-    { media: "nokia-3310", label: "2000s" },
-    { media: "nativeland-2016", label: "2016" },
-    { media: "tems-international", label: "2020s" },
-  ],
   lineages: [
     { from: ["Dùndún"], steps: ["Jùjú", "Modern Yorùbá pop"] },
     { from: ["Wéré / ajisari"], steps: ["Fuji", "Street-pop", "Afropiano"] },
     { from: ["Highlife", "Jazz", "Funk"], steps: ["Afrobeat"] },
     { from: ["Hip-hop", "R&B", "Pidgin", "Local rhythms"], steps: ["Naija pop", "Afrobeats"] },
   ] as readonly { from: Lines; steps: Lines }[],
-  statement: ["Nigeria", "repeatedly", "absorbs", "outside influence,", "transforms it", "locally,", "and sends", "something new", "back into", "the world."] as Lines,
+  statement: ["Nigeria repeatedly | *absorbs*", "outside influence, | *transforms it* | locally,", "and sends | *something new* | back into the world."] as Lines,
   thesis: ARCHIVE_THESIS,
 } as const;
 
 export const FINALE = {
-  years: "1900 — 2026",
   figures: [
     { value: String(ERA_IDS.length), label: "Eras" },
     { value: String(ARCHIVE_ENTRIES.length), label: "Records" },
     { value: String(2026 - 1900), label: "Years" },
   ],
-  unfinished: ["The story", "is not", "finished."] as Lines,
-  invitation: ["Listen", "to it."] as Lines,
+  unfinished: ["The story is", "not finished."] as Lines,
+  invitation: ["Listen to it."] as Lines,
 } as const;
 
 /** Every archive record the homepage cites, per era — checked by the tests. */
@@ -379,7 +364,6 @@ export const PLACED_MEDIA: Readonly<Partial<Record<BeatId, readonly string[]>>> 
   record1922: [RECORD_1922.media],
   city: CITY.sequence.map((step) => step.media),
   king1937: [KING_1937.media],
-  highlife: HIGHLIFE.sleeves,
   independence: [INDEPENDENCE.media],
   afrobeat: [AFROBEAT.media],
   modernities: [MODERNITIES.juju.media, MODERNITIES.apala.media],
@@ -388,6 +372,7 @@ export const PLACED_MEDIA: Readonly<Partial<Record<BeatId, readonly string[]>>> 
   youth: [YOUTH.media],
   naija: [...NAIJA.sleeves, ...NAIJA.objects],
   afrobeats: [AFROBEATS.media.performance, AFROBEATS.media.nativeland],
+  onedance: [ONE_DANCE.media],
   essence: [ESSENCE.media],
   global: [GLOBAL.media.stage, GLOBAL.media.home],
 };
