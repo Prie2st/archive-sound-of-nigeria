@@ -11,6 +11,7 @@
     "check:tonearm": "node --no-warnings scripts/check-tonearm-mechanics.mjs",
     "check": "tsc --noEmit && eslint . && npm test && npm run check:content",
     "models": "node --no-warnings scripts/build-models.mjs",
+    "favicons": "node --no-warnings scripts/build-favicons.mjs",
     "check:hall": "node --no-warnings scripts/check-hall-layout.mjs",
     "audit:textures": "node --no-warnings scripts/audit-textures.mjs",
     "audit:geometry": "node --no-warnings scripts/audit-turntable-geometry.mjs",
