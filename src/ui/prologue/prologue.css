@@ -487,14 +487,15 @@ html.archive-prologue body {
 
 /* --- loader: the first moment (Figma "ARCHIVE — Intro / Home", node 46:39) --------------------------------------
  * Cream screen, wordmark top-left, a cycling instrument icon in the centre, the count bottom-right. An ink panel rises
- * with the count (--p, 0–1, written by Loader.tsx): the dark face is the same layout in cream, clipped to the panel.
+ * with the count: Loader.tsx slides .pro-loader__panel up and the dark face inside it down by the same amount
+ * (Web Animations on transform, so the motion stays composited while the museum loads underneath).
  */
 
 .pro-loader {
   --loader-cream: #efe7da;
   --loader-ink: #0d0c0b;
   --loader-type: clamp(5.5rem, 10.42vw, 11.5rem); /* 150px at 1440 */
-  --loader-icon-step: 0.42s;
+  --loader-icon-step: 0.6s;
   position: fixed;
   inset: 0;
   z-index: 60;
@@ -509,10 +510,19 @@ html.archive-prologue body {
   background: var(--loader-cream);
 }
 
+.pro-loader__panel {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  transform: translate3d(0, 100%, 0);
+  will-change: transform;
+}
+
 .pro-loader__face--dark {
   color: var(--loader-cream);
   background: var(--loader-ink);
-  clip-path: inset(calc((1 - var(--p, 0)) * 100%) 0 0 0);
+  transform: translate3d(0, -100%, 0);
+  will-change: transform;
 }
 
 /* Graphics are the supplied SVGs used as masks, so each face can colour them (ink / cream). Native sizes kept. */
@@ -544,28 +554,26 @@ html.archive-prologue body {
   place-items: center;
 }
 
-/* Five icons, one at a time: each holds a fifth of the cycle (keyframe offsets assume --n = 5). */
+/* Five icons, one at a time: each holds a fifth of the cycle and crossfades into the next (offsets assume --n = 5). */
 .pro-loader__icon {
   grid-area: 1 / 1;
   opacity: 0;
-  animation: pro-icon calc(var(--n) * var(--loader-icon-step)) linear infinite;
+  animation: pro-icon calc(var(--n) * var(--loader-icon-step)) ease-in-out infinite;
   animation-delay: calc((var(--i) - var(--n)) * var(--loader-icon-step));
+  will-change: opacity;
 }
 
 @keyframes pro-icon {
   0% {
     opacity: 0;
-    transform: scale(0.94);
   }
-  3%,
-  18% {
+  6%,
+  20% {
     opacity: 1;
-    transform: none;
   }
-  20%,
+  26%,
   100% {
     opacity: 0;
-    transform: none;
   }
 }
 
@@ -592,6 +600,37 @@ html.archive-prologue body {
     line-height: 0.86;
     text-box: trim-both cap alphabetic;
   }
+}
+
+/*
+ * The count as odometer cells: fixed width (OJUJU has no tabular figures), one 1em row per digit, the strip moved
+ * by a stepped transform animation (Loader.tsx). At line-height 1 OJUJU sits its baseline 0.92em down, so the
+ * cells drop 0.08em to keep the Figma baseline on the margin; digits occupy 0.20–0.94em, inside the cell.
+ */
+.pro-loader .pro-loader__count {
+  display: flex;
+  bottom: calc(max(var(--pro-margin), env(safe-area-inset-bottom)) - 0.08em);
+  line-height: 1;
+  text-box: normal;
+}
+
+.pro-loader__digit {
+  display: block;
+  width: 0.59em;
+  height: 1em;
+  overflow: hidden;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+.pro-loader__strip {
+  display: block;
+  will-change: transform;
+}
+
+.pro-loader__strip > span {
+  display: block;
+  height: 1em;
 }
 
 /* Words wait for OJUJU (the fallback face would jump). */

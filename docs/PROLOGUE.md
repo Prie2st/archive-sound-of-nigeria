@@ -35,15 +35,21 @@ points below.)
     story fades (0.95 s; 0.25 s with reduced motion) → unmount.
 - **Loading screen** (`Loader.tsx`; Figma "ARCHIVE — Intro / Home", node 46:39; redesigned 2026-10-18):
   - **Layout.** Cream `#efe7da` screen. The ARCHIVE wordmark (`public/brand/archive-wordmark.svg`) sits
-    top-left. An instrument icon cycles in the centre: trumpet, guitar, shaker, djembe, conga, 0.42 s each, from
+    top-left. An instrument icon cycles in the centre: trumpet, guitar, shaker, djembe, conga, crossfading every 0.6 s, from
     `design/icons` → `public/icons/loader/` at native sizes. A large OJUJU 650 counter sits bottom-right, 150 px
     at 1440.
   - **Count.** The counter runs 00 → 100 and an ink `#0d0c0b` panel rises with it. Whatever the panel covers
     turns cream: a second copy of the layout is clipped to the panel, and the graphics are the SVGs used as CSS
     masks.
-  - **What drives it.** The count follows drei's file progress, smoothed. It never runs backwards, creeps while
-    nothing reports, holds at 94 until the archive is ready, and takes at least 2.6 s. A timer writes it to the
-    DOM, so a hidden page still completes.
+  - **What drives it.** Loading the museum blocks the main thread for seconds at a time, so nothing in the
+    loader moves on it; everything runs on the compositor:
+    - The panel is moved by Web Animations on `transform`: the panel slides up while its content slides down.
+    - Each digit is an odometer strip (fixed 0.59 em cells, because OJUJU has no tabular figures). Stepped
+      `transform` animations move the strips, with change times taken from the panel's own easing curve.
+    - The icons and letters are CSS opacity animations.
+  - **Timing.** Phase A runs 0 → 94 over 4.2 s and waits there. Once the archive is ready, phase B goes from
+    wherever A is to 100, never finishing before 2.8 s in total. JavaScript only starts the runs and notices the
+    end; a slow timer covers hidden pages.
   - **Outro.** At 100 the count holds, it and the icon fade, and THE SOUND OF NIGERIA arrives letter by letter
     (55 ms stagger) on the full ink screen. Then the existing shutter lift opens the story (about 2.2 s after
     100). The motion reference was the owner's loader video.
