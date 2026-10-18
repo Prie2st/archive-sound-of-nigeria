@@ -3,3 +3,4 @@
 /table.glb filter=lfs diff=lfs merge=lfs -text
 /turntable.glb filter=lfs diff=lfs merge=lfs -text
 /vinyl.glb filter=lfs diff=lfs merge=lfs -text
+/exhibits-src/*.glb filter=lfs diff=lfs merge=lfs -text

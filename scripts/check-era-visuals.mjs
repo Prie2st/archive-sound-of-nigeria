@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import * as THREE from 'three';
 import { OBB } from 'three/examples/jsm/math/OBB.js';
-import { getHallLayout, progressDelta } from '../src/data/hallLayout.ts';
+import { EXHIBIT_PLINTH, EXHIBIT_SLOTS, exhibitHeading, getHallLayout, progressDelta } from '../src/data/hallLayout.ts';
+import { EXHIBITS } from '../src/data/exhibits.ts';
 import { ERA_ATLAS, ERA_WORLD_LAYOUT, eraPanelPose, eraVisualTier } from '../src/data/eraVisuals.ts';
 import { FOCUS_CONFIG, bezierPoint, transitionControlPoint } from '../src/state/focus.ts';
 const layout=getHallLayout(), p=ERA_WORLD_LAYOUT.panel;
@@ -20,6 +21,12 @@ const boxes=layout.stations.flatMap(station=>{
   }
   return result;
 });
+// Instrument exhibits: plinth footprint up to the top of the instrument stood upright (conservative).
+for(const slot of EXHIBIT_SLOTS){
+  const exhibit=EXHIBITS.find(e=>e.id===slot.exhibitId); assert(exhibit,`exhibit slot ${slot.exhibitId} has no exhibit`);
+  const top=exhibit.plinth+exhibit.size;
+  boxes.push(box([0,top/2,0],[EXHIBIT_PLINTH.width,top,EXHIBIT_PLINTH.depth],matrix(slot.position,exhibitHeading(slot))));
+}
 const distance=point=>Math.min(...boxes.map(b=>b.clampPoint(point,new THREE.Vector3()).distanceTo(point)));
 let route=Infinity,flight=Infinity,sight=Infinity;
 for(let k=0;k<1600;k++) route=Math.min(route,distance(layout.curve.getPointAt(k/1600)));
@@ -38,5 +45,5 @@ for(let i=0;i<8;i++) {
   assert.equal(tiers.filter(t=>t==='active').length,1); assert.equal(tiers.filter(t=>t==='nearby').length,2); assert.equal(tiers.filter(t=>t==='distant').length,5);
 }
 const stat=await fs.stat('public'+ERA_ATLAS.url); assert(stat.size<256*1024,'atlas over 256 KiB transfer budget');
-console.log(`Era visuals: 8 conservative OBBs (one backdrop panel per station); interaction and moving-record envelopes clear.\nRoute: ${route.toFixed(3)} m (1,600 samples). Focus flights: ${flight.toFixed(3)} m (8 × 9 × 61). Deck sightlines: ${sight.toFixed(3)} m.\nAll eight LOD assignments: 1 ACTIVE / 2 NEARBY / 5 DISTANT, including GLOBAL ↔ ROOTS.\nAtlas: ${(stat.size/1024).toFixed(1)} KiB, 10.67 MiB with mipmaps. Hall geometry screening: npm run check:hall.`);
+console.log(`Era visuals: ${boxes.length} conservative OBBs (8 backdrop panels, ${EXHIBIT_SLOTS.length} exhibits); interaction and moving-record envelopes clear.\nRoute: ${route.toFixed(3)} m (1,600 samples). Focus flights: ${flight.toFixed(3)} m (8 × 9 × 61). Deck sightlines: ${sight.toFixed(3)} m.\nAll eight LOD assignments: 1 ACTIVE / 2 NEARBY / 5 DISTANT, including GLOBAL ↔ ROOTS.\nAtlas: ${(stat.size/1024).toFixed(1)} KiB, 10.67 MiB with mipmaps. Hall geometry screening: npm run check:hall.`);
 

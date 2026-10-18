@@ -22,7 +22,8 @@ import { NodeIO } from "@gltf-transform/core";
 import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
 import { MeshoptDecoder } from "meshoptimizer";
 import * as THREE from "three";
-import { HALL, PATH_CONTROL_POINTS, getHallLayout, progressDelta } from "../src/data/hallLayout.ts";
+import { EXHIBIT_PLINTH, EXHIBIT_SLOTS, HALL, PATH_CONTROL_POINTS, exhibitHeading, getHallLayout, progressDelta } from "../src/data/hallLayout.ts";
+import { EXHIBITS } from "../src/data/exhibits.ts";
 import { FOCUS_CONFIG, bezierPoint, transitionControlPoint } from "../src/state/focus.ts";
 
 import { ERA_WORLD_LAYOUT, eraPanelPose } from "../src/data/eraVisuals.ts";
@@ -314,6 +315,26 @@ for (const station of layout.stations) {
   for(let x=-panel.width/2;x<=panel.width/2+.001;x+=.1) for(let y=pose.position[1]-panel.height/2;y<=pose.position[1]+panel.height/2;y+=.1) probe(x,y,0,pose.position,pose.heading);
   console.log(`  ${station.debugLabel.padEnd(14)} ${samples} probes, ${hits} hall intersections`);
   if(hits) problems.fail.push(`${station.debugLabel}: era visual surfaces intersect hall (${hits} probes)`);
+}
+
+// Instrument exhibits (EXHIBIT_SLOTS): the plinth footprint grown by 10 cm, up to the top of the instrument (its
+// largest dimension stood upright, a conservative bound). Floor flat under it, no hall voxels inside it.
+console.log("\nExhibits (10 cm margin around plinth + instrument):");
+for (const slot of EXHIBIT_SLOTS) {
+  const exhibit = EXHIBITS.find((e) => e.id === slot.exhibitId);
+  if (!exhibit) { problems.fail.push(`exhibit slot ${slot.exhibitId}: no such exhibit`); continue; }
+  const yaw = exhibitHeading(slot), top = exhibit.plinth + exhibit.size;
+  const hw = EXHIBIT_PLINTH.width / 2 + 0.1, hd = EXHIBIT_PLINTH.depth / 2 + 0.1;
+  let hits = 0, samples = 0, worstFloor = 0;
+  for (let lx = -hw; lx <= hw + 1e-6; lx += 0.05) for (let lz = -hd; lz <= hd + 1e-6; lz += 0.05) {
+    const wx = slot.position[0] + lx * Math.cos(yaw) + lz * Math.sin(yaw), wz = slot.position[2] - lx * Math.sin(yaw) + lz * Math.cos(yaw);
+    const f = floor[cellOf(wx, wz)];
+    worstFloor = Math.max(worstFloor, Number.isNaN(f) ? Infinity : Math.abs(f - slot.position[1]));
+    for (let y = slot.position[1] + 0.1; y <= slot.position[1] + top + 0.05; y += 0.1) { samples++; if (voxelAt(wx, y, wz)) hits++; }
+  }
+  console.log(`  ${exhibit.id.padEnd(13)} ${samples} probes, ${hits} hall intersections, floor deviation ${fmt(worstFloor, 3)} m`);
+  if (hits) problems.fail.push(`exhibit ${exhibit.id}: intersects hall (${hits} probes)`);
+  if (worstFloor > 0.03) problems.fail.push(`exhibit ${exhibit.id}: floor not flat under the plinth (${fmt(worstFloor, 3)} m)`);
 }
 
 // The listening desk (docs/LISTENING_STATION_TABLE.md) in station space, grown by the album-stack browse glide

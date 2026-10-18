@@ -291,6 +291,12 @@ Gallery
 ```
 Lighting is baked into the texture (unlit material) — scene lights won't affect it.
 
+**`/public/models/exhibits/<id>.glb`**: nine instrument exhibits on plinths around the hall, built by
+`npm run exhibits` (`scripts/build-exhibits.mjs`) from the Sketchfab originals in `/exhibits-src` (Git LFS; never
+edit them). Content and credits are in `src/data/exhibits.ts`, placement in `EXHIBIT_SLOTS` (`src/data/hallLayout.ts`),
+and the rest in [docs/EXHIBITS.md](docs/EXHIBITS.md). All are third-party: keep the credits, and never simplify the
+CC BY-ND axatse.
+
 ### Loading
 - Files require **`EXT_meshopt_compression`**. Drei's `useGLTF` handles Meshopt by default; with plain `GLTFLoader` call `loader.setMeshoptDecoder(MeshoptDecoder)` (`three/examples/jsm/libs/meshopt_decoder.module.js`). Draco is not used.
 - Load each GLB **once** and clone nodes per station (§8). Heaviest assets: the marble gallery (2.34 M triangles) and the ACTIVE turntable (774k triangles) — only one station should use the ACTIVE tier; the others use NEARBY / DISTANT (§10, docs/STATION_LOD.md).

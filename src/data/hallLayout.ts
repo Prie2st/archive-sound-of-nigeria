@@ -156,6 +156,37 @@ export const STATION_SLOTS: readonly StationSlot[] = [
   { index: 7, eraId: "global", debugLabel: "08 GLOBAL", position: [-16.54, HALL.walkwayFloorY, -19.56], viewControlPoint: 14, note: "NW corner bay" },
 ];
 
+/**
+ * Instrument exhibits (src/data/exhibits.ts) on plinths on the outer walkway, one in the bay just before each era's
+ * station (seen on the approach), two for ROOTS in the GLOBAL → ROOTS seam bay. Each faces the hall centre, turned
+ * by `yawOffsetDeg`. Added 2026-10-18 (docs/HALL_LAYOUT_LOCK.md §8, docs/EXHIBITS.md); screened by `npm run check:hall` and
+ * `npm run check:visuals`.
+ */
+export interface ExhibitSlot {
+  exhibitId: string;
+  position: Vec3;
+  yawOffsetDeg: number;
+  note: string;
+}
+
+export const EXHIBIT_PLINTH = { width: 0.7, depth: 0.7 } as const;
+
+export const EXHIBIT_SLOTS: readonly ExhibitSlot[] = [
+  { exhibitId: "talking-drum", position: [-11.2, HALL.walkwayFloorY, -23.6], yawOffsetDeg: 0, note: "N walkway, west bay (GLOBAL → ROOTS seam)" },
+  { exhibitId: "axatse", position: [-9.6, HALL.walkwayFloorY, -23.6], yawOffsetDeg: 0, note: "N walkway, west bay, beside the talking drum" },
+  { exhibitId: "gramophone", position: [10.7, HALL.walkwayFloorY, -23.6], yawOffsetDeg: -30, note: "N walkway, east bay (ROOTS → RECORDING)" },
+  { exhibitId: "trumpet", position: [23.8, HALL.walkwayFloorY, -7], yawOffsetDeg: 0, note: "E walkway, bay between the wall pillars at z −10.6 and −3.4 (RECORDING → HIGH-LIFE)" },
+  { exhibitId: "saxophone", position: [23.8, HALL.walkwayFloorY, 7], yawOffsetDeg: 0, note: "E walkway, bay between the wall pillars at z 3.4 and 10.6 (HIGH-LIFE → EXPLOSION)" },
+  { exhibitId: "boombox", position: [10.7, HALL.walkwayFloorY, 23.6], yawOffsetDeg: 0, note: "S walkway, east bay (EXPLOSION → TRANSITION)" },
+  { exhibitId: "guitar", position: [-10.7, HALL.walkwayFloorY, 23.6], yawOffsetDeg: 0, note: "S walkway, west bay (TRANSITION → NAIJA)" },
+  { exhibitId: "conga", position: [-23.8, HALL.walkwayFloorY, 7], yawOffsetDeg: 0, note: "W walkway, bay between the wall pillars at z 10.6 and 3.4 (NAIJA → AFROBEATS)" },
+  { exhibitId: "tambourine", position: [-23.8, HALL.walkwayFloorY, -7], yawOffsetDeg: 0, note: "W walkway, bay between the wall pillars at z −3.4 and −10.6 (AFROBEATS → GLOBAL)" },
+];
+
+/** Heading (rotation.y) of an exhibit: front (+Z) towards the hall centre, plus the slot's offset. */
+export const exhibitHeading = (slot: ExhibitSlot): number =>
+  Math.atan2(-slot.position[0], -slot.position[2]) + (slot.yawOffsetDeg * Math.PI) / 180;
+
 // ---------------------------------------------------------------------------
 // Derived layout (curve, progress anchors, headings, view anchors)
 // ---------------------------------------------------------------------------

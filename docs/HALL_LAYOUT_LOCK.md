@@ -183,3 +183,13 @@ heading (table top 0.635 + turntable platter origin + record thickness).
 4. Dev view (`?gallery=marble`, HALL LAYOUT panel): inspect ROUTE VIEW and FOCUS VIEW of
    every affected station, and the seam if the route changed.
 5. Update the tables in this document.
+
+---
+
+## 8. Additions since the lock
+
+- **2026-10-18 — instrument exhibits** ([EXHIBITS.md](EXHIBITS.md)). At the owner's request, nine plinths stand on
+  the outer walkway (`EXHIBIT_SLOTS` in `src/data/hallLayout.ts`), one in the bay before each station and two in the
+  GLOBAL → ROOTS bay. No locked value changed: the route, stations, view and focus anchors and the seam are
+  untouched. `npm run check:hall` reports no failures (0 hall intersections, flat floor under every plinth).
+  `npm run check:visuals` puts the nearest exhibit 5.76 m from the route.

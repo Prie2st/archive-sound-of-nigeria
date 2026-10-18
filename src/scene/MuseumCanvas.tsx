@@ -8,6 +8,7 @@ import { QUALITY_SETTINGS } from "@/config/quality";
 import { resolveDevConfig, type CameraMode } from "@/config/dev";
 import { DEFAULT_ERA_VISUAL_SETTINGS, type EraVisualSettings } from "@/data/eraVisuals";
 import { EraWorlds } from "@/scene/EraWorlds";
+import { Exhibits } from "@/scene/Exhibits";
 import { ERAS, getEra } from "@/data/eras";
 import { GALLERIES } from "@/data/galleries";
 import { getHallLayout } from "@/data/hallLayout";
@@ -247,6 +248,7 @@ function MuseumExperience() {
             </Suspense>
           )}
           {definition.hasHallLayout && config.stations && <Suspense fallback={null}><EraWorlds activeEra={activeEra} settings={visualSettings} quality={config.quality} /></Suspense>}
+          {definition.hasHallLayout && <Exhibits ready={isSceneReady} />}
           {cameraMode === "travel" && <CameraRig travel={travel} focus={focus} onActiveEraChange={activeEra.set} />}
           {/* After the CameraRig: the audio listener follows the camera pose it just set. */}
           <AudioListenerBridge audio={audio} travel={travel} focus={focus} />
