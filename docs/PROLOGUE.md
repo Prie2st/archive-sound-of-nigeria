@@ -146,7 +146,12 @@ Final images render through `next/image` (lazy, `sizes` per slot, object-fit cov
 The homepage no longer lists image credits (removed 2026-10-18 at the owner's request). Credits stay in the data
 (`credit` / `source` / `license`) for whatever surface publishes them.
 
-## 6. ENTER ARCHIVE
+## 6. ENTER ARCHIVE and the bottom blur
+
+- **Bottom blur.** A band fixed to the bottom of the screen for the whole story: a 13.25 px backdrop blur, no tint,
+  122 px on a 900 px screen (`clamp(72px, 13.6svh, 140px)`), masked so it fades in from its top edge. It sits under
+  ENTER ARCHIVE, takes no pointer events, and fades out with the story when the visitor enters. (It replaces the
+  darker Figma gradient band, which was removed.)
 
 - **Placement.** Fixed top-right, on the page margin (64 px at 1440, as in the Figma), safe-area aware, 44 px
   minimum, the same size throughout. Its colours still follow each chapter's tone.
@@ -183,6 +188,7 @@ Six columns, recomposed rather than shrunk:
 - EVERYTHING EXPLODES. comes before the genre cloud;
 - the 1922 chain and the digital route stack, with ↓ arrows;
 - the One Dance cover, credit and note stack;
+- the footer wordmark shows whole, with room below it for the bottom blur (cropped under it, it would be smeared);
 - the thesis steps diagonally;
 - display shifts are capped at one column;
 - the authored phone breaks apply.
