@@ -148,9 +148,11 @@ The homepage no longer lists image credits (removed 2026-10-18 at the owner's re
 
 ## 6. ENTER ARCHIVE and the bottom veil
 
-- **Veil** (Figma 66:156). A band fixed to the bottom of the screen for the whole story: transparent → black with an
-  18.45 px backdrop blur that fades in with it, 122 px on a 900 px screen (`clamp(72px, 13.6svh, 140px)`). It sits
-  under ENTER ARCHIVE, takes no pointer events, and fades out with the story when the visitor enters.
+- **Veil** (Figma 66:156 → 69:12, revised 2026-10-18). A band fixed to the bottom of the screen for the whole
+  story, 122 px on a 900 px screen (`clamp(72px, 13.6svh, 140px)`): a uniform 13.25 px backdrop blur under a
+  gradient that is clear for the top ~11 % and reaches about 61 % black at the bottom edge (the design's 263 px
+  gradient, clipped to the band). It sits under ENTER ARCHIVE, takes no pointer events, and fades out with the story
+  when the visitor enters.
 
 - **Placement.** Fixed top-right, on the page margin (64 px at 1440, as in the Figma), safe-area aware, 44 px
   minimum, the same size throughout. Its colours still follow each chapter's tone.
