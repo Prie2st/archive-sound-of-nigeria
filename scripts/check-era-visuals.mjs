@@ -6,13 +6,12 @@ import { OBB } from 'three/examples/jsm/math/OBB.js';
 import { getHallLayout, progressDelta } from '../src/data/hallLayout.ts';
 import { ERA_ATLAS, ERA_WORLD_LAYOUT, eraPanelPose, eraVisualTier } from '../src/data/eraVisuals.ts';
 import { FOCUS_CONFIG, bezierPoint, transitionControlPoint } from '../src/state/focus.ts';
-const layout=getHallLayout(), p=ERA_WORLD_LAYOUT.panel, prop=ERA_WORLD_LAYOUT.prop;
+const layout=getHallLayout(), p=ERA_WORLD_LAYOUT.panel;
 const matrix=(position,yaw)=>new THREE.Matrix4().compose(new THREE.Vector3(...position),new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),yaw),new THREE.Vector3(1,1,1));
 const box=(center,size,transform)=>new OBB(new THREE.Vector3(...center).applyMatrix4(transform),new THREE.Vector3(...size).multiplyScalar(.5),new THREE.Matrix3().setFromMatrix4(transform));
-const edge=ERA_WORLD_LAYOUT.nextEdge;
 const boxes=layout.stations.flatMap(station=>{
   const pose=eraPanelPose(station), stationMatrix=matrix(station.position,station.heading);
-  const result=[box([0,0,0],[p.width,p.height,p.thickness],matrix(pose.position,pose.heading)),box([prop.x,prop.height/2,prop.z],[prop.halfWidth*2,prop.height,prop.halfDepth*2],stationMatrix),box([edge.x,edge.y,edge.z],[edge.width,edge.height,.012],stationMatrix)];
+  const result=[box([0,0,0],[p.width,p.height,p.thickness],matrix(pose.position,pose.heading))];
   const interaction=box(FOCUS_CONFIG.volume.center,FOCUS_CONFIG.volume.size,stationMatrix);
   const movingRecord=box([-.2,.65,0],[1.5,1.3,1.2],stationMatrix); // includes staged record and sleeve at -X
   for(const b of result) {
@@ -39,5 +38,5 @@ for(let i=0;i<8;i++) {
   assert.equal(tiers.filter(t=>t==='active').length,1); assert.equal(tiers.filter(t=>t==='nearby').length,2); assert.equal(tiers.filter(t=>t==='distant').length,5);
 }
 const stat=await fs.stat('public'+ERA_ATLAS.url); assert(stat.size<256*1024,'atlas over 256 KiB transfer budget');
-console.log(`Era visuals: 24 conservative OBBs; interaction and moving-record envelopes clear.\nRoute: ${route.toFixed(3)} m (1,600 samples). Focus flights: ${flight.toFixed(3)} m (8 × 9 × 61). Deck sightlines: ${sight.toFixed(3)} m.\nAll eight LOD assignments: 1 ACTIVE / 2 NEARBY / 5 DISTANT, including GLOBAL ↔ ROOTS.\nAtlas: ${(stat.size/1024).toFixed(1)} KiB, 10.67 MiB with mipmaps. Hall geometry screening: npm run check:hall.`);
+console.log(`Era visuals: 8 conservative OBBs (one backdrop panel per station); interaction and moving-record envelopes clear.\nRoute: ${route.toFixed(3)} m (1,600 samples). Focus flights: ${flight.toFixed(3)} m (8 × 9 × 61). Deck sightlines: ${sight.toFixed(3)} m.\nAll eight LOD assignments: 1 ACTIVE / 2 NEARBY / 5 DISTANT, including GLOBAL ↔ ROOTS.\nAtlas: ${(stat.size/1024).toFixed(1)} KiB, 10.67 MiB with mipmaps. Hall geometry screening: npm run check:hall.`);
 

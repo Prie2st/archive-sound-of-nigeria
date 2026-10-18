@@ -9,20 +9,9 @@ import { ERA_ATLAS, ERA_VISUALS, ERA_WORLD_LAYOUT, eraPanelPose, eraVisualTier, 
 import { getHallLayout } from "@/data/hallLayout";
 import type { EraId } from "@/data/types";
 import { useStoreValue, type ValueStore } from "@/state/valueStore";
-import { createEraProp } from "@/scene/eraPropGeometry";
 import { LISTENING_DESK } from "@/stations/albumStack";
 
 const noRaycast = () => undefined;
-
-function createNextEdges() {
-  return ERAS.map((_,index)=>{
-    const geometry=new THREE.PlaneGeometry(ERA_WORLD_LAYOUT.nextEdge.width,ERA_WORLD_LAYOUT.nextEdge.height);
-    const uv=geometry.getAttribute("uv"), next=(index+1)%8;
-    // A 50 × 318 px slice through the centre of the next era's tile: the strip's own 0.22 × 1.4 proportion, unstretched.
-    for(let i=0;i<uv.count;i++) uv.setXY(i, (next%4+(250+uv.getX(i)*50)/512)/4, (1-Math.floor(next/4)/2-.5)+(44+uv.getY(i)*318)/1024);
-    return geometry;
-  });
-}
 
 function createPanels() {
   return ERAS.map((_, index) => {
@@ -34,7 +23,7 @@ function createPanels() {
   });
 }
 
-/** Cheap, static installations. Only discrete LOD visibility and the one light change with active era. */
+/** One backdrop panel behind each station; only the desk light follows the active era. */
 export function EraWorlds({ activeEra: activeStore, settings: settingsStore, quality }: { activeEra: ValueStore<EraId>; settings: ValueStore<EraVisualSettings>; quality: ExperienceQuality }) {
   const budget=QUALITY_SETTINGS[quality];
   const semanticEra=useStoreValue(activeStore);
@@ -43,15 +32,11 @@ export function EraWorlds({ activeEra: activeStore, settings: settingsStore, qua
   const atlas=useTexture(ERA_ATLAS.url, texture => { texture.colorSpace = THREE.SRGBColorSpace; });
   const resources=useMemo(() => ({
     panels:createPanels(),
-    edges:createNextEdges(),
-    props:ERAS.map(era=>createEraProp(ERA_VISUALS[era.id])),
     material:new THREE.MeshBasicMaterial({map:atlas,alphaTest:.5,toneMapped:false}),
-    hint:new THREE.BoxGeometry(.18,.9,.12),
-    hintMaterials:ERAS.map(era=>new THREE.MeshBasicMaterial({color:ERA_VISUALS[era.id].secondary})),
   }),[atlas]);
   useEffect(() => () => {
-    resources.panels.forEach(g=>g.dispose()); resources.edges.forEach(g=>g.dispose()); resources.props.forEach(p=>p.dispose());
-    resources.material.dispose(); resources.hint.dispose(); resources.hintMaterials.forEach(m=>m.dispose());
+    resources.panels.forEach(g=>g.dispose());
+    resources.material.dispose();
   },[resources]);
   const layout=getHallLayout();
   const current=layout.stations[active];
@@ -64,18 +49,8 @@ export function EraWorlds({ activeEra: activeStore, settings: settingsStore, qua
         const station=layout.stations[index];
         const pose=eraPanelPose(station);
         const tier=eraVisualTier(index,active);
-        const prop=resources.props[index];
         return <group key={era.id} name={`EraWorld_${era.id}_${tier}`}>
           <mesh geometry={resources.panels[index]} material={resources.material} position={pose.position} rotation={[0,pose.heading,0]} raycast={noRaycast}/>
-          <group position={[...station.position]} rotation={[0,station.heading,0]}>
-            <mesh visible={tier==="active" || (tier==="nearby" && budget.nearbyDecoration)} geometry={resources.edges[index]} material={resources.material} position={[ERA_WORLD_LAYOUT.nextEdge.x,ERA_WORLD_LAYOUT.nextEdge.y,ERA_WORLD_LAYOUT.nextEdge.z]} raycast={noRaycast}/>
-            <group position={[ERA_WORLD_LAYOUT.prop.x,0,ERA_WORLD_LAYOUT.prop.z]}>
-              <group visible={tier==="active" && budget.activeProps}>
-                {prop.geometry.map((geometry,batch)=><mesh key={batch} geometry={geometry} material={prop.materials[batch]} raycast={noRaycast}/>)}
-              </group>
-              <mesh visible={tier==="nearby" && budget.nearbyDecoration} geometry={resources.hint} material={resources.hintMaterials[index]} position={[0,.45,0]} raycast={noRaycast}/>
-            </group>
-          </group>
         </group>;
       })}
       {/* Reuse the one era light for a tight live shadow map. Its colour / power / reach stay intact;

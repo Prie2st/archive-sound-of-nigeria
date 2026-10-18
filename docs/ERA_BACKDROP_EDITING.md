@@ -21,7 +21,6 @@ The figures are original geometric illustrations, not archival photographs. Stat
 3. Run `node scripts/import-era-backdrops.mjs 01.png 02.png 03.png 04.png 05.png 06.png 07.png 08.png` (in that order). The importer scales each tile to 496 × 496, packs it into its atlas cell inside the 8 px transparent gutter, encodes WebP (quality 82, smart subsampling) and checks the 256 KiB budget. A single 2048 × 1024 transparent atlas export is still accepted instead.
 4. Review all eight eras in the hall, then deploy through the normal GitHub/Vercel flow. This is a local asset replacement, not a live Figma connection.
 
-Beside each station, a narrow strip previews the next era: a 50 × 318 px slice through the centre of that era's tile (`createNextEdges` in `src/scene/EraWorlds.tsx`).
 
 ## Reproduce the code-authored originals
 

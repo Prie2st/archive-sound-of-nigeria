@@ -303,18 +303,15 @@ if (segmentWarnings.length) {
 
 // Stations
 // Presentation surfaces are screened against the same untouched hall voxel grid.
-console.log("\nEra visual surfaces (10 cm grid; panel and prop bounding volume):");
+console.log("\nEra visual surfaces (10 cm grid; backdrop panel):");
 for (const station of layout.stations) {
-  const pose=eraPanelPose(station), panel=ERA_WORLD_LAYOUT.panel, prop=ERA_WORLD_LAYOUT.prop;
+  const pose=eraPanelPose(station), panel=ERA_WORLD_LAYOUT.panel;
   let hits=0, samples=0;
   const probe=(x,y,z,origin,yaw)=>{
     const wx=origin[0]+x*Math.cos(yaw)+z*Math.sin(yaw), wz=origin[2]-x*Math.sin(yaw)+z*Math.cos(yaw);
     samples++; if(voxelAt(wx,y,wz)) hits++;
   };
   for(let x=-panel.width/2;x<=panel.width/2+.001;x+=.1) for(let y=pose.position[1]-panel.height/2;y<=pose.position[1]+panel.height/2;y+=.1) probe(x,y,0,pose.position,pose.heading);
-  for(let x=prop.x-prop.halfWidth;x<=prop.x+prop.halfWidth;x+=.05) for(let z=prop.z-prop.halfDepth;z<=prop.z+prop.halfDepth;z+=.05) for(let y=.1;y<=prop.height;y+=.1) probe(x,y,z,station.position,station.heading);
-  const edge=ERA_WORLD_LAYOUT.nextEdge;
-  for(let x=edge.x-edge.width/2;x<=edge.x+edge.width/2;x+=.05) for(let y=edge.y-edge.height/2;y<=edge.y+edge.height/2;y+=.1) probe(x,y,edge.z,station.position,station.heading);
   console.log(`  ${station.debugLabel.padEnd(14)} ${samples} probes, ${hits} hall intersections`);
   if(hits) problems.fail.push(`${station.debugLabel}: era visual surfaces intersect hall (${hits} probes)`);
 }

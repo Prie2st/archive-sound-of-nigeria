@@ -6,7 +6,6 @@ Implemented 15 October 2026. This is the environmental milestone only; final UI,
 
 - `src/data/eraVisuals.ts`: presentation palettes, motif names, dimensions, derived panel poses, visual settings and wrap-aware quality policy.
 - `src/scene/EraWorlds.tsx`: reusable installation renderer, one shared atlas material, cropped next-era fragments, cheap discrete detail tiers and one bounded light.
-- `src/scene/eraPropGeometry.ts`: original primitive prop references merged into two material batches per installation.
 - `scripts/build-era-worlds.mjs`: reproducible original SVG artwork and optimized WebP atlas. Run `npm run artwork:eras`.
 - `public/textures/environment/era-worlds.svg` and `era-worlds-v1.webp`: editable source and runtime atlas. These are geometric illustrations, never purported archival photographs.
 - `src/scene/MuseumCanvas.tsx`: mounts the presentation layer independently of stations and hides inspector/markers in production.
@@ -19,7 +18,9 @@ Implemented 15 October 2026. This is the environmental milestone only; final UI,
 
 The independent `EraWorlds` layer reads the existing semantic active-era store. It never writes to travel, focus, audio, selection, platter, tonearm or record-change controllers. A comparison of 36 protected source/test files against their pre-edit SHA-256 hashes found no changes. That includes the hall layout, camera rig, neutral lighting, archive/art tokens, audio/input/state modules, station implementation and mechanical systems. The 40-entry archive and five-entry playlists remain unchanged.
 
-Each 3 × 3 m graphic sits behind its station, facing the hall centre. Its placement is derived from the locked station position/heading; there are no replacement rooms or new walls. Backdrop bottom is 0.7 m and top is 3.7 m. (Until 2026-10-18 it was 3 × 3.35 m; the redesigned square tiles, docs/ERA_BACKDROP_EDITING.md, made it square. The palettes and motifs below describe the original geometric set.) Primitive props sit at station-local (+1.35, 0, −0.75), away from the sleeve and record staging area at −X. All visual meshes ignore pointer raycasts.
+Each 3 × 3 m graphic sits behind its station, facing the hall centre. Its placement is derived from the locked station position/heading; there are no replacement rooms or new walls. Backdrop bottom is 0.7 m and top is 3.7 m. (Until 2026-10-18 it was 3 × 3.35 m; the redesigned square tiles, docs/ERA_BACKDROP_EDITING.md, made it square. The palettes and motifs below describe the original geometric set.) All visual meshes ignore pointer raycasts.
+
+**Removed 2026-10-18:** the primitive era props beside each station (and their NEARBY box hints) and the cropped next-era edge strip. Each installation is now the backdrop panel alone, plus the shared desk light. The LOD, transition and verification notes below describe the original installations where they mention props or the next fragment.
 
 ## Palettes and motifs
 
@@ -70,7 +71,7 @@ The slim graphic fragment beside each installation is cropped from the *next* er
 - All interaction volumes and a conservative moving-record/sleeve/station envelope: no intersection.
 - All eight semantic assignments: exactly 1 ACTIVE / 2 NEARBY / 5 DISTANT, including the wrap.
 
-The extended `check:hall` uses the existing 10 cm hall voxel grid and 2,015 probes per installation (panel, prop bounding volume and next fragment): **zero hall intersections for all eight**. The locked route remains **121.81 m**. Existing route, station, focus and transition checks pass without threshold changes. The voxel check is screening at approximately ±5 cm, not a physics simulation; browser review is still necessary.
+The extended `check:hall` uses the existing 10 cm hall voxel grid and 2,015 probes per installation (at the time: panel, prop bounding volume and next fragment; now the panel only): **zero hall intersections for all eight**. The locked route remains **121.81 m**. Existing route, station, focus and transition checks pass without threshold changes. The voxel check is screening at approximately ±5 cm, not a physics simulation; browser review is still necessary.
 
 ## Performance, before / after
 

@@ -25,6 +25,5 @@ describe("experience quality policy", () => {
     for (const tier of [null, "auto", "HIGH", "ultra"]) assert(!isExperienceQuality(tier));
     assert.deepEqual(Object.values(QUALITY_SETTINGS).map(settings => settings.maxDpr), [2, 2, 1]);
     assert.equal(QUALITY_SETTINGS.medium.antialias, true);
-    assert.equal(QUALITY_SETTINGS.medium.activeProps, true);
   });
 });
