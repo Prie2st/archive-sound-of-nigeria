@@ -2546,12 +2546,6 @@
 
   /* finale */
   .pro-finale__figures dd { font-size: clamp(2.6rem, 15vw, 5rem); }
-
-  /* the wordmark is too small here to crop under the bottom veil: show it whole, clear of the veil */
-  .pro-finale__wordmark {
-    height: auto;
-    padding-bottom: clamp(72px, 13.6svh, 140px);
-  }
 }
 
 /* Mid widths (tablet / narrow desktop): keep twelve columns, ease the tightest placements. */

@@ -19,7 +19,7 @@ node 46:60, with every earlier animation kept.)
 | `src/ui/prologue/parts.tsx` | `Display` (authored lines, optional flush-right `end`), `Accents` (`*word*` → accent), `Media` (image, designed image + overlay words, or archive card), `RecordIndex`, `WordList`, `Reveal`, `Micro` |
 | `src/ui/prologue/prologue.css` | the shell: tokens, grid, type system, archive card, ENTER ARCHIVE, loader, reveals, exit |
 | `src/ui/prologue/home.css` | grounds (themes), the 23 compositions, scroll-driven detail, phone and mid-width recompositions |
-| `src/ui/prologue/Prologue.tsx` | orchestrator: readiness, phases, observers, ENTER ARCHIVE, the bottom veil |
+| `src/ui/prologue/Prologue.tsx` | orchestrator: readiness, phases, observers, ENTER ARCHIVE |
 | `src/ui/prologue/Loader.tsx` | the loading screen: count, rising panel, cycling icons, letter outro (§2) |
 | `src/app/fonts.ts`, `src/app/layout.tsx` | OJUJU through `next/font/google` (`--font-ojuju`) |
 | `src/scene/MuseumCanvas.tsx`, `src/app/globals.css` | (earlier milestone) Prologue mount, fixed `museum-stage`, `frameloop` on demand while covered |
@@ -146,13 +146,7 @@ Final images render through `next/image` (lazy, `sizes` per slot, object-fit cov
 The homepage no longer lists image credits (removed 2026-10-18 at the owner's request). Credits stay in the data
 (`credit` / `source` / `license`) for whatever surface publishes them.
 
-## 6. ENTER ARCHIVE and the bottom veil
-
-- **Veil** (Figma 66:156 → 69:12, revised 2026-10-18). A band fixed to the bottom of the screen for the whole
-  story, 122 px on a 900 px screen (`clamp(72px, 13.6svh, 140px)`): a uniform 13.25 px backdrop blur under a
-  gradient that is clear for the top ~11 % and reaches about 61 % black at the bottom edge (the design's 263 px
-  gradient, clipped to the band). It sits under ENTER ARCHIVE, takes no pointer events, and fades out with the story
-  when the visitor enters.
+## 6. ENTER ARCHIVE
 
 - **Placement.** Fixed top-right, on the page margin (64 px at 1440, as in the Figma), safe-area aware, 44 px
   minimum, the same size throughout. Its colours still follow each chapter's tone.
@@ -189,7 +183,6 @@ Six columns, recomposed rather than shrunk:
 - EVERYTHING EXPLODES. comes before the genre cloud;
 - the 1922 chain and the digital route stack, with ↓ arrows;
 - the One Dance cover, credit and note stack;
-- the footer wordmark shows whole, with room below it for the bottom veil (cropped under it, it would vanish);
 - the thesis steps diagonally;
 - display shifts are capped at one column;
 - the authored phone breaks apply.

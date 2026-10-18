@@ -203,8 +203,6 @@ export function Prologue({ audio, returningHome = false, isSceneReady, onEnter, 
         </span>
       </button>
 
-      <div className="pro-veil" aria-hidden="true" />
-
       <article className="pro-story" tabIndex={-1} aria-label="The Sound of Nigeria, 1900 to 2026 — the story before the archive">
         <Opening />
         <Systems />
