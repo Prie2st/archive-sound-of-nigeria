@@ -4,7 +4,6 @@ import { useProgress } from "@react-three/drei";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { startArchiveSound } from "@/audio/browserAudio";
 import type { AudioEngine } from "@/audio/engine";
-import { HOME_MEDIA_LIST } from "@/content/homeMedia";
 import { CHAPTERS, type ChapterMeta } from "@/content/homeStory";
 import { releaseFocusAfterPointer } from "@/input/pointerActivation";
 import {
@@ -204,6 +203,8 @@ export function Prologue({ audio, returningHome = false, isSceneReady, onEnter, 
         </span>
       </button>
 
+      <div className="pro-veil" aria-hidden="true" />
+
       <article className="pro-story" tabIndex={-1} aria-label="The Sound of Nigeria, 1900 to 2026 — the story before the archive">
         <Opening />
         <Systems />
@@ -227,27 +228,11 @@ export function Prologue({ audio, returningHome = false, isSceneReady, onEnter, 
         <Essence />
         <Global />
         <Lineage />
-        <Finale credits={<Credits />} />
+        <Finale />
       </article>
 
       {!returningHome && <Loader ready={archiveReady && fontReady} active={phase === "loading"} fontReady={fontReady} reduced={reduced} onDone={finishLoader} />}
     </div>
-  );
-}
-
-function Credits() {
-  return (
-    <details className="pro-credits">
-      <summary className="pro-micro">Image credits</summary>
-      <ul>
-        {HOME_MEDIA_LIST.map((media) => (
-          <li key={media.id}>
-            <span>{media.caption}</span>
-            <span>{media.status === "final" ? [media.credit, media.source, media.license].filter(Boolean).join(" · ") : "Archive image pending — credit to follow"}</span>
-          </li>
-        ))}
-      </ul>
-    </details>
   );
 }
 

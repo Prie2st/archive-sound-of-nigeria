@@ -2135,14 +2135,10 @@
   color: #c98f4e;
 }
 
-.pro-finale__foot {
-  margin-top: var(--space-2xl);
-}
-
 /* the ARCHIVE wordmark, cropped by the end of the page */
 .pro-finale__wordmark {
   height: calc((100vw - var(--pro-left) - var(--pro-right)) * 268 / 1315.54);
-  margin-top: var(--space-2xl);
+  margin-top: clamp(96px, 19.2vw, 280px); /* 277 px under LISTEN TO IT. at 1440 */
   padding-inline: var(--pro-left) var(--pro-right);
   overflow: hidden;
 }
@@ -2154,36 +2150,6 @@
   background: #efe7da;
   -webkit-mask: url("/brand/archive-outline.svg") center / 100% 100% no-repeat;
   mask: url("/brand/archive-outline.svg") center / 100% 100% no-repeat;
-}
-
-.pro-credits {
-  grid-column: 1 / 8;
-  color: var(--ink-faint);
-}
-
-.pro-credits summary {
-  display: inline-flex;
-  min-height: 44px;
-  align-items: center;
-  cursor: pointer;
-}
-
-.pro-credits summary:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
-}
-
-.pro-credits ul {
-  display: grid;
-  gap: 0.35em;
-  padding-bottom: var(--space-md);
-  font: 400 var(--t-small) / 1.45 var(--f-text);
-}
-
-.pro-credits li {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-  gap: var(--space-sm);
 }
 
 /* ===========================================================================
@@ -2581,9 +2547,10 @@
   /* finale */
   .pro-finale__figures dd { font-size: clamp(2.6rem, 15vw, 5rem); }
 
-  .pro-credits li {
-    grid-template-columns: 1fr;
-    gap: 0;
+  /* the wordmark is too small here to crop under the bottom veil: show it whole, clear of the veil */
+  .pro-finale__wordmark {
+    height: auto;
+    padding-bottom: clamp(72px, 13.6svh, 140px);
   }
 }
 

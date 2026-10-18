@@ -19,7 +19,7 @@ node 46:60, with every earlier animation kept.)
 | `src/ui/prologue/parts.tsx` | `Display` (authored lines, optional flush-right `end`), `Accents` (`*word*` → accent), `Media` (image, designed image + overlay words, or archive card), `RecordIndex`, `WordList`, `Reveal`, `Micro` |
 | `src/ui/prologue/prologue.css` | the shell: tokens, grid, type system, archive card, ENTER ARCHIVE, loader, reveals, exit |
 | `src/ui/prologue/home.css` | grounds (themes), the 23 compositions, scroll-driven detail, phone and mid-width recompositions |
-| `src/ui/prologue/Prologue.tsx` | orchestrator: readiness, phases, observers, ENTER ARCHIVE, credits |
+| `src/ui/prologue/Prologue.tsx` | orchestrator: readiness, phases, observers, ENTER ARCHIVE, the bottom veil |
 | `src/ui/prologue/Loader.tsx` | the loading screen: count, rising panel, cycling icons, letter outro (§2) |
 | `src/app/fonts.ts`, `src/app/layout.tsx` | OJUJU through `next/font/google` (`--font-ojuju`) |
 | `src/scene/MuseumCanvas.tsx`, `src/app/globals.css` | (earlier milestone) Prologue mount, fixed `museum-stage`, `frameloop` on demand while covered |
@@ -101,7 +101,7 @@ Each beat answers *what changed Nigerian music here?* Order, years and eras are 
 | 19 | 2020 | black | crossover stops looking accidental | 2020 · **Essence sleeve** · key line | — |
 | 20 | Global | steel | already part of global pop; an ecosystem | **sticky stage** (Tems, international) with the headline arriving line by line · 11 names · genre field · "ecosystem" line · **Ayra Starr in Lagos** · GLOBAL / DOES NOT MEAN / ROOTLESS. | step sequence, stage settle |
 | 21 | The thread | night | the past keeps returning | THE NEW SOUND / IS NEVER / ENTIRELY NEW. · 4 lineages · the sentence in 3 lines with accents · **only now** TRADITION ↓ ADAPTATION ↓ LOCALISATION ↓ EXPORTATION, on a diagonal | thesis words 320 ms apart |
-| 22 | Finale | night | — | 8 ERAS · 40 RECORDS · 126 YEARS (from data) · THE STORY IS / NOT FINISHED. · LISTEN TO IT. · image credits · the outlined ARCHIVE wordmark, cropped by the end of the page | — |
+| 22 | Finale | night | — | 8 ERAS · 40 RECORDS · 126 YEARS (from data) · THE STORY IS / NOT FINISHED. · LISTEN TO IT. · the outlined ARCHIVE wordmark, cropped by the end of the page | — |
 
 **Length:** about 32 screens at 1440 × 900 (the Figma frame is 30,144 px) and about 34 at 390 × 844. That is about 60–70 s to skim and 2–3 min to
 read. Section rhythm tokens: `--space-section` clamp(64px, 8vh, 110px), `--space-2xl` clamp(56px, 6.2vw, 104px).
@@ -114,7 +114,7 @@ objectPosition, aspectRatio, status: "placeholder" | "final" }`
 - **`role`** is what the image does in the story: `evidence | object | archive | context | performance`.
 - **`proves`** is the sentence the image supports (required by the tests).
 - **`label`** is the internal slot name, e.g. `FESTAC ’77 DURBAR / FESTIVAL — ARCHIVE IMAGE`. It is a data
-  attribute on the figure and appears in the credits.
+  attribute on the figure.
 - **`placeholder`** is the archive card's text.
 
 **Designed images (2026-10-18).** Every slot now has the image the Figma design shows, exported to
@@ -143,7 +143,14 @@ stays `status: "placeholder"` with the pending credit: they are shown, but they 
 
 Final images render through `next/image` (lazy, `sizes` per slot, object-fit cover). Nothing is preloaded.
 
-## 6. ENTER ARCHIVE
+The homepage no longer lists image credits (removed 2026-10-18 at the owner's request). Credits stay in the data
+(`credit` / `source` / `license`) for whatever surface publishes them.
+
+## 6. ENTER ARCHIVE and the bottom veil
+
+- **Veil** (Figma 66:156). A band fixed to the bottom of the screen for the whole story: transparent → black with an
+  18.45 px backdrop blur that fades in with it, 122 px on a 900 px screen (`clamp(72px, 13.6svh, 140px)`). It sits
+  under ENTER ARCHIVE, takes no pointer events, and fades out with the story when the visitor enters.
 
 - **Placement.** Fixed top-right, on the page margin (64 px at 1440, as in the Figma), safe-area aware, 44 px
   minimum, the same size throughout. Its colours still follow each chapter's tone.
@@ -180,6 +187,7 @@ Six columns, recomposed rather than shrunk:
 - EVERYTHING EXPLODES. comes before the genre cloud;
 - the 1922 chain and the digital route stack, with ↓ arrows;
 - the One Dance cover, credit and note stack;
+- the footer wordmark shows whole, with room below it for the bottom veil (cropped under it, it would vanish);
 - the thesis steps diagonally;
 - display shifts are capped at one column;
 - the authored phone breaks apply.

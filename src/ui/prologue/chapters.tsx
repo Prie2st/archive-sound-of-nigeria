@@ -794,7 +794,7 @@ export function Lineage() {
   );
 }
 
-export function Finale({ credits }: { credits: ReactNode }) {
+export function Finale() {
   return (
     <Beat id="finale" labelledBy="pro-finale-title">
       <div className="pro-grid pro-finale__grid">
@@ -809,7 +809,6 @@ export function Finale({ credits }: { credits: ReactNode }) {
         <Display id="pro-finale-title" lines={FINALE.unfinished} className="pro-display--display pro-finale__unfinished" />
         <Display as="p" lines={FINALE.invitation} end className="pro-display--headline pro-finale__invitation" />
       </div>
-      <div className="pro-grid pro-finale__foot">{credits}</div>
       <div className="pro-finale__wordmark" aria-hidden="true">
         <span className="pro-finale__wordmark-art" />
       </div>
