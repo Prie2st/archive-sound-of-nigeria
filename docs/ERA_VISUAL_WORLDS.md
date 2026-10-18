@@ -19,7 +19,7 @@ Implemented 15 October 2026. This is the environmental milestone only; final UI,
 
 The independent `EraWorlds` layer reads the existing semantic active-era store. It never writes to travel, focus, audio, selection, platter, tonearm or record-change controllers. A comparison of 36 protected source/test files against their pre-edit SHA-256 hashes found no changes. That includes the hall layout, camera rig, neutral lighting, archive/art tokens, audio/input/state modules, station implementation and mechanical systems. The 40-entry archive and five-entry playlists remain unchanged.
 
-Each 3 × 3.35 m graphic sits behind its station, facing the hall centre. Its placement is derived from the locked station position/heading; there are no replacement rooms or new walls. Backdrop bottom is 0.525 m and top is 3.875 m. Primitive props sit at station-local (+1.35, 0, −0.75), away from the sleeve and record staging area at −X. All visual meshes ignore pointer raycasts.
+Each 3 × 3 m graphic sits behind its station, facing the hall centre. Its placement is derived from the locked station position/heading; there are no replacement rooms or new walls. Backdrop bottom is 0.7 m and top is 3.7 m. (Until 2026-10-18 it was 3 × 3.35 m; the redesigned square tiles, docs/ERA_BACKDROP_EDITING.md, made it square. The palettes and motifs below describe the original geometric set.) Primitive props sit at station-local (+1.35, 0, −0.75), away from the sleeve and record staging area at −X. All visual meshes ignore pointer raycasts.
 
 ## Palettes and motifs
 

@@ -26,7 +26,8 @@ export const ERA_VISUALS: Record<EraId, EraVisualToken> = {
 
 export const ERA_ATLAS = { url: "/textures/environment/era-worlds-v1.webp", width: 2048, height: 1024, tile: 512, padding: 8 } as const;
 export const ERA_WORLD_LAYOUT = {
-  panel: { width: 3, height: 3.35, y: 2.2, z: -1.31, thickness: 0.012 },
+  // Square, like the 512 px tiles (Figma "ARCHIVE — Editable Era Backdrops", BACKDROP 14:91), so nothing stretches.
+  panel: { width: 3, height: 3, y: 2.2, z: -1.31, thickness: 0.012 },
   nextEdge: { x: 1.66, y: 2.3, z: -0.75, width: 0.22, height: 1.4 },
   prop: { x: 1.35, z: -0.75, halfWidth: 0.22, halfDepth: 0.22, height: 1.14 },
 } as const;

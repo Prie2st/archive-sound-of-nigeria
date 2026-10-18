@@ -18,7 +18,8 @@ function createNextEdges() {
   return ERAS.map((_,index)=>{
     const geometry=new THREE.PlaneGeometry(ERA_WORLD_LAYOUT.nextEdge.width,ERA_WORLD_LAYOUT.nextEdge.height);
     const uv=geometry.getAttribute("uv"), next=(index+1)%8;
-    for(let i=0;i<uv.count;i++) uv.setXY(i, (next%4+(250+uv.getX(i)*50)/512)/4, (1-Math.floor(next/4)/2-.5)+(32+uv.getY(i)*170)/1024);
+    // A 50 × 318 px slice through the centre of the next era's tile: the strip's own 0.22 × 1.4 proportion, unstretched.
+    for(let i=0;i<uv.count;i++) uv.setXY(i, (next%4+(250+uv.getX(i)*50)/512)/4, (1-Math.floor(next/4)/2-.5)+(44+uv.getY(i)*318)/1024);
     return geometry;
   });
 }
