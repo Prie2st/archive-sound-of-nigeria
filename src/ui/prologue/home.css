@@ -2315,20 +2315,6 @@
     min-height: 64px;
   }
 
-  .pro-loader__foot {
-    grid-template-columns: 1fr auto;
-    grid-template-areas: "label years" "track track";
-    row-gap: 14px;
-  }
-
-  .pro-loader__foot > p:first-child { grid-area: label; }
-  .pro-loader__track { grid-area: track; }
-  .pro-loader__years { grid-area: years; }
-
-  .pro-loader__title span:last-child {
-    padding-inline-start: 0.8em;
-  }
-
   .pro-year {
     font-size: clamp(4.4rem, 30vw, 9rem);
   }

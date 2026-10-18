@@ -18,7 +18,8 @@ points below.)
 | `src/ui/prologue/parts.tsx` | `Display` (authored lines), `Media` (image or archive card), `RecordIndex`, `WordList`, `Reveal`, `Micro` |
 | `src/ui/prologue/prologue.css` | the shell: tokens, grid, type system, archive card, ENTER ARCHIVE, loader, reveals, exit |
 | `src/ui/prologue/home.css` | grounds (themes), the 23 compositions, scroll-driven detail, phone and mid-width recompositions |
-| `src/ui/prologue/Prologue.tsx` | orchestrator: readiness, loader, phases, observers, ENTER ARCHIVE, credits |
+| `src/ui/prologue/Prologue.tsx` | orchestrator: readiness, phases, observers, ENTER ARCHIVE, credits |
+| `src/ui/prologue/Loader.tsx` | the loading screen: count, rising panel, cycling icons, letter outro (§2) |
 | `src/app/fonts.ts`, `src/app/layout.tsx` | OJUJU through `next/font/google` (`--font-ojuju`) |
 | `src/scene/MuseumCanvas.tsx`, `src/app/globals.css` | (earlier milestone) Prologue mount, fixed `museum-stage`, `frameloop` on demand while covered |
 | removed | `src/content/introStory.ts`, `introMedia.ts`, `introStory.test.ts` (the era-summary story) |
@@ -32,9 +33,23 @@ points below.)
   - **story**: the museum underneath draws only on demand.
   - **leaving**: ENTER ARCHIVE → `startArchiveSound(audio)` → the museum draws again and the HUD appears → the
     story fades (0.95 s; 0.25 s with reduced motion) → unmount.
-- **Loading screen.** It shows ARCHIVE · THE SOUND OF NIGERIA · a 1 px **indeterminate** line (drei's file count
-  grows in waves, so no percentage is shown) · LOADING ARCHIVE · 1900 — 2026. Readiness is the old intro's rules:
-  files done + scene probe + two frames, a 6 s grace, a 30 s maximum.
+- **Loading screen** (`Loader.tsx`; Figma "ARCHIVE — Intro / Home", node 46:39; redesigned 2026-10-18):
+  - **Layout.** Cream `#efe7da` screen. The ARCHIVE wordmark (`public/brand/archive-wordmark.svg`) sits
+    top-left. An instrument icon cycles in the centre: trumpet, guitar, shaker, djembe, conga, 0.42 s each, from
+    `design/icons` → `public/icons/loader/` at native sizes. A large OJUJU 650 counter sits bottom-right, 150 px
+    at 1440.
+  - **Count.** The counter runs 00 → 100 and an ink `#0d0c0b` panel rises with it. Whatever the panel covers
+    turns cream: a second copy of the layout is clipped to the panel, and the graphics are the SVGs used as CSS
+    masks.
+  - **What drives it.** The count follows drei's file progress, smoothed. It never runs backwards, creeps while
+    nothing reports, holds at 94 until the archive is ready, and takes at least 2.6 s. A timer writes it to the
+    DOM, so a hidden page still completes.
+  - **Outro.** At 100 the count holds, it and the icon fade, and THE SOUND OF NIGERIA arrives letter by letter
+    (55 ms stagger) on the full ink screen. Then the existing shutter lift opens the story (about 2.2 s after
+    100). The motion reference was the owner's loader video.
+  - **Readiness.** Unchanged from the old intro: files done + scene probe + two frames, a 6 s grace, a 30 s
+    maximum, plus OJUJU.
+  - **Reduced motion.** Icons change every 1.2 s with no scale, and the letters appear together.
 - **No per-frame JS.** IntersectionObservers toggle `.is-in` (reveals), the chapter indicator, GLOBAL's steps and
   the finale state.
 

@@ -485,86 +485,174 @@ html.archive-prologue body {
   transition: none;
 }
 
-/* --- loader: the first moment ----------------------------------------------- */
+/* --- loader: the first moment (Figma "ARCHIVE — Intro / Home", node 46:39) --------------------------------------
+ * Cream screen, wordmark top-left, a cycling instrument icon in the centre, the count bottom-right. An ink panel rises
+ * with the count (--p, 0–1, written by Loader.tsx): the dark face is the same layout in cream, clipped to the panel.
+ */
 
 .pro-loader {
+  --loader-cream: #efe7da;
+  --loader-ink: #0d0c0b;
+  --loader-type: clamp(5.5rem, 10.42vw, 11.5rem); /* 150px at 1440 */
+  --loader-icon-step: 0.42s;
   position: fixed;
   inset: 0;
   z-index: 60;
-  display: grid;
-  color: var(--ink);
-  background: #0d0c0b;
+  overflow: hidden;
   clip-path: inset(0 0 0 0);
 }
 
-.pro-loader__inner {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  height: 100%;
-  padding: max(var(--pro-margin), env(safe-area-inset-top)) var(--pro-right) max(var(--pro-margin), env(safe-area-inset-bottom)) var(--pro-left);
-}
-
-.pro-loader__title {
-  align-self: center;
-  display: grid;
-  font: 250 clamp(2.4rem, 6.4vw, 6.6rem) / 0.86 var(--f-display);
-  letter-spacing: -0.03em;
-  text-transform: uppercase;
-  opacity: 0;
-  transform: translateY(0.18em);
-  transition:
-    opacity 1.1s var(--pro-ease),
-    transform 1.4s var(--pro-ease);
-}
-
-.pro-loader.is-type .pro-loader__title {
-  opacity: 1;
-  transform: none;
-}
-
-.pro-loader__title span:last-child {
-  padding-inline-start: 1.6em;
-}
-
-.pro-loader__foot {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: clamp(14px, 2vw, 32px);
-  align-items: center;
-}
-
-.pro-loader__track {
-  position: relative;
-  height: 1px;
-  overflow: hidden;
-  background: rgba(239, 231, 218, 0.16);
-}
-
-.pro-loader__track span {
+.pro-loader__face {
   position: absolute;
-  inset: 0 auto 0 0;
-  width: 14%;
-  background: var(--ink);
-  animation: pro-seek 2.4s var(--pro-ease-io) infinite;
+  inset: 0;
+  color: var(--loader-ink);
+  background: var(--loader-cream);
 }
 
-@keyframes pro-seek {
+.pro-loader__face--dark {
+  color: var(--loader-cream);
+  background: var(--loader-ink);
+  clip-path: inset(calc((1 - var(--p, 0)) * 100%) 0 0 0);
+}
+
+/* Graphics are the supplied SVGs used as masks, so each face can colour them (ink / cream). Native sizes kept. */
+.pro-loader__mark,
+.pro-loader__icon {
+  background: currentColor;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.pro-loader__mark {
+  position: absolute;
+  top: max(var(--pro-margin), env(safe-area-inset-top));
+  left: var(--pro-left);
+  width: 142.529px;
+  height: 38.249px;
+  -webkit-mask-image: url("/brand/archive-wordmark.svg");
+  mask-image: url("/brand/archive-wordmark.svg");
+}
+
+.pro-loader__icons {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* Five icons, one at a time: each holds a fifth of the cycle (keyframe offsets assume --n = 5). */
+.pro-loader__icon {
+  grid-area: 1 / 1;
+  opacity: 0;
+  animation: pro-icon calc(var(--n) * var(--loader-icon-step)) linear infinite;
+  animation-delay: calc((var(--i) - var(--n)) * var(--loader-icon-step));
+}
+
+@keyframes pro-icon {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  3%,
+  18% {
+    opacity: 1;
+    transform: none;
+  }
+  20%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+.pro-loader__count,
+.pro-loader__title {
+  position: absolute;
+  right: var(--pro-right);
+  bottom: max(var(--pro-margin), env(safe-area-inset-bottom));
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: 650;
+  font-size: var(--loader-type);
+  line-height: 0.74;
+  letter-spacing: -0.0267em; /* -4px at 150px */
+  text-align: right;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-kerning: normal;
+}
+
+@supports (text-box: trim-both cap alphabetic) {
+  .pro-loader__count,
+  .pro-loader__title {
+    line-height: 0.86;
+    text-box: trim-both cap alphabetic;
+  }
+}
+
+/* Words wait for OJUJU (the fallback face would jump). */
+.pro-loader__count {
+  opacity: 0;
+  transition: opacity 0.5s var(--pro-ease);
+}
+
+.pro-loader.is-type .pro-loader__count {
+  opacity: 1;
+}
+
+/* 100: the count holds, then it and the icon fade. */
+.pro-loader__icons {
+  transition: opacity 0.42s ease;
+}
+
+.pro-loader.pro-loader--complete .pro-loader__count,
+.pro-loader.pro-loader--complete .pro-loader__icons {
+  opacity: 0;
+  transition: opacity 0.42s ease 0.26s;
+}
+
+.pro-loader.pro-loader--title .pro-loader__count,
+.pro-loader.pro-loader--title .pro-loader__icons {
+  opacity: 0;
+}
+
+/* Then the name arrives letter by letter, on the full ink screen. */
+.pro-loader__title {
+  display: grid;
+  justify-items: end;
+  font-size: min(var(--loader-type), calc((100vw - 2 * var(--pro-margin)) / 6.4));
+}
+
+.pro-loader__face--light .pro-loader__title {
+  visibility: hidden;
+}
+
+.pro-loader__letter {
+  opacity: 0;
+}
+
+.pro-loader--title .pro-loader__letter {
+  animation: pro-letter 0.52s var(--pro-ease) forwards;
+  animation-delay: calc(var(--l) * 55ms);
+}
+
+@keyframes pro-letter {
   from {
-    transform: translateX(-100%);
+    opacity: 0;
+  }
+  45% {
+    opacity: 0.35;
   }
   to {
-    transform: translateX(720%);
+    opacity: 1;
   }
 }
 
-/* Ready: the line completes, then the whole loader lifts away like a gallery shutter. */
-.pro:not(.pro--loading) .pro-loader__track span {
-  width: 100%;
-  animation: none;
-  transform: none;
-  transition: width 0.45s var(--pro-ease);
-}
-
+/* Ready: the whole loader lifts away like a gallery shutter, onto the dark opening. */
 .pro:not(.pro--loading) .pro-loader {
   clip-path: inset(0 0 100% 0);
   pointer-events: none;
@@ -658,12 +746,28 @@ html.archive-prologue body {
   transition-duration: 0.4s !important;
 }
 
-.pro--reduced .pro-loader__title {
-  transform: none;
+.pro--reduced .pro-loader {
+  --loader-icon-step: 1.2s;
 }
 
-.pro--reduced .pro-loader__track span {
-  animation-duration: 6s;
+.pro--reduced .pro-loader__icon {
+  animation-name: pro-icon-still;
+}
+
+@keyframes pro-icon-still {
+  0%,
+  19.9% {
+    opacity: 1;
+  }
+  20%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.pro--reduced .pro-loader--title .pro-loader__letter {
+  animation-duration: 0.3s;
+  animation-delay: 0s;
 }
 
 .pro--reduced:not(.pro--loading) .pro-loader {

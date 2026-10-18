@@ -32,6 +32,7 @@ import {
   War1967,
   Youth,
 } from "./chapters";
+import { Loader } from "./Loader";
 import "./prologue.css";
 import "./home.css";
 
@@ -84,7 +85,10 @@ export function Prologue({ audio, returningHome = false, isSceneReady, onEnter, 
   const archiveReady = useArchiveReady(isSceneReady);
   const fontReady = useDisplayFontReady();
   const reduced = useReducedMotion();
-  const revealed = returningHome || (archiveReady && fontReady);
+  // The loader counts to 100 once the archive is ready, plays its outro, then the story opens.
+  const [loaderDone, setLoaderDone] = useState(false);
+  const finishLoader = useCallback(() => setLoaderDone(true), []);
+  const revealed = returningHome || loaderDone;
   const [settled, setSettled] = useState(returningHome);
   const [leaving, setLeaving] = useState(false);
   const [chapter, setChapter] = useState<ChapterMeta>(CHAPTERS[0]);
@@ -238,30 +242,7 @@ export function Prologue({ audio, returningHome = false, isSceneReady, onEnter, 
         <Finale credits={<Credits />} />
       </article>
 
-      <Loader phase={phase} fontReady={fontReady} />
-    </div>
-  );
-}
-
-/** The first moment of the exhibition: the name, and a quiet indeterminate line (no invented percentage). */
-function Loader({ phase, fontReady }: { phase: string; fontReady: boolean }) {
-  return (
-    <div className={`pro-loader${fontReady ? " is-type" : ""}`} aria-hidden={phase !== "loading"}>
-      <div className="pro-loader__inner">
-        <p className="pro-micro pro-loader__kicker">Archive</p>
-        <p className="pro-loader__title">
-          <span>The sound</span> <span>of Nigeria</span>
-        </p>
-        <div className="pro-loader__foot">
-          <p className="pro-micro" id="pro-loading-label">
-            {phase === "loading" ? "Loading archive" : "Archive ready"}
-          </p>
-          <div className="pro-loader__track" role="progressbar" aria-labelledby="pro-loading-label" aria-busy={phase === "loading"}>
-            <span />
-          </div>
-          <p className="pro-micro pro-loader__years">1900 — 2026</p>
-        </div>
-      </div>
+      {!returningHome && <Loader ready={archiveReady && fontReady} active={phase === "loading"} fontReady={fontReady} reduced={reduced} onDone={finishLoader} />}
     </div>
   );
 }
