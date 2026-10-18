@@ -157,9 +157,10 @@ export const STATION_SLOTS: readonly StationSlot[] = [
 ];
 
 /**
- * Instrument exhibits (src/data/exhibits.ts) on plinths on the outer walkway, one in the bay just before each era's
- * station (seen on the approach), two for ROOTS in the GLOBAL → ROOTS seam bay. Each faces the hall centre, turned
- * by `yawOffsetDeg`. Added 2026-10-18 (docs/HALL_LAYOUT_LOCK.md §8, docs/EXHIBITS.md); screened by `npm run check:hall` and
+ * Instrument exhibits (src/data/exhibits.ts) on plinths on the sunken ring, 1.5 m outward of the route (toward the
+ * walls), one in the stretch just before each era's station (seen on the approach), two for ROOTS in the GLOBAL → ROOTS
+ * seam. Each spot is the route point at progress `u` (noted) + 1.5 m along the outward normal, on flat floor. Headings
+ * face the hall centre, turned by `yawOffsetDeg` (−40°: three-quarters toward the arriving camera). Added 2026-10-18 (docs/HALL_LAYOUT_LOCK.md §8, docs/EXHIBITS.md); screened by `npm run check:hall` and
  * `npm run check:visuals`.
  */
 export interface ExhibitSlot {
@@ -169,18 +170,18 @@ export interface ExhibitSlot {
   note: string;
 }
 
-export const EXHIBIT_PLINTH = { width: 0.7, depth: 0.7 } as const;
+export const EXHIBIT_PLINTH = { width: 1, depth: 1 } as const;
 
 export const EXHIBIT_SLOTS: readonly ExhibitSlot[] = [
-  { exhibitId: "talking-drum", position: [-11.2, HALL.walkwayFloorY, -23.6], yawOffsetDeg: 0, note: "N walkway, west bay (GLOBAL → ROOTS seam)" },
-  { exhibitId: "axatse", position: [-9.6, HALL.walkwayFloorY, -23.6], yawOffsetDeg: 0, note: "N walkway, west bay, beside the talking drum" },
-  { exhibitId: "gramophone", position: [10.7, HALL.walkwayFloorY, -23.6], yawOffsetDeg: -30, note: "N walkway, east bay (ROOTS → RECORDING)" },
-  { exhibitId: "trumpet", position: [23.8, HALL.walkwayFloorY, -7], yawOffsetDeg: 0, note: "E walkway, bay between the wall pillars at z −10.6 and −3.4 (RECORDING → HIGH-LIFE)" },
-  { exhibitId: "saxophone", position: [23.8, HALL.walkwayFloorY, 7], yawOffsetDeg: 0, note: "E walkway, bay between the wall pillars at z 3.4 and 10.6 (HIGH-LIFE → EXPLOSION)" },
-  { exhibitId: "boombox", position: [10.7, HALL.walkwayFloorY, 23.6], yawOffsetDeg: 0, note: "S walkway, east bay (EXPLOSION → TRANSITION)" },
-  { exhibitId: "guitar", position: [-10.7, HALL.walkwayFloorY, 23.6], yawOffsetDeg: 0, note: "S walkway, west bay (TRANSITION → NAIJA)" },
-  { exhibitId: "conga", position: [-23.8, HALL.walkwayFloorY, 7], yawOffsetDeg: 0, note: "W walkway, bay between the wall pillars at z 10.6 and 3.4 (NAIJA → AFROBEATS)" },
-  { exhibitId: "tambourine", position: [-23.8, HALL.walkwayFloorY, -7], yawOffsetDeg: 0, note: "W walkway, bay between the wall pillars at z −3.4 and −10.6 (AFROBEATS → GLOBAL)" },
+  { exhibitId: "talking-drum", position: [-8.03, HALL.sunkenFloorY, -18.03], yawOffsetDeg: -40, note: "u 0.928, GLOBAL → ROOTS seam" },
+  { exhibitId: "axatse", position: [-6.62, HALL.sunkenFloorY, -18.24], yawOffsetDeg: -40, note: "u 0.941, beside the talking drum" },
+  { exhibitId: "gramophone", position: [7.57, HALL.sunkenFloorY, -18.19], yawOffsetDeg: -40, note: "u 0.059, ROOTS → RECORDING" },
+  { exhibitId: "trumpet", position: [17.83, HALL.sunkenFloorY, -9.33], yawOffsetDeg: -40, note: "u 0.170 (1.3 m out; at the RECORDING / HIGH-LIFE midpoint so focus flights clear it), RECORDING → HIGH-LIFE" },
+  { exhibitId: "saxophone", position: [19.21, HALL.sunkenFloorY, 5.63], yawOffsetDeg: -40, note: "u 0.289, HIGH-LIFE → EXPLOSION" },
+  { exhibitId: "boombox", position: [7.69, HALL.sunkenFloorY, 18.07], yawOffsetDeg: -40, note: "u 0.431, EXPLOSION → TRANSITION" },
+  { exhibitId: "guitar", position: [-7.57, HALL.sunkenFloorY, 18.19], yawOffsetDeg: -40, note: "u 0.559, TRANSITION → NAIJA" },
+  { exhibitId: "conga", position: [-19.18, HALL.sunkenFloorY, 5.67], yawOffsetDeg: -40, note: "u 0.701 (1.3 m out: the steps are closer here), NAIJA → AFROBEATS" },
+  { exhibitId: "tambourine", position: [-18.25, HALL.sunkenFloorY, -8.02], yawOffsetDeg: -40, note: "u 0.810 (1.3 m out; at the AFROBEATS / GLOBAL midpoint so focus flights clear it), AFROBEATS → GLOBAL" },
 ];
 
 /** Heading (rotation.y) of an exhibit: front (+Z) towards the hall centre, plus the slot's offset. */

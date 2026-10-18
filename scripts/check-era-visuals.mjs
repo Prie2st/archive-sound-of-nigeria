@@ -24,7 +24,7 @@ const boxes=layout.stations.flatMap(station=>{
 // Instrument exhibits: plinth footprint up to the top of the instrument stood upright (conservative).
 for(const slot of EXHIBIT_SLOTS){
   const exhibit=EXHIBITS.find(e=>e.id===slot.exhibitId); assert(exhibit,`exhibit slot ${slot.exhibitId} has no exhibit`);
-  const top=exhibit.plinth+exhibit.size;
+  const top=exhibit.plinth+exhibit.size*exhibit.display;
   boxes.push(box([0,top/2,0],[EXHIBIT_PLINTH.width,top,EXHIBIT_PLINTH.depth],matrix(slot.position,exhibitHeading(slot))));
 }
 const distance=point=>Math.min(...boxes.map(b=>b.clampPoint(point,new THREE.Vector3()).distanceTo(point)));

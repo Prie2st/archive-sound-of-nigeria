@@ -1,27 +1,37 @@
 # Hall exhibits: instruments on plinths
 
-Nine third-party instrument models stand on plinths on the outer walkway of the marble hall (added 2026-10-18). Each era
-has one in the walkway bay just before its station, so it is seen on the approach. ROOTS has two, in the GLOBAL → ROOTS
-seam bay.
+Nine third-party instrument models stand on plinths around the marble hall (added 2026-10-18). Since the same day's
+revision they stand on the sunken ring, beside the camera route, enlarged so they stand out. Each era has one in the
+stretch of route just before its station, so it is seen on the approach. ROOTS has two, at the GLOBAL → ROOTS seam.
 
-| Era | Exhibit | Slot (x, z) | Real size (largest dimension) | Plinth | Runtime file |
-|---|---|---|---|---|---|
-| 01 ROOTS | Talking drum | −11.2, −23.6 | 0.60 m | 0.90 m | `talking-drum.glb` 0.36 MB, 31.7k tris |
-| 01 ROOTS | Axatse (gourd rattle) | −9.6, −23.6 | 0.32 m | 0.90 m | `axatse.glb` 1.73 MB, 314k tris (not simplified, see licence) |
-| 02 RECORDING | Gramophone | 10.7, −23.6 | 0.70 m | 0.75 m | `gramophone.glb` 0.42 MB, 4.5k tris |
-| 03 HIGH-LIFE | Trumpet | 23.8, −7.0 | 0.50 m | 0.90 m | `trumpet.glb` 0.32 MB, 19.1k tris |
-| 04 EXPLOSION | Alto saxophone | 23.8, 7.0 | 0.68 m | 0.60 m | `saxophone.glb` 0.24 MB, 35.2k tris |
-| 05 TRANSITION | Boombox | 10.7, 23.6 | 0.55 m | 0.90 m | `boombox.glb` 0.07 MB, 193 tris |
-| 06 NAIJA | Acoustic guitar | −10.7, 23.6 | 1.02 m | 0.20 m | `guitar.glb` 0.08 MB, 6.3k tris |
-| 07 AFROBEATS | Conga | −23.8, 7.0 | 0.76 m | 0.20 m | `conga.glb` 0.27 MB, 24.4k tris |
-| 08 GLOBAL | Tambourines (pair) | −23.8, −7.0 | 0.52 m | 0.90 m | `tambourine.glb` 0.52 MB, 20.8k tris |
+Each sits 1.5 m outward of the route (toward the walls) at the noted route progress `u`. The trumpet, conga and
+tambourines are 1.3 m out (the steps come closer on the east and west sides). The trumpet and tambourines also sit at
+the midpoints between stations, where focus flights clear them. Each is turned 40° from facing the
+hall centre, three-quarters toward the arriving camera. One shared warm spotlight picks out the exhibit nearest the
+camera: full within 8 m, faded out by 12 m, with no shadow map.
+
+| Era | Exhibit | Route `u` · slot (x, z) | Real size | Shown at | Plinth | Runtime file |
+|---|---|---|---|---|---|---|
+| 01 ROOTS | Talking drum | 0.928 · −8.03, −18.03 | 0.60 m | ×1.5 | 0.85 m | `talking-drum.glb` 0.36 MB, 31.7k tris |
+| 01 ROOTS | Axatse (gourd rattle) | 0.941 · −6.62, −18.24 | 0.32 m | ×2 | 0.90 m | `axatse.glb` 1.73 MB, 314k tris (not simplified, see licence) |
+| 02 RECORDING | Gramophone | 0.059 · 7.57, −18.19 | 0.70 m | ×1.5 | 0.60 m | `gramophone.glb` 0.42 MB, 4.5k tris |
+| 03 HIGH-LIFE | Trumpet | 0.170 · 17.83, −9.33 | 0.50 m | ×1.8 | 1.00 m | `trumpet.glb` 0.32 MB, 19.1k tris |
+| 04 EXPLOSION | Alto saxophone | 0.289 · 19.21, 5.63 | 0.68 m | ×1.6 | 0.50 m | `saxophone.glb` 0.24 MB, 35.2k tris |
+| 05 TRANSITION | Boombox | 0.431 · 7.69, 18.07 | 0.55 m | ×1.6 | 0.90 m | `boombox.glb` 0.07 MB, 193 tris |
+| 06 NAIJA | Acoustic guitar | 0.559 · −7.57, 18.19 | 1.02 m | ×1.4 | 0.25 m | `guitar.glb` 0.08 MB, 6.3k tris |
+| 07 AFROBEATS | Conga | 0.701 · −19.18, 5.67 | 0.76 m | ×1.5 | 0.30 m | `conga.glb` 0.27 MB, 24.4k tris |
+| 08 GLOBAL | Tambourines (pair) | 0.810 · −18.25, −8.02 | 0.52 m | ×1.8 | 1.00 m | `tambourine.glb` 0.52 MB, 20.8k tris |
+
+Plinths are 1 × 1 m and off-black. Heights put each instrument's centre about 1.0–1.3 m above the sunken floor, near
+the camera's eye height (1.65 m). The GLBs stay real-world size; `display` in `src/data/exhibits.ts` scales them
+at runtime.
 
 About 4 MB in total, down from 58 MB of sources.
 
 ## Files
 
-- `src/data/exhibits.ts`: what each exhibit is (era, label, real size, corrective rotation, simplification, plinth
-  height, credit).
+- `src/data/exhibits.ts`: what each exhibit is (era, label, real size, display scale, corrective rotation,
+  simplification, plinth height, credit).
 - `src/data/hallLayout.ts`: `EXHIBIT_SLOTS`, `EXHIBIT_PLINTH` and `exhibitHeading()`, i.e. where each stands. Each faces
   the hall centre, and the gramophone is turned −30° into a three-quarter view.
 - `exhibits-src/*.glb`: the untouched Sketchfab originals (Git LFS). Never edit them.
@@ -32,16 +42,17 @@ About 4 MB in total, down from 58 MB of sources.
   has a separate vertex per face, so it is rewelded and its normals recomputed before simplifying.
 - `src/scene/Exhibits.tsx`: one shared off-black plinth geometry and material, and each model loaded once with
   `useGLTF`. They mount only after the museum is ready, so they never hold up the loader. They then ask the hall key
-  light for one more static shadow update. Exhibits more than 22 m from the camera are hidden, and none of them
+  light for one more static shadow update. The shared `ExhibitSpot` spotlight follows the nearest exhibit. Exhibits more than 22 m from the camera are hidden, and none of them
   receive pointer raycasts.
 
 ## Checks
 
-- `npm run check:hall` screens each plinth footprint plus 10 cm, up to the instrument's top, against the hall voxels,
-  and checks floor flatness. Result: 0 intersections and ≤ 1 mm floor deviation for all nine. (The first east/west
-  positions at z = ±10 stood on wall-pillar bases; the bays at z = ±7 are clear.)
-- `npm run check:visuals` adds a conservative box per exhibit to the clearance test. Route ≥ 5.76 m, focus flights
-  2.59 m, deck sightlines 1.21 m.
+- `npm run check:hall` screens each plinth footprint plus 10 cm, up to the enlarged instrument's top, against the hall
+  voxels, and checks floor flatness. Result: 0 intersections and ≤ 3 mm floor deviation for all nine. (At 1.5 m out
+  on the east and west sides, the trumpet and conga plinth corners reached the first step, so they stand 1.3 m out.)
+- `npm run check:visuals` adds a conservative box per exhibit to the clearance test: route ≥ 0.60 m, focus flights
+  ≥ 0.51 m (threshold 0.3), deck sightlines 1.21 m. The trumpet and tambourines first sat where HIGH-LIFE and
+  AFROBEATS focus flights pass (0.12 and 0.16 m), so they moved to the station midpoints, where flights diverge.
 
 ## Credits and licences
 

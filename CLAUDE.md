@@ -291,7 +291,7 @@ Gallery
 ```
 Lighting is baked into the texture (unlit material) — scene lights won't affect it.
 
-**`/public/models/exhibits/<id>.glb`**: nine instrument exhibits on plinths around the hall, built by
+**`/public/models/exhibits/<id>.glb`**: nine instrument exhibits on plinths beside the route (enlarged at runtime), built by
 `npm run exhibits` (`scripts/build-exhibits.mjs`) from the Sketchfab originals in `/exhibits-src` (Git LFS; never
 edit them). Content and credits are in `src/data/exhibits.ts`, placement in `EXHIBIT_SLOTS` (`src/data/hallLayout.ts`),
 and the rest in [docs/EXHIBITS.md](docs/EXHIBITS.md). All are third-party: keep the credits, and never simplify the

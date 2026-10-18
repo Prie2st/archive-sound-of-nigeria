@@ -318,12 +318,12 @@ for (const station of layout.stations) {
 }
 
 // Instrument exhibits (EXHIBIT_SLOTS): the plinth footprint grown by 10 cm, up to the top of the instrument (its
-// largest dimension stood upright, a conservative bound). Floor flat under it, no hall voxels inside it.
+// largest dimension at display scale, stood upright: a conservative bound). Floor flat under it, no hall voxels inside it.
 console.log("\nExhibits (10 cm margin around plinth + instrument):");
 for (const slot of EXHIBIT_SLOTS) {
   const exhibit = EXHIBITS.find((e) => e.id === slot.exhibitId);
   if (!exhibit) { problems.fail.push(`exhibit slot ${slot.exhibitId}: no such exhibit`); continue; }
-  const yaw = exhibitHeading(slot), top = exhibit.plinth + exhibit.size;
+  const yaw = exhibitHeading(slot), top = exhibit.plinth + exhibit.size * exhibit.display;
   const hw = EXHIBIT_PLINTH.width / 2 + 0.1, hd = EXHIBIT_PLINTH.depth / 2 + 0.1;
   let hits = 0, samples = 0, worstFloor = 0;
   for (let lx = -hw; lx <= hw + 1e-6; lx += 0.05) for (let lz = -hd; lz <= hd + 1e-6; lz += 0.05) {
