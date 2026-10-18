@@ -1,5 +1,9 @@
 # Audio Engine — global playback
 
+> **2026-10-18:** production recordings no longer go through the buffer cache below. They are **streamed** through a
+> bounded pool of media elements into the same voice graph. Only development tones are still fetched and decoded.
+> See [PRODUCTION_AUDIO.md](PRODUCTION_AUDIO.md). The loading and memory figures in §5 and §15 describe the tones.
+
 Status: **built** (2026-10-14). One AudioContext, unlock gate, per-era selected track, lazy
 buffer cache, master mute, visibility handling, failure states. **Spatial since 2026-10-14**: one
 voice each for the previous / active / next era, PannerNodes at the stations, a semantic crossfade

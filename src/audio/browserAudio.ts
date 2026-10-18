@@ -37,11 +37,17 @@ export function getAudioEngine({ initialEra, failEra = null }: BrowserAudioOptio
       contextCreated = true;
       return new Context();
     },
-    // Local application assets only (audioCatalog.ts rejects anything outside /audio/).
+    // Development tones only (a few hundred KiB). Local application assets only (audioCatalog.ts rejects anything outside /audio/).
     fetchAudio: async (url) => {
       const response = await fetch(url);
       if (!response.ok) throw new AudioLoadError("network", `HTTP ${response.status}`);
       return response.arrayBuffer();
+    },
+    // Recordings stream through a bounded pool of these, created inside the unlock gesture (docs/PRODUCTION_AUDIO.md).
+    createMediaElement: () => {
+      const element = new Audio();
+      element.preload = "none";
+      return element;
     },
     // Transient user activation (inside a click / tap / key handler). Browsers without the API: trust the caller.
     hasUserActivation: () => (typeof navigator.userActivation === "undefined" ? true : navigator.userActivation.isActive),

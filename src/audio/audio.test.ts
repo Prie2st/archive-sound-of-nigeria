@@ -9,6 +9,10 @@
  * neighbour tests deliberately break "record 2" / "record 3", which must be fixtures — never production
  * archive entries (docs/ARCHIVE_CONTENT.md §7). The production archive is covered by content.test.ts and
  * recordChange.test.ts.
+ *
+ * The shared voice / mix mechanics run with `decodeRecordings` (heroes decoded like tones). The
+ * "production audio — streamed recordings" suite and the streamed record changes run the real
+ * production path: recordings through a mock media element pool, never fetched whole or decoded.
  * Run with: npm test
  */
 import "../data/useDevRecordSet.ts"; // FIRST: selects the fixture record set before the era data loads
@@ -18,9 +22,10 @@ import { describe, it } from "node:test";
 import * as THREE from "three";
 import { isDevFixture } from "../data/devFixtures.ts";
 import { ERAS, getEra } from "../data/eras.ts";
+import { PRODUCTION_AUDIO_URLS } from "../data/productionAudio.ts";
 import { ACTIVE_RECORD_SET } from "../data/recordSets.ts";
 import { getHallLayout } from "../data/hallLayout.ts";
-import { HERO_TRACK_IDS } from "../data/tracks.ts";
+import { ARCHIVE_ENTRIES, HERO_TRACK_IDS } from "../data/tracks.ts";
 import { ERA_IDS, type EraId, type Track } from "../data/types.ts";
 import { FocusController } from "../state/focus.ts";
 import { resolveTravelConfig, selectActiveStation, TRAVEL_CONFIG, TravelController } from "../state/travel.ts";
@@ -30,7 +35,7 @@ import { resolveTonearmPoses, TonearmMotionSystem } from "../stations/tonearmMot
 import { AUDIO_ASSET_POLICY, getAudioEntry, resolveAudioEntry, type AudioTrackEntry } from "./audioCatalog.ts";
 import { AudioBufferCache, AudioLoadError } from "./bufferCache.ts";
 import { DEV_AUDIO_SPEC } from "./devAudioAssets.ts";
-import { AUDIO_CONFIG, AudioEngine, type AudioEngineOptions, type AudioFrame, type AudioVoiceInfo } from "./engine.ts";
+import { AUDIO_CONFIG, AudioEngine, audioSourceStrategy, type AudioEngineOptions, type AudioFrame, type AudioVoiceInfo } from "./engine.ts";
 import { adjacentEras, roleOf, SPATIAL_MIX_CONFIG } from "./spatialMix.ts";
 import { TrackSelection } from "./trackSelection.ts";
 import type {
@@ -43,6 +48,9 @@ import type {
   BufferSourceLike,
   DistanceModel,
   GainNodeLike,
+  MediaElementEvent,
+  MediaElementLike,
+  MediaErrorLike,
   PannerNodeLike,
   PanningModel,
 } from "./webAudio.ts";
@@ -192,6 +200,107 @@ class MockSource extends MockNode implements BufferSourceLike {
   }
 }
 
+/**
+ * A streaming <audio> element as a local server feeds it: setting `src` (or `load()`) restarts the load
+ * algorithm; on the next tick it reports metadata, and — with preload "auto" — enough data to play
+ * (loadeddata, canplay). URLs containing "missing" fail like a 404 (code 4); `slow` URLs keep buffering
+ * until released. Nothing here ever holds decoded audio.
+ */
+class MockMediaElement implements MediaElementLike {
+  preload = "";
+  loop = false;
+  currentTime = 0;
+  paused = true;
+  readyState = 0;
+  error: MediaErrorLike | null = null;
+  /** Load algorithm runs (src assignments + load()). */
+  loads = 0;
+  plays = 0;
+  /** Every URL assigned to `src`. */
+  readonly history: string[] = [];
+  private source = "";
+  private generation = 0;
+  private readonly slow: Set<string>;
+  private readonly listeners = new Map<MediaElementEvent, (() => void)[]>();
+
+  constructor(slow: Set<string>) {
+    this.slow = slow;
+  }
+
+  get src() {
+    return this.source;
+  }
+
+  set src(url: string) {
+    this.source = url;
+    this.history.push(url);
+    this.runLoad();
+  }
+
+  removeAttribute(name: string) {
+    if (name === "src") this.source = "";
+  }
+
+  load() {
+    this.runLoad();
+  }
+
+  play() {
+    this.plays++;
+    if (!this.source) return Promise.reject(new Error("NotSupportedError: no supported sources"));
+    this.paused = false;
+    return Promise.resolve();
+  }
+
+  pause() {
+    this.paused = true;
+  }
+
+  addEventListener(type: MediaElementEvent, listener: () => void) {
+    this.listeners.set(type, [...(this.listeners.get(type) ?? []), listener]);
+  }
+
+  /** Enough data buffered: HAVE_ENOUGH_DATA, loadeddata, canplay. */
+  becomeReady() {
+    this.readyState = 4;
+    this.fire("loadeddata");
+    this.fire("canplay");
+  }
+
+  private fire(type: MediaElementEvent) {
+    for (const listener of this.listeners.get(type) ?? []) listener();
+  }
+
+  private runLoad() {
+    this.loads++;
+    this.paused = true;
+    this.currentTime = 0;
+    this.readyState = 0;
+    this.error = null;
+    const generation = ++this.generation;
+    const url = this.source;
+    if (!url) return;
+    setImmediate(() => {
+      if (generation !== this.generation) return; // superseded: the real element drops the old load's tasks
+      if (url.includes("missing")) {
+        this.error = { code: 4, message: "MEDIA_ELEMENT_ERROR: Format error" };
+        this.fire("error");
+        return;
+      }
+      this.readyState = 1;
+      if (this.preload === "auto" && !this.slow.has(url)) this.becomeReady();
+    });
+  }
+}
+
+class MockMediaNode extends MockNode {
+  readonly element: MockMediaElement;
+  constructor(element: MockMediaElement) {
+    super();
+    this.element = element;
+  }
+}
+
 const SECONDS = 8;
 
 class MockContext implements AudioContextLike {
@@ -204,6 +313,7 @@ class MockContext implements AudioContextLike {
   readonly sources: MockSource[] = [];
   readonly gains: MockGain[] = [];
   readonly panners: MockPanner[] = [];
+  readonly mediaNodes: MockMediaNode[] = [];
   decodes = 0;
   resumeCalls = 0;
   suspendCalls = 0;
@@ -253,6 +363,14 @@ class MockContext implements AudioContextLike {
     return Promise.resolve(this.createBuffer(1, SECONDS * this.sampleRate, this.sampleRate));
   }
 
+  /** Like the real API: an element can be wired into a context only once. */
+  createMediaElementSource(element: MediaElementLike) {
+    if (this.mediaNodes.some((node) => node.element === element)) throw new Error("InvalidStateError: the element already has a source node");
+    const node = new MockMediaNode(element as MockMediaElement);
+    this.mediaNodes.push(node);
+    return node;
+  }
+
   resume() {
     this.resumeCalls++;
     if (this.refuseResume) {
@@ -275,9 +393,12 @@ class MockContext implements AudioContextLike {
     this.onstatechange?.(new Event("statechange"));
   }
 
-  /** Advances the audio clock; fires `ended` for stopped or finished sources. */
+  /** Advances the audio clock (and playing media elements); fires `ended` for stopped or finished sources. */
   advance(seconds: number) {
-    if (this.state === "running") this.currentTime += seconds;
+    if (this.state === "running") {
+      this.currentTime += seconds;
+      for (const node of this.mediaNodes) if (!node.element.paused) node.element.currentTime += seconds;
+    }
     for (const source of this.sources) {
       if (source.startCount === 0 || source.ended) continue;
       const duration = source.buffer?.duration ?? 0;
@@ -310,7 +431,11 @@ interface Harness {
   gesture: { active: boolean };
 }
 
-/** URLs containing "missing" 404, "corrupt" return undecodable bytes. */
+/**
+ * URLs containing "missing" 404, "corrupt" return undecodable bytes. Recordings are decoded like tones here
+ * (`decodeRecordings`): these suites test the shared voice / mix mechanics. createStreamingHarness runs the
+ * production path.
+ */
 function createHarness(options: Partial<AudioEngineOptions> & { initialEra?: EraId } = {}): Harness {
   const context = new MockContext();
   const fetches: string[] = [];
@@ -330,9 +455,38 @@ function createHarness(options: Partial<AudioEngineOptions> & { initialEra?: Era
     },
     hasUserActivation: () => gesture.active,
     warn: () => {},
+    decodeRecordings: true,
     ...options,
   });
   return { engine, context, fetches, contextsCreated: () => created, gesture };
+}
+
+interface StreamHarness extends Harness {
+  /** Every media element the engine created. */
+  elements: MockMediaElement[];
+  /** URLs that keep buffering until `finishLoading`. */
+  slow: Set<string>;
+  finishLoading: (url: string) => void;
+}
+
+/** The production path: recordings stream through the media element pool; tones still decode. */
+function createStreamingHarness(options: Partial<AudioEngineOptions> & { initialEra?: EraId } = {}): StreamHarness {
+  const elements: MockMediaElement[] = [];
+  const slow = new Set<string>();
+  const h = createHarness({
+    decodeRecordings: false,
+    createMediaElement: () => {
+      const element = new MockMediaElement(slow);
+      elements.push(element);
+      return element;
+    },
+    ...options,
+  });
+  const finishLoading = (url: string) => {
+    slow.delete(url);
+    for (const element of elements) if (element.src === url && element.readyState < 3) element.becomeReady();
+  };
+  return { ...h, elements, slow, finishLoading };
 }
 
 /** Catalog in which `trackId` has no playable audio (the dev records all have tones now). */
@@ -369,6 +523,31 @@ function sourceOf(h: Harness, eraId: EraId): MockSource | undefined {
     return panner?.positionX.value === x;
   });
 }
+
+/** The media element of an era's live (not fading) stream voice, found through its voice chain. */
+function streamOf(h: StreamHarness, eraId: EraId): MockMediaElement | undefined {
+  const x = layout.stations[getEra(eraId).index].platter[0];
+  return h.context.mediaNodes.find((node) => {
+    const gain = node.outputs[0] as MockGain | undefined;
+    if (!gain) return false;
+    const clock = h.context.sources.find((source) => source.outputs[0] === gain);
+    if (!clock || clock.stopAt !== null || clock.ended) return false;
+    return gain.outputs.some((next) => next instanceof MockPanner && next.positionX.value === x);
+  })?.element;
+}
+
+const mediaNodeOf = (h: StreamHarness, element: MockMediaElement) => h.context.mediaNodes.find((node) => node.element === element);
+const JA_FUNMI = PRODUCTION_AUDIO_URLS["king-sunny-ade-ja-funmi"];
+const BATA = PRODUCTION_AUDIO_URLS["bata-drumming"];
+const FREE_MIND = PRODUCTION_AUDIO_URLS["tems-free-mind"];
+
+/** Streaming tests: record `index` of `eraId` (a dev fixture) stands for a production recording — its real file and kind. */
+const asRecording =
+  (eraId: EraId, index: number, url: string) =>
+  (era: EraId, trackId: string): AudioTrackEntry => {
+    const entry = getAudioEntry(era, trackId);
+    return era === eraId && trackId === getEra(eraId).tracks[index].id ? { ...entry, url, kind: "recording", unavailable: null } : entry;
+  };
 
 /** A frame as the listener bridge publishes it: the camera on the route at `loopProgress`. */
 function routeFrame(loopProgress: number, focusAmount = 0, focusStation = -1, frame?: AudioFrame): AudioFrame {
@@ -1206,6 +1385,306 @@ describe("audio engine — failures", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Production audio: streamed recordings (docs/PRODUCTION_AUDIO.md)
+// ---------------------------------------------------------------------------
+
+describe("production audio — streamed recordings", () => {
+  const MAX = AUDIO_CONFIG.maxMediaElements;
+
+  it("every production archive recording streams; only development tones decode", () => {
+    assert.equal(ARCHIVE_ENTRIES.length, 40);
+    for (const track of ARCHIVE_ENTRIES) {
+      const entry = resolveAudioEntry(track);
+      assert.equal(entry.kind, "recording", track.id);
+      assert.equal(audioSourceStrategy(entry.kind), "stream", track.id);
+    }
+    for (const era of ERAS) for (const track of era.tracks.filter(isDevFixture)) assert.equal(audioSourceStrategy(getAudioEntry(era.id, track.id).kind), "buffer");
+    assert.equal(audioSourceStrategy("recording", true), "buffer", "only the engine-mechanics test switch decodes a recording");
+  });
+
+  it("one AudioContext; the bounded pool is created and primed inside the unlock gesture, each element wired once", async () => {
+    const h = createStreamingHarness();
+    await startPlayback(h);
+    h.engine.unlock(); // later gestures create nothing
+    h.engine.setPageVisible(false);
+    h.engine.setPageVisible(true);
+    await flush();
+    assert.equal(h.contextsCreated(), 1);
+    assert.equal(h.engine.getDebugInfo().contextsCreated, 1);
+    assert.equal(h.elements.length, MAX);
+    assert.deepEqual(
+      h.context.mediaNodes.map((node) => node.element),
+      h.elements,
+      "one MediaElementAudioSourceNode per element, all on THE context",
+    );
+    for (const element of h.elements) assert.ok(element.plays >= 1, "started once inside the gesture (WebKit playback permission)");
+    assert.equal(h.engine.getSnapshot().status, "PLAYING");
+  });
+
+  it("a stream enters the existing chain: media node → voice gain → panner → spatial, + dry → music → master", async () => {
+    const h = createStreamingHarness();
+    await startPlayback(h);
+    assert.equal(h.context.mediaNodes.filter((media) => media.outputs.length).length, 3);
+    for (const node of h.context.mediaNodes.filter((media) => media.outputs.length)) {
+      const gain = node.outputs[0] as MockGain;
+      const clock = h.context.sources.find((source) => source.outputs[0] === gain);
+      assert.equal(gain.gain.valueAt(clock?.startedAt ?? NaN), 0, "a stream voice rises from silence");
+    }
+    h.context.advance(0.01); // the unlock primer ends
+    h.engine.updateFrame(routeFrame(layout.stations[0].progress));
+    const [master, music, , , spatial, dry] = h.context.gains;
+    for (const eraId of ["roots", "recording", "global"] as EraId[]) {
+      const element = streamOf(h, eraId);
+      assert.ok(element, eraId);
+      assert.equal(element.src, heroUrl(eraId));
+      assert.equal(element.preload, "auto");
+      assert.equal(element.paused, false);
+      const node = mediaNodeOf(h, element);
+      assert.equal(node?.outputs.length, 1);
+      const gain = node?.outputs[0] as MockGain;
+      const panner = gain.outputs.find((next): next is MockPanner => next instanceof MockPanner);
+      assert.ok(panner && gain.outputs.includes(dry));
+      assert.deepEqual(panner.outputs, [spatial]);
+      assert.deepEqual([panner.positionX.value, panner.positionY.value, panner.positionZ.value], [...layout.stations[getEra(eraId).index].platter]);
+      close(voiceOf(h.engine, eraId)?.target ?? NaN, eraId === "roots" ? 1 : SPATIAL_MIX_CONFIG.bleed);
+    }
+    for (const bus of [spatial, dry]) assert.deepEqual(bus.outputs, [music]);
+    assert.deepEqual(music.outputs, [master]);
+    assert.deepEqual(master.outputs, [h.context.destination]);
+    assert.equal(h.context.decodes, 0, "no recording decoded");
+    assert.deepEqual(h.fetches, [], "no recording fetched whole");
+    assert.equal(h.context.trackSources().length, 0, "no decoded track source");
+    assert.equal(h.engine.getDebugInfo().liveNodes, BUS_NODES + 3 * VOICE_NODES);
+  });
+
+  it("the long recording (Ja Funmi, 67 min) streams: never fetched whole, never decoded, plays and advances", async () => {
+    const h = createStreamingHarness({ initialEra: "explosion", resolveEntry: asRecording("explosion", 1, JA_FUNMI) });
+    await startPlayback(h);
+    const jaFunmi = getEra("explosion").tracks[1].id;
+    assert.equal(h.engine.selectTrack("explosion", jaFunmi), true);
+    await flush();
+    assert.equal(h.engine.getSnapshot().status, "PLAYING");
+    assert.equal(h.engine.getSnapshot().playingTrackId, jaFunmi);
+    const element = streamOf(h, "explosion");
+    assert.equal(element?.src, JA_FUNMI);
+    h.context.advance(30);
+    close(element?.currentTime ?? NaN, 30);
+    const info = h.engine.getDebugInfo();
+    assert.equal(h.context.decodes, 0);
+    assert.deepEqual(h.fetches, []);
+    assert.deepEqual([info.cache.buffers, info.cache.bytes, info.cache.requests], [0, 0, 0], "no decoded audio held at all");
+    assert.ok(info.streams && info.streams.prepared <= MAX && info.streams.owned === 3);
+    assert.ok(!h.elements.some((other) => other !== element && other.src === heroUrl("explosion")), "the replaced hero's element was released");
+  });
+
+  it("development tones stay decoded buffers (deterministic) beside streamed neighbours", async () => {
+    const h = createStreamingHarness();
+    await startPlayback(h);
+    const tone = getEra("roots").tracks[1].id;
+    h.engine.selectTrack("roots", tone);
+    await flush();
+    h.context.advance(1);
+    const source = sourceOf(h, "roots");
+    assert.ok(source);
+    assert.equal(source.buffer?.length, SECONDS * 48000);
+    assert.ok(source.loop);
+    assert.deepEqual(h.fetches, [getAudioEntry("roots", tone).url]);
+    assert.equal(h.context.decodes, 1);
+    assert.equal(streamOf(h, "roots"), undefined);
+    assert.ok(streamOf(h, "recording") && streamOf(h, "global"), "the neighbours still stream");
+    assert.ok(!h.elements.some((element) => element.src === heroUrl("roots")), "the hero's element was released after its fade");
+    assert.equal(h.engine.getSnapshot().playingTrackId, tone);
+  });
+
+  it("a retired stream releases its element: paused, source detached, node disconnected — then reused", async () => {
+    const h = createStreamingHarness();
+    await startPlayback(h);
+    h.context.advance(1);
+    const global = streamOf(h, "global");
+    assert.ok(global);
+    const node = mediaNodeOf(h, global);
+    h.engine.setActiveEra("recording"); // GLOBAL leaves the neighbourhood, HIGH-LIFE joins
+    await flush();
+    assert.equal(streamOf(h, "global"), undefined);
+    assert.equal(global.paused, false, "still playing while it fades out");
+    h.context.advance(1);
+    await flush();
+    assert.equal(global.paused, true);
+    assert.equal(global.src, "");
+    assert.deepEqual(node?.outputs, []);
+    assert.ok(streamOf(h, "highlife"));
+    const info = h.engine.getDebugInfo();
+    assert.equal(info.voices.length, 3);
+    assert.equal(info.streams?.owned, 3);
+    assert.equal(info.liveNodes, BUS_NODES + 3 * VOICE_NODES);
+    assert.equal(h.elements.length, MAX, "elements are reused, never added");
+  });
+
+  it("returning to a stream that is still fading out continues it: same element, same position, no reload", async () => {
+    const h = createStreamingHarness();
+    await startPlayback(h);
+    h.context.advance(3.2);
+    h.engine.setActiveEra("recording");
+    await flush();
+    const roots = streamOf(h, "roots");
+    assert.ok(roots);
+    const loads = roots.loads;
+    h.engine.setActiveEra("highlife"); // ROOTS leaves the neighbourhood and fades
+    await flush();
+    h.context.advance(0.1);
+    assert.equal(streamOf(h, "roots"), undefined);
+    h.engine.setActiveEra("recording"); // ROOTS is the previous neighbour again
+    await flush();
+    assert.equal(streamOf(h, "roots"), roots);
+    assert.equal(roots.loads, loads);
+    close(roots.currentTime, 3.3, 1e-9);
+    h.context.advance(1);
+    assert.equal(streamOf(h, "roots"), roots, "its old scheduled stop no longer ends it");
+    assert.equal(roots.paused, false);
+    assert.equal(h.engine.getDebugInfo().liveNodes, BUS_NODES + 3 * VOICE_NODES);
+  });
+
+  it("an exhausted pool never grows: rapid moves end the oldest fading stream early to make room", async () => {
+    const h = createStreamingHarness({ config: { maxMediaElements: 4 } });
+    await startPlayback(h);
+    h.engine.setActiveEra("recording"); // GLOBAL fades, HIGH-LIFE takes the last free element
+    await flush();
+    h.engine.setActiveEra("highlife"); // ROOTS fades too; EXPLOSION finds every element owned
+    await flush();
+    assert.equal(streamOf(h, "explosion"), undefined, "waiting for an element");
+    h.context.advance(0.1); // the oldest fading stream (GLOBAL) ends early
+    await flush();
+    assert.ok(streamOf(h, "explosion"), "placed once an element was free");
+    h.context.advance(1);
+    await flush();
+    assert.equal(h.elements.length, 4);
+    assert.deepEqual(liveVoices(h.engine).map((voice) => voice.eraId).sort(), neighbourhood("highlife"));
+    assert.equal(h.engine.getDebugInfo().liveNodes, BUS_NODES + 3 * VOICE_NODES);
+  });
+
+  it("three laps and back: the working set never exceeds the pool, every boundary seamless, nothing leaks", async () => {
+    const h = createStreamingHarness();
+    await startPlayback(h);
+    let peakPrepared = 0;
+    let peakOwned = 0;
+    const sample = () => {
+      const streams = h.engine.getDebugInfo().streams;
+      peakPrepared = Math.max(peakPrepared, streams?.prepared ?? 0);
+      peakOwned = Math.max(peakOwned, streams?.owned ?? 0);
+    };
+    const order = ERA_IDS.map(hero);
+    const forward = await travel(h, 0, 3, 6, sample);
+    assert.deepEqual(forward.played, [...order, ...order, ...order, order[0]]);
+    assertSeamless(forward.boundaries);
+    const backward = await travel(h, 3, 1, 6, sample);
+    assertSeamless(backward.boundaries);
+    await flush();
+    const info = h.engine.getDebugInfo();
+    assert.equal(h.elements.length, MAX);
+    assert.ok(peakPrepared <= MAX && peakOwned <= MAX, `peak ${peakPrepared} prepared / ${peakOwned} owned`);
+    assert.equal(info.voices.length, 3, "fading voices released");
+    assert.equal(info.streams?.owned, 3);
+    assert.ok((info.streams?.prepared ?? 0) <= 4, "the three voices + at most the lookahead");
+    assert.equal(info.liveNodes, BUS_NODES + 3 * VOICE_NODES);
+    for (const element of h.elements) if (!liveVoices(h.engine).some((voice) => element.src === heroUrl(voice.eraId))) assert.equal(element.paused, true);
+    assert.equal(h.context.decodes, 0);
+    assert.deepEqual(h.fetches, []);
+  });
+
+  it("GLOBAL ↔ ROOTS: ROOTS rises on its own element before the switch and keeps it (no restart, no reload)", async () => {
+    const h = createStreamingHarness({ initialEra: "global" });
+    await startPlayback(h);
+    const global = getEra("global").index;
+    const roots = streamOf(h, "roots");
+    assert.ok(roots);
+    const loads = roots.loads;
+    const { played, boundaries } = await travel(h, layout.stations[global].progress, 1 + layout.stations[0].progress + 0.01);
+    assert.deepEqual(played, [hero("global"), hero("roots")]);
+    assertSeamless(boundaries);
+    assert.equal(streamOf(h, "roots"), roots, "the same element plays on across the seam");
+    assert.equal(roots.loads, loads, "never reloaded");
+    assert.ok(roots.currentTime > 1);
+    const back = await travel(h, 1 + layout.stations[0].progress + 0.01, layout.stations[global].progress - 0.01);
+    assert.equal(back.played.at(-1), hero("global"));
+    assertSeamless(back.boundaries);
+    assert.equal(streamOf(h, "global")?.src, heroUrl("global"));
+  });
+
+  it("mute is state-safe: elements keep playing, nothing reloads, the position carries on", async () => {
+    const h = createStreamingHarness();
+    await startPlayback(h);
+    h.context.advance(5);
+    const element = streamOf(h, "roots");
+    assert.ok(element);
+    const loads = h.elements.map((e) => e.loads);
+    const before = element.currentTime;
+    const master = h.context.gains[0];
+    h.engine.mute();
+    h.context.advance(3);
+    close(master.gain.value, 0);
+    assert.equal(element.paused, false, "muting never pauses a stream");
+    h.engine.unmute();
+    h.context.advance(1);
+    close(master.gain.value, 1);
+    assert.equal(streamOf(h, "roots"), element);
+    close(element.currentTime, before + 4);
+    assert.deepEqual(
+      h.elements.map((e) => e.loads),
+      loads,
+      "no element reloaded",
+    );
+  });
+
+  it("a hidden page pauses the streams with the context; visible again resumes them where they were", async () => {
+    const h = createStreamingHarness();
+    await startPlayback(h);
+    h.context.advance(2);
+    const playing = h.elements.filter((element) => !element.paused);
+    assert.equal(playing.length, 3);
+    const loads = playing.map((element) => element.loads);
+    h.engine.setPageVisible(false);
+    await flush();
+    assert.ok(playing.every((element) => element.paused));
+    h.engine.setPageVisible(true);
+    await flush();
+    assert.equal(h.engine.getSnapshot().status, "PLAYING");
+    assert.ok(playing.every((element) => !element.paused));
+    for (const element of playing) close(element.currentTime, 2);
+    assert.deepEqual(
+      playing.map((element) => element.loads),
+      loads,
+    );
+  });
+
+  it("a missing streamed recording fails safely: ERROR, no tone, no fetch, element freed, neighbours play; play() retries once", async () => {
+    const url = "/audio/roots/missing.mp3";
+    const h = createStreamingHarness({ resolveEntry: (era, track) => (track === hero("roots") ? { ...getAudioEntry(era, track), url } : getAudioEntry(era, track)) });
+    await startPlayback(h);
+    const snapshot = h.engine.getSnapshot();
+    assert.equal(snapshot.status, "ERROR");
+    assert.deepEqual(snapshot.error, { trackId: hero("roots"), reason: "network" });
+    assert.equal(h.engine.eraVoiceTrack("roots"), null);
+    assert.equal(h.engine.isEraPlaying("roots"), false);
+    assert.ok(!h.elements.some((element) => element.src === url), "the failed element was released");
+    assert.ok(streamOf(h, "recording") && streamOf(h, "global"));
+    assert.deepEqual(h.fetches, []);
+    const attempts = () => h.elements.flatMap((element) => element.history).filter((src) => src === url).length;
+    assert.equal(attempts(), 1);
+    h.engine.setActiveEra("recording");
+    await flush();
+    h.engine.setActiveEra("roots");
+    await flush();
+    assert.equal(attempts(), 1, "remembered, not retried by travel");
+    assert.equal(h.engine.getSnapshot().playingTrackId, null);
+    h.engine.play();
+    await flush();
+    assert.equal(attempts(), 2, "an explicit play retries once");
+    assert.equal(h.engine.getSnapshot().status, "ERROR");
+    assert.equal(h.contextsCreated(), 1);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Platter motion through the semantic bridge (engine.isEraPlaying)
 // ---------------------------------------------------------------------------
 
@@ -1556,5 +2035,105 @@ describe("record change — real audio engine", () => {
     assert.equal(h.engine.eraVoiceTrack("roots"), hero("roots"));
     assert.equal(deck.controller.phase, "PLAYING");
     assert.deepEqual(deck.problems, []);
+  });
+
+  it("streams: NEXT prepares the destination element early, starts it only at needle contact, and no stale record plays", async () => {
+    const h = createStreamingHarness({ resolveEntry: asRecording("roots", 1, BATA) });
+    await startPlayback(h);
+    const deck = deckOn(h, "roots");
+    await deck.run(3);
+    assert.equal(deck.controller.phase, "PLAYING");
+    const b = getEra("roots").tracks[1].id;
+    const old = streamOf(h, "roots");
+    const neighbours = [streamOf(h, "recording"), streamOf(h, "global")];
+    deck.controller.requestStep("next");
+    let destination: MockMediaElement | undefined;
+    let releasePhase: string | null = null;
+    let startedAt = NaN;
+    while (deck.controller.changing) {
+      deck.frame();
+      await flush();
+      destination ??= h.elements.find((element) => element.src === BATA);
+      if ((deck.controller.phase as string) === "LIFT_RECORD") {
+        assert.equal(h.engine.trackLoadState("roots", b), "ready", "playable before the record leaves");
+        assert.equal(destination?.paused, true, "prepared, silent");
+        assert.equal(streamOf(h, "roots"), undefined, "nothing plays while the record is off the platter");
+      }
+      if (releasePhase === null && h.engine.eraVoiceTrack("roots") === b) {
+        releasePhase = deck.controller.phase;
+        startedAt = destination?.currentTime ?? NaN;
+      }
+    }
+    await deck.run(0.5);
+    assert.ok(releasePhase === "LOWER_NEEDLE" || releasePhase === "FADE_IN_AUDIO", `destination started in ${releasePhase}`);
+    assert.ok(startedAt <= STEP + 1e-9, `from the top, at needle contact (seen one frame later at ${startedAt} s)`);
+    assert.ok(destination && streamOf(h, "roots") === destination);
+    assert.equal(destination.paused, false);
+    assert.equal(old?.paused, true);
+    assert.ok(!h.elements.some((element) => element.src === heroUrl("roots")), "the old record's element was released");
+    assert.deepEqual([streamOf(h, "recording"), streamOf(h, "global")], neighbours, "neighbour streams untouched");
+    assert.equal(h.engine.getSnapshot().playingTrackId, b);
+    assert.equal(h.engine.selection.get("roots"), b);
+    assert.equal(deck.controller.phase, "PLAYING");
+    assert.deepEqual(deck.problems, []);
+    assert.equal(h.context.decodes, 0);
+    assert.deepEqual(h.fetches, []);
+  });
+
+  it("streams: a destination still buffering keeps the arm hovering; it drops once the element can play", async () => {
+    const h = createStreamingHarness({ resolveEntry: asRecording("roots", 1, BATA) });
+    await startPlayback(h);
+    const deck = deckOn(h, "roots");
+    await deck.run(3);
+    h.slow.add(BATA);
+    deck.controller.requestStep("next");
+    await deck.run(12);
+    assert.equal(deck.controller.phase, "STOP_PLATTER", "the old record waits on the deck until the destination can play");
+    assert.equal(h.engine.trackLoadState("roots", getEra("roots").tracks[1].id), "loading");
+    h.finishLoading(BATA);
+    await deck.settle();
+    assert.equal(deck.controller.phase, "PLAYING");
+    assert.equal(streamOf(h, "roots")?.src, BATA);
+    assert.deepEqual(deck.problems, []);
+  });
+
+  it("streams: a destination that fails to load restores the original record and its stream (never lifted)", async () => {
+    const h = createStreamingHarness({ resolveEntry: asRecording("roots", 1, "/audio/roots/missing.mp3") });
+    await startPlayback(h);
+    const deck = deckOn(h, "roots");
+    await deck.run(3);
+    deck.controller.requestStep("next");
+    let lifted = false;
+    while (deck.controller.changing) {
+      deck.frame();
+      await flush();
+      if (deck.controller.vinyl[1] > 0) lifted = true;
+    }
+    await deck.run(0.5);
+    assert.equal(lifted, false);
+    assert.equal(deck.controller.lastOutcome, "restored-after-load-failure");
+    assert.equal(h.engine.selection.get("roots"), hero("roots"));
+    assert.equal(streamOf(h, "roots")?.src, heroUrl("roots"));
+    assert.equal(deck.controller.phase, "PLAYING");
+    assert.deepEqual(deck.problems, []);
+  });
+
+  it("streams: a changed GLOBAL record is what GLOBAL streams as ROOTS's neighbour, across the seam and back", async () => {
+    const h = createStreamingHarness({ initialEra: "global", resolveEntry: asRecording("global", 1, FREE_MIND) });
+    await startPlayback(h);
+    const deck = deckOn(h, "global");
+    await deck.run(3);
+    deck.controller.requestStep("next");
+    await deck.settle();
+    const b = getEra("global").tracks[1].id;
+    assert.equal(streamOf(h, "global")?.src, FREE_MIND);
+    const { played, boundaries } = await travel(h, layout.stations[getEra("global").index].progress, 1 + layout.stations[1].progress + 0.01);
+    assert.deepEqual(played, [b, hero("roots"), hero("recording")]);
+    assertSeamless(boundaries);
+    const back = await travel(h, 1 + layout.stations[1].progress + 0.01, layout.stations[getEra("global").index].progress);
+    assert.equal(back.played.at(-1), b);
+    assertSeamless(back.boundaries);
+    assert.equal(streamOf(h, "global")?.src, FREE_MIND, "the persisted selection, never the hero");
+    assert.ok(!h.elements.some((element) => element.src === heroUrl("global")));
   });
 });

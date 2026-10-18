@@ -76,6 +76,36 @@ export interface AudioListenerLike {
   setOrientation?(x: number, y: number, z: number, xUp: number, yUp: number, zUp: number): void;
 }
 
+export interface MediaErrorLike {
+  /** MediaError: 1 aborted, 2 network, 3 decode, 4 source not supported (also a missing file). */
+  readonly code: number;
+  readonly message: string;
+}
+
+export type MediaElementEvent = "loadeddata" | "canplay" | "error" | "ended";
+
+/**
+ * The slice of HTMLMediaElement used for STREAMED production recordings (docs/PRODUCTION_AUDIO.md).
+ * The element only streams and decodes ahead of its playhead; its output reaches the graph through
+ * a MediaElementAudioSourceNode of THE AudioContext, never the speakers directly.
+ */
+export interface MediaElementLike {
+  src: string;
+  /** "none" | "metadata" | "auto" (a string here so HTMLMediaElement stays assignable). */
+  preload: string;
+  loop: boolean;
+  currentTime: number;
+  readonly paused: boolean;
+  /** HAVE_NOTHING 0 · HAVE_METADATA 1 · HAVE_CURRENT_DATA 2 · HAVE_FUTURE_DATA 3 · HAVE_ENOUGH_DATA 4. */
+  readonly readyState: number;
+  readonly error: MediaErrorLike | null;
+  play(): Promise<void>;
+  pause(): void;
+  load(): void;
+  removeAttribute(name: string): void;
+  addEventListener(type: MediaElementEvent, listener: () => void): void;
+}
+
 /** "interrupted" is Safari's state when the OS takes the audio session (calls, Siri…). */
 export type AudioContextState = "suspended" | "running" | "closed" | "interrupted";
 
@@ -90,7 +120,10 @@ export interface AudioContextLike {
   createPanner(): PannerNodeLike;
   createBufferSource(): BufferSourceLike;
   createBuffer(numberOfChannels: number, length: number, sampleRate: number): AudioBufferLike;
+  /** Development tones only — production recordings are streamed, never decoded whole. */
   decodeAudioData(data: ArrayBuffer): Promise<AudioBufferLike>;
+  /** Routes a media element into the graph. Allowed ONCE per element: the pool creates each pair once. */
+  createMediaElementSource(element: MediaElementLike): AudioNodeLike;
   resume(): Promise<void>;
   suspend(): Promise<void>;
 }

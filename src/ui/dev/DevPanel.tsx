@@ -189,6 +189,7 @@ function AudioControls({ audio }: { audio: AudioEngine }) {
         `voices    ${voices}`,
         `nodes     ${d.liveNodes} live · ${d.voices.length} voices (${d.voices.filter((v) => v.role !== "fading").length} live) · ${d.sourcesCreated} sources created`,
         `buffers   ${d.cache.buffers} decoded (${mb(d.cache.bytes)}) · loading ${d.cache.loading} · errors ${d.cache.errors} · requests ${d.cache.requests}`,
+        `streams   ${d.streams ? `${d.streams.owned} playing · ${d.streams.prepared}/${d.streams.max} elements in use (${d.streams.elements} created) · ${d.streams.errors} errors · ${d.streams.assignments} loads${d.streams.urls.length ? `\n          ${d.streams.urls.join("\n          ")}` : ""}` : "—"}`,
       ].join("\n");
     };
     write();

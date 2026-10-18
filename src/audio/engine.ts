@@ -19,10 +19,15 @@
  * (spatialMix.ts): the active station dominates, neighbours bleed faintly, the incoming era rises
  * before the active-era switch, focus pulls the neighbours out. Distant eras have no voice at all.
  *
- * Every playback instance is a NEW AudioBufferSourceNode (+ gain + panner); all three are
- * disconnected when the source ends. A voice that changes role (next → active → previous) is the
- * SAME instance — never restarted at an era boundary. Gain changes are AudioParam automation on the
- * audio clock — no JS volume timers.
+ * Two kinds of source feed the same voice chain (docs/PRODUCTION_AUDIO.md):
+ *   - licensed recordings / previews are STREAMED: a media element of the bounded pool (streamPool.ts)
+ *     → its MediaElementAudioSourceNode → voiceGain. Never fetched whole, never decoded into a buffer.
+ *   - development tones are short decoded buffers: a NEW AudioBufferSourceNode per playback instance.
+ * Either way each voice has one AudioBufferSourceNode that keeps its time on the audio clock (the tone
+ * itself, or a silent one-frame loop for a stream); its scheduled stop ends the voice and everything is
+ * disconnected (a stream's element is paused and detached). A voice that changes role (next → active →
+ * previous) is the SAME instance — never restarted at an era boundary. Gain changes are AudioParam
+ * automation on the audio clock — no JS volume timers.
  *
  * Plain TypeScript against the structural Web Audio types in webAudio.ts, so Node tests can drive
  * it with a mock context.
@@ -31,6 +36,7 @@ import { getEra, getEraByIndex } from "../data/eras.ts";
 import type { EraId } from "../data/types.ts";
 import { getAudioEntry, type AudioAssetKind, type AudioTrackEntry } from "./audioCatalog.ts";
 import { AudioBufferCache, AudioLoadError, type AudioLoadErrorKind, type BufferCacheStats, type BufferLoadState } from "./bufferCache.ts";
+import { StreamPool, type MediaSlot, type StreamDemand, type StreamPoolStats, type StreamPreload } from "./streamPool.ts";
 import {
   adjacentEras,
   computeMixGains,
@@ -52,6 +58,7 @@ import type {
   BufferSourceLike,
   DistanceModel,
   GainNodeLike,
+  MediaElementLike,
   PannerNodeLike,
   PanningModel,
 } from "./webAudio.ts";
@@ -97,6 +104,11 @@ export interface AudioConfig {
   maxFadingVoices: number;
   /** A fading voice's source is stopped this long after its ramp reaches 0 (s). */
   stopMargin: number;
+  /**
+   * Streamed recordings: media elements in the pool — the hard bound of the streaming working set
+   * (3 neighbourhood voices + a record-change destination + the lookahead + one voice fading out).
+   */
+  maxMediaElements: number;
   /** Semantic mix shape (spatialMix.ts). */
   mix: SpatialMixConfig;
   spatial: SpatialAudioConfig;
@@ -116,6 +128,7 @@ export const AUDIO_CONFIG: AudioConfig = {
   suspendWhenHidden: true,
   maxFadingVoices: 4,
   stopMargin: 0.05,
+  maxMediaElements: 6,
   mix: SPATIAL_MIX_CONFIG,
   spatial: {
     wet: 0.8,
@@ -135,7 +148,7 @@ export const AUDIO_CONFIG: AudioConfig = {
 /**
  * LOCKED     no user gesture yet: no AudioContext exists, nothing loads or plays
  * READY      unlocked, nothing requested (playback intent off)
- * LOADING    the active era's record is being fetched / decoded
+ * LOADING    the active era's record is being prepared (stream buffering to `canplay` / tone decoding)
  * PLAYING    the active era's voice is running
  * SUSPENDED  unlocked, but the context is suspended (hidden page, browser / OS); needs resume
  * ERROR      the active era's record is unavailable, or Web Audio itself failed — navigation unaffected
@@ -162,7 +175,7 @@ export interface AudioSnapshot {
   /** The active era's selected record. */
   selectedTrackId: string;
   selectedKind: AudioAssetKind | null;
-  /** = selectedTrackId once its buffer is decoded, else null. */
+  /** = selectedTrackId once it can play (stream ready / tone decoded), else null. */
   loadedTrackId: string | null;
   /** The ACTIVE era's voice (neighbour voices are not counted). */
   playingTrackId: string | null;
@@ -240,17 +253,31 @@ export interface AudioDebugInfo {
   voices: AudioVoiceInfo[];
   /** AudioNodes created by the engine and not yet disconnected (bus nodes included). */
   liveNodes: number;
-  /** Buffer sources created since the start (one per playback instance). */
+  /** Buffer sources created since the start (one per playback instance; a stream's is its silent clock). */
   sourcesCreated: number;
+  /** Decoded development tones. Recordings never appear here: they are streamed. */
   cache: BufferCacheStats;
   loadedUrls: string[];
+  /** The streamed-recording pool (null before unlock or without media element support). */
+  streams: StreamPoolStats | null;
 }
 
 export interface AudioEngineOptions {
   /** Creates THE AudioContext. Called at most once, inside the first user gesture. */
   createContext: () => AudioContextLike;
-  /** Fetches the bytes of a local audio asset (throw AudioLoadError("network") on failure). */
+  /** Fetches the bytes of a local development tone (throw AudioLoadError("network") on failure). */
   fetchAudio: (url: string) => Promise<ArrayBuffer>;
+  /**
+   * Creates one media element for STREAMED recordings (the browser: `new Audio()`); called only inside the
+   * unlock gesture, `maxMediaElements` times. Without it, recordings are unavailable — never decoded —
+   * unless `decodeRecordings` is set.
+   */
+  createMediaElement?: () => MediaElementLike;
+  /**
+   * Tests of the shared voice / mix mechanics only: decode recordings like development tones. Never set in
+   * the browser — a full-length recording decoded whole can take gigabytes (docs/PRODUCTION_AUDIO.md).
+   */
+  decodeRecordings?: boolean;
   initialEra: EraId;
   /** The eight stations in era order (hallLayout.ts): route anchors and sound sources. */
   stations: readonly StationAudioAnchor[];
@@ -272,22 +299,31 @@ interface AudioGraph {
   dry: GainNodeLike;
 }
 
-/** One playback instance of one era's record: single-use source → gain → panner. */
+/** One playback instance of one era's record: source → gain → panner (+ dry). */
 interface Voice {
   id: number;
   eraId: EraId;
   eraIndex: number;
   trackId: string;
-  buffer: AudioBufferLike;
+  /** The decoded development tone; null for a streamed recording. */
+  buffer: AudioBufferLike | null;
+  /**
+   * Single-use buffer source: the tone itself, or — for a stream — a silent one-frame loop that only keeps
+   * the voice's time on the audio clock. Its (scheduled) stop ends the voice either way.
+   */
   source: BufferSourceLike;
+  /** A streamed recording's pool element (with its MediaElementAudioSourceNode); null for a tone. */
+  media: MediaSlot<Voice> | null;
   gain: GainNodeLike;
   panner: PannerNodeLike;
-  /** Context time the source started, and the buffer offset it started at. */
+  /** Context time the source started, and the buffer offset it started at (tones). */
   startTime: number;
   offset: number;
   /** Last semantic gain target sent to `gain` (NaN = none yet). */
   target: number;
   stopping: boolean;
+  /** Its stop was brought forward (cutShort): not cut again while it ends. */
+  cut: boolean;
   released: boolean;
 }
 
@@ -325,6 +361,13 @@ const sameSnapshot = (a: AudioSnapshot, b: AudioSnapshot) =>
 /** Decoded size of a buffer: 32-bit float per sample frame per channel. */
 export const decodedBytes = (buffer: AudioBufferLike) => buffer.length * buffer.numberOfChannels * 4;
 
+/**
+ * How an entry's audio plays: licensed recordings and previews STREAM (any length, never decoded whole);
+ * development tones are small decoded BUFFERS. `decodeRecordings` is the engine-mechanics test switch.
+ */
+export const audioSourceStrategy = (kind: AudioAssetKind | null, decodeRecordings = false): "stream" | "buffer" | null =>
+  kind === null ? null : kind === "development-placeholder" || decodeRecordings ? "buffer" : "stream";
+
 // ---------------------------------------------------------------------------
 // Engine
 // ---------------------------------------------------------------------------
@@ -335,6 +378,16 @@ export class AudioEngine {
   readonly selection = new TrackSelection();
   private readonly options: AudioEngineOptions;
   private readonly cache: AudioBufferCache<AudioBufferLike>;
+  /** Streamed recordings (created with the context, inside the unlock gesture). */
+  private pool: StreamPool<Voice> | null = null;
+  /** Why recordings cannot stream at all (no media element support); null when they can. */
+  private streamFailure: AudioLoadError | null = null;
+  /** Record-change destinations being prepared (era → track), until the era is released. */
+  private readonly destinations = new Map<EraId, string>();
+  private reconciling = false;
+  private reconcileAgain = false;
+  /** The one-frame silent buffer looped by a stream voice's clock source (created once). */
+  private silence: AudioBufferLike | null = null;
   private readonly stations: readonly StationAudioAnchor[];
   private readonly anchors: readonly number[];
   private context: AudioContextLike | null = null;
@@ -416,10 +469,12 @@ export class AudioEngine {
       this.graph = this.buildGraph(context);
       context.onstatechange = () => this.handleContextState();
       this.primeOutput(context);
+      this.pool = this.createStreamPool(context);
       if (this.hasFrame) this.applyListener(context);
     }
     this.unlocked = true;
     this.resumeContext();
+    this.syncMediaPlayback(); // inside the gesture: an element the browser refused earlier may start now
     this.preloadNeighbourhood();
     this.reconcile();
     this.emit();
@@ -431,7 +486,10 @@ export class AudioEngine {
     this.wantsPlayback = true;
     this.finished.clear();
     const entry = this.resolve(this.activeEra, this.selection.get(this.activeEra));
-    if (this.context && entry.url && this.cache.state(entry.url) === "error") this.requestLoad(entry.url, true);
+    if (this.context && entry.url && this.loadState(entry) === "error") {
+      if (this.streamed(entry)) this.pool?.retry(entry.url);
+      else this.requestLoad(entry.url, true);
+    }
     this.reconcile();
     this.emit();
   }
@@ -504,8 +562,9 @@ export class AudioEngine {
     this.emit();
   }
 
-  /** Ends a hold: the era's SELECTED record starts as a fresh voice rising from 0 (if decoded and relevant). */
+  /** Ends a hold: the era's SELECTED record starts as a fresh voice rising from 0 (if playable and relevant). */
   releaseEra(eraId: EraId) {
+    this.destinations.delete(eraId); // prepared → it is the selection now (or the change was abandoned)
     if (!this.held.delete(eraId)) return;
     this.finished.clear();
     this.reconcile();
@@ -516,17 +575,24 @@ export class AudioEngine {
     return this.held.has(eraId);
   }
 
-  /** Starts fetching / decoding a record of `eraId` without selecting or playing it. Deduplicated; no-op before unlock. */
+  /**
+   * Prepares a record of `eraId` without selecting or playing it: a recording gets a pool element buffering
+   * to `canplay` (kept until the era is released), a tone is fetched and decoded. Idempotent; no-op before unlock.
+   */
   prepareTrack(eraId: EraId, trackId: string) {
     if (!this.context || this.fatal) return;
     const entry = this.resolve(eraId, trackId);
-    if (entry.url && this.cache.state(entry.url) === "idle") this.requestLoad(entry.url);
+    if (!entry.url) return;
+    if (this.streamed(entry)) {
+      this.destinations.set(eraId, trackId);
+      this.syncStreams();
+    } else if (this.cache.state(entry.url) === "idle") this.requestLoad(entry.url);
   }
 
   /** Load state of a record's audio: "unavailable" when it has no playable file at all. */
   trackLoadState(eraId: EraId, trackId: string): BufferLoadState | "unavailable" {
     const entry = this.resolve(eraId, trackId);
-    return entry.url ? this.cache.state(entry.url) : "unavailable";
+    return entry.url ? this.loadState(entry) : "unavailable";
   }
 
   /**
@@ -542,11 +608,15 @@ export class AudioEngine {
     return this.unlocked && this.wantsPlayback && !this.fatal;
   }
 
-  /** Loads (does not play) an era's selected record. Needs the context (after unlock); no-op before. Deduplicated by the cache. */
+  /**
+   * Loads (does not play) an era's selected TONE. Needs the context (after unlock); no-op before. Deduplicated
+   * by the cache. Recordings are never preloaded this way: the stream pool prepares only the working set
+   * (neighbourhood, record-change destination, lookahead) — see streamDemand().
+   */
   preloadEra(eraId: EraId) {
     if (!this.context || this.fatal) return;
     const entry = this.resolve(eraId, this.selection.get(eraId));
-    if (entry.url && this.cache.state(entry.url) === "idle") this.requestLoad(entry.url);
+    if (entry.url && !this.streamed(entry) && this.cache.state(entry.url) === "idle") this.requestLoad(entry.url);
   }
 
   /**
@@ -601,9 +671,10 @@ export class AudioEngine {
     this.emit();
   }
 
-  /** Development: drops every decoded buffer and remembered failure (voices keep playing their buffer). */
+  /** Development: drops every decoded tone and remembered failure (voices keep playing their buffer / stream). */
   clearCache() {
     this.cache.clear();
+    this.pool?.clearErrors();
     this.awaiting.clear();
     this.preloadNeighbourhood();
     this.reconcile();
@@ -670,8 +741,8 @@ export class AudioEngine {
       neighbourhood: (["previous", "active", "next"] as const).map((role) => {
         const eraId = adjacentEras(this.activeEra)[role];
         const trackId = this.selection.get(eraId);
-        const url = this.resolve(eraId, trackId).url;
-        return { role, eraId, trackId, load: url ? this.cache.state(url) : "unavailable", playing: this.eraVoices.get(eraId)?.trackId === trackId };
+        const entry = this.resolve(eraId, trackId);
+        return { role, eraId, trackId, load: entry.url ? this.loadState(entry) : "unavailable", playing: this.eraVoices.get(eraId)?.trackId === trackId };
       }),
       mix: { ...this.debugMix },
       panningModel: this.panningModel,
@@ -693,6 +764,7 @@ export class AudioEngine {
       sourcesCreated: this.sourcesCreated,
       cache: this.cache.stats(),
       loadedUrls: this.cache.readyUrls(),
+      streams: this.pool?.stats() ?? null,
     };
   }
 
@@ -700,6 +772,89 @@ export class AudioEngine {
 
   private resolve(eraId: EraId, trackId: string): AudioTrackEntry {
     return (this.options.resolveEntry ?? getAudioEntry)(eraId, trackId);
+  }
+
+  /** Whether an entry plays as a stream (recordings / previews) rather than a decoded tone. */
+  private streamed(entry: AudioTrackEntry): boolean {
+    return entry.url !== null && audioSourceStrategy(entry.kind, this.options.decodeRecordings) === "stream";
+  }
+
+  /** An entry's load state, whichever way it plays (callers handle a null URL). */
+  private loadState(entry: AudioTrackEntry): BufferLoadState {
+    if (!entry.url) return "idle";
+    if (!this.streamed(entry)) return this.cache.state(entry.url);
+    if (this.streamFailure) return "error";
+    return this.pool ? this.pool.state(entry.url) : "idle";
+  }
+
+  private loadError(entry: AudioTrackEntry): AudioLoadError | undefined {
+    if (!entry.url) return undefined;
+    if (!this.streamed(entry)) return this.cache.error(entry.url);
+    return this.streamFailure ?? this.pool?.error(entry.url);
+  }
+
+  /**
+   * The streaming working set, highest priority first: the active era's record, record-change destinations,
+   * the next and previous eras' records (preload "auto" while playback is wanted, else "metadata"), and the
+   * lookahead era's record ("metadata": headers only). Held eras are left out — their old record is leaving
+   * the deck. Voices fading out keep their elements outside this list until they end.
+   */
+  private streamDemand(): StreamDemand[] {
+    const demand: StreamDemand[] = [];
+    const add = (eraId: EraId, trackId: string, preload: StreamPreload) => {
+      const entry = this.resolve(eraId, trackId);
+      if (entry.url && this.streamed(entry) && !demand.some((item) => item.url === entry.url)) demand.push({ url: entry.url, preload });
+    };
+    const neighbourhood = this.wantsPlayback ? "auto" : "metadata";
+    const { previous, active, next } = adjacentEras(this.activeEra);
+    if (!this.held.has(active)) add(active, this.selection.get(active), neighbourhood);
+    for (const [eraId, trackId] of this.destinations) add(eraId, trackId, "auto");
+    for (const eraId of [next, previous]) if (!this.held.has(eraId)) add(eraId, this.selection.get(eraId), neighbourhood);
+    if (this.lookahead >= 0) {
+      const eraId = getEraByIndex(this.lookahead).id;
+      if (!this.held.has(eraId)) add(eraId, this.selection.get(eraId), "metadata");
+    }
+    return demand;
+  }
+
+  /** Prepares / frees pool elements for the current working set (never touches a playing voice). */
+  private syncStreams() {
+    const pool = this.pool;
+    if (!pool || !this.context || this.fatal) return;
+    if (pool.sync(this.streamDemand())) return;
+    // Every element is owned (voices fading out after rapid moves): end the oldest fading stream quickly;
+    // its release re-runs reconcile, which places what is still missing.
+    let oldest: Voice | undefined;
+    for (const voice of this.voices) if (voice.media && voice.stopping && !voice.cut && (!oldest || voice.id < oldest.id)) oldest = voice;
+    if (oldest) this.cutShort(oldest, this.context.currentTime);
+  }
+
+  /** The bounded media element pool, created and primed inside the unlock gesture. */
+  private createStreamPool(context: AudioContextLike): StreamPool<Voice> | null {
+    const create = this.options.createMediaElement;
+    if (!create) {
+      this.streamFailure = new AudioLoadError("unsupported", "streamed playback is not available (no media elements)");
+      return null;
+    }
+    const pool = new StreamPool<Voice>(this.config.maxMediaElements, this.config.loopTracks, {
+      changed: () => {
+        this.reconcile();
+        this.emit();
+      },
+      ended: (voice) => this.releaseVoice(voice, true),
+      failed: (voice) => {
+        this.warnOnce(`stream:${voice.trackId}`, `streamed recording failed while playing: ${voice.trackId}`);
+        this.releaseVoice(voice, false);
+      },
+    });
+    try {
+      pool.prime(context, create);
+    } catch (error) {
+      this.streamFailure = new AudioLoadError("unsupported", `streamed playback is not available: ${errorMessage(error)}`);
+      this.warnOnce("stream-pool", this.streamFailure.message);
+      return null;
+    }
+    return pool;
   }
 
   private async fetchAndDecode(url: string): Promise<AudioBufferLike> {
@@ -726,7 +881,10 @@ export class AudioEngine {
     this.preloadEra(previous);
   }
 
-  /** Once the visitor leaves the active station's plateau, decode the era beyond the neighbour ahead (either direction). */
+  /**
+   * Once the visitor leaves the active station's plateau, prepare the era beyond the neighbour ahead (either
+   * direction): a tone is decoded, a recording only gets its metadata (streamDemand).
+   */
   private preloadLookahead() {
     const config = this.config.mix;
     const offset = stationOffset(stationCoordinate(this.mixInput.loopProgress, this.anchors), this.activeIndex, this.anchors.length);
@@ -734,6 +892,7 @@ export class AudioEngine {
     if (index === this.lookahead) return;
     this.lookahead = index;
     if (index >= 0) this.preloadEra(getEraByIndex(index).id);
+    this.syncStreams();
   }
 
   private requestLoad(url: string, retry = false) {
@@ -828,7 +987,32 @@ export class AudioEngine {
       this.warnOnce("closed", "the AudioContext was closed; audio is unavailable until the page reloads");
       for (const voice of [...this.voices]) this.releaseVoice(voice, false);
     }
+    this.syncMediaPlayback();
     this.emit();
+  }
+
+  /**
+   * Streamed voices follow the context like buffer sources follow the audio clock: their elements play while
+   * it runs and pause while it is suspended (hidden page, OS interruption), resuming where they were.
+   */
+  private syncMediaPlayback() {
+    const pool = this.pool;
+    const context = this.context;
+    if (!pool || !context) return;
+    const running = context.state === "running" && !this.fatal;
+    for (const slot of pool.ownedSlots()) {
+      if (!running) slot.element.pause();
+      else if (slot.element.paused) this.playMedia(slot);
+    }
+  }
+
+  private playMedia(slot: MediaSlot<Voice>) {
+    slot.element.play().catch((error: unknown) => {
+      // AbortError: paused or detached before it started (normal). Otherwise (autoplay refused) the next gesture retries.
+      if (error instanceof Error && error.name === "AbortError") return;
+      this.warnOnce("media-play", `streamed playback was refused (${errorMessage(error)}); the next click / tap resumes it`);
+      this.emit();
+    });
   }
 
   /** The listener = the production camera (AudioParams where supported, deprecated setters otherwise). */
@@ -853,11 +1037,31 @@ export class AudioEngine {
 
   // --- internals: voices -----------------------------------------------------
 
-  /** Makes the voice set match the semantic target: the previous / active / next eras' selected records. */
+  /**
+   * Makes the voice set match the semantic target: the previous / active / next eras' selected records.
+   * Re-entrant calls (a stream released while reconciling frees an element) run once more afterwards.
+   */
   private reconcile() {
     const context = this.context;
     const graph = this.graph;
     if (!context || !graph || !this.unlocked || this.fatal) return;
+    if (this.reconciling) {
+      this.reconcileAgain = true;
+      return;
+    }
+    this.reconciling = true;
+    try {
+      for (let pass = 0; pass < 4; pass++) {
+        this.reconcileAgain = false;
+        this.reconcileOnce(context, graph);
+        if (!this.reconcileAgain || this.fatal) break;
+      }
+    } finally {
+      this.reconciling = false;
+    }
+  }
+
+  private reconcileOnce(context: AudioContextLike, graph: AudioGraph) {
     const relevant = this.wantsPlayback ? adjacentEras(this.activeEra) : null;
     // A held era (record change in progress) is never wanted: its voice ducks out and none is created.
     const wanted = relevant ? [relevant.active, relevant.next, relevant.previous].filter((eraId) => !this.held.has(eraId)) : [];
@@ -869,6 +1073,8 @@ export class AudioEngine {
         this.eraVoices.delete(eraId);
       }
     }
+    // Streams: prepare / free pool elements for the working set before starting voices from them.
+    this.syncStreams();
     for (const eraId of wanted) {
       if (this.eraVoices.has(eraId)) continue;
       const trackId = this.selection.get(eraId);
@@ -876,6 +1082,12 @@ export class AudioEngine {
       const entry = this.resolve(eraId, trackId);
       if (!entry.url) {
         if (eraId === this.activeEra) this.warnOnce(`unavailable:${trackId}`, `no playable audio for "${trackId}" (${entry.unavailable})`);
+        continue;
+      }
+      if (this.streamed(entry)) {
+        // Ready → a voice now; loading → `canplay` reconciles again; failed / no element → nothing yet.
+        const voice = this.startStream(context, graph, eraId, trackId, entry.url);
+        if (voice) this.eraVoices.set(eraId, voice);
         continue;
       }
       const buffer = this.cache.peek(entry.url);
@@ -906,19 +1118,69 @@ export class AudioEngine {
     }
   }
 
-  /** A fresh source + gain + panner for one playback instance, placed at its station. */
-  private startVoice(context: AudioContextLike, graph: AudioGraph, eraId: EraId, trackId: string, buffer: AudioBufferLike): Voice | null {
+  /**
+   * A streamed record's voice: from its prepared element once it can play. Returning to a record whose
+   * stream is still fading out revives that same playback (same element and position — no restart heard).
+   */
+  private startStream(context: AudioContextLike, graph: AudioGraph, eraId: EraId, trackId: string, url: string): Voice | null {
+    const slot = this.pool?.slotFor(url);
+    if (!slot) return null;
+    if (slot.owner) return slot.owner.stopping && slot.owner.eraId === eraId ? this.revive(context, slot.owner) : null;
+    if (slot.state !== "ready") return null;
+    return this.startVoice(context, graph, eraId, trackId, null, slot);
+  }
+
+  /** Cancels a stream voice's fade-out: a new clock replaces the one whose stop was already scheduled. */
+  private revive(context: AudioContextLike, voice: Voice): Voice | null {
+    let clock: BufferSourceLike;
+    try {
+      clock = this.createClock(context);
+    } catch (error) {
+      this.warnOnce("voice", `could not create a playback voice: ${errorMessage(error)}`);
+      return null;
+    }
     const now = context.currentTime;
-    // Returning to a record that is still fading out continues from where it is (no restart heard).
+    const old = voice.source;
+    old.onended = null;
+    old.disconnect();
+    this.sourcesCreated++;
+    clock.connect(voice.gain);
+    clock.onended = () => this.releaseVoice(voice, true);
+    clock.start(now);
+    voice.source = clock;
+    voice.stopping = false;
+    voice.cut = false;
+    voice.startTime = now; // rises again from its current gain over fadeIn
+    voice.target = Number.NaN;
+    const gain = voice.gain.gain;
+    const level = gain.value;
+    gain.cancelScheduledValues(now);
+    gain.setValueAtTime(level, now);
+    return voice;
+  }
+
+  /** A stream voice's clock: a silent one-frame loop whose scheduled stop ends the voice on the audio clock. */
+  private createClock(context: AudioContextLike): BufferSourceLike {
+    this.silence ??= context.createBuffer(1, 1, context.sampleRate);
+    const clock = context.createBufferSource();
+    clock.buffer = this.silence;
+    clock.loop = true;
+    return clock;
+  }
+
+  /** A fresh source + gain + panner for one playback instance (a decoded tone, or a ready stream element), placed at its station. */
+  private startVoice(context: AudioContextLike, graph: AudioGraph, eraId: EraId, trackId: string, buffer: AudioBufferLike | null, media: MediaSlot<Voice> | null = null): Voice | null {
+    const now = context.currentTime;
+    // Returning to a tone that is still fading out continues from where it is (no restart heard).
     let fading: Voice | undefined;
-    for (const voice of this.voices) if (voice.stopping && voice.eraId === eraId && voice.trackId === trackId) fading = voice;
+    if (buffer) for (const voice of this.voices) if (voice.stopping && voice.buffer && voice.eraId === eraId && voice.trackId === trackId) fading = voice;
     const offset = fading ? this.position(fading, now) : 0;
 
     let source: BufferSourceLike;
     let gain: GainNodeLike;
     let panner: PannerNodeLike;
     try {
-      source = context.createBufferSource();
+      source = buffer ? context.createBufferSource() : this.createClock(context);
       gain = context.createGain();
       panner = context.createPanner();
     } catch (error) {
@@ -928,7 +1190,23 @@ export class AudioEngine {
     this.sourcesCreated++;
     this.liveNodes += 3;
     const eraIndex = getEra(eraId).index;
-    const voice: Voice = { id: this.nextVoiceId++, eraId, eraIndex, trackId, buffer, source, gain, panner, startTime: now, offset, target: Number.NaN, stopping: false, released: false };
+    const voice: Voice = {
+      id: this.nextVoiceId++,
+      eraId,
+      eraIndex,
+      trackId,
+      buffer,
+      source,
+      media,
+      gain,
+      panner,
+      startTime: now,
+      offset,
+      target: Number.NaN,
+      stopping: false,
+      cut: false,
+      released: false,
+    };
 
     // Station source: fixed, from the hall layout (identical for every visual LOD tier).
     const spatial = this.config.spatial;
@@ -946,10 +1224,17 @@ export class AudioEngine {
       panner.positionZ.value = z;
     } else panner.setPosition?.(x, y, z);
 
-    source.buffer = buffer;
-    source.loop = this.config.loopTracks;
+    if (buffer) {
+      source.buffer = buffer;
+      source.loop = this.config.loopTracks;
+    }
     gain.gain.setValueAtTime(0, now);
     source.connect(gain);
+    // A stream enters the SAME chain: element → MediaElementAudioSourceNode → voice gain.
+    if (media) {
+      media.node.connect(gain);
+      this.pool?.claim(media, voice);
+    }
     gain.connect(panner);
     panner.connect(graph.spatial);
     gain.connect(graph.dry);
@@ -962,6 +1247,7 @@ export class AudioEngine {
       this.releaseVoice(voice, false);
       return null;
     }
+    if (media && context.state === "running") this.playMedia(media); // else it starts when the context runs
     this.limitFadingVoices(now);
     return voice;
   }
@@ -986,16 +1272,25 @@ export class AudioEngine {
     while (fading.length > this.config.maxFadingVoices) {
       const voice = fading.shift();
       if (!voice) break;
-      rampTo(voice.gain.gain, 0, now, 0.03);
-      try {
-        voice.source.stop(now + 0.03 + this.config.stopMargin);
-      } catch {
-        this.releaseVoice(voice, false);
-      }
+      this.cutShort(voice, now);
     }
   }
 
-  /** Called once per voice when its source ends (stopped or finished): disconnect and forget it. */
+  /** Ends a fading voice within 30 ms (no click): its source stop is rescheduled sooner. */
+  private cutShort(voice: Voice, now: number) {
+    voice.cut = true;
+    rampTo(voice.gain.gain, 0, now, 0.03);
+    try {
+      voice.source.stop(now + 0.03 + this.config.stopMargin);
+    } catch {
+      this.releaseVoice(voice, false);
+    }
+  }
+
+  /**
+   * Called once per voice when its source ends (stopped or finished): disconnect and forget it. A stream's
+   * element is paused and detached (download aborted, decoder buffers freed) and goes back to the pool.
+   */
   private releaseVoice(voice: Voice, ended: boolean) {
     if (voice.released) return;
     voice.released = true;
@@ -1004,18 +1299,25 @@ export class AudioEngine {
     voice.gain.disconnect();
     voice.panner.disconnect();
     this.liveNodes -= 3;
+    const media = voice.media;
+    if (media) {
+      voice.media = null;
+      this.pool?.release(media);
+    }
     this.voices.delete(voice);
     if (this.eraVoices.get(voice.eraId) === voice) {
       this.eraVoices.delete(voice.eraId);
       if (ended) this.finished.add(`${voice.eraId}|${voice.trackId}`); // a non-looping record reached its end
     }
+    if (media) this.reconcile(); // an element is free: place what the working set still misses
     this.emit();
   }
 
   private position(voice: Voice, now: number): number {
-    const played = voice.offset + Math.max(0, now - voice.startTime);
-    const duration = voice.buffer.duration;
+    if (voice.media) return voice.media.element.currentTime;
+    const duration = voice.buffer?.duration ?? 0;
     if (duration <= 0) return 0;
+    const played = voice.offset + Math.max(0, now - voice.startTime);
     return this.config.loopTracks ? played % duration : Math.min(played, duration);
   }
 
@@ -1025,7 +1327,7 @@ export class AudioEngine {
     const trackId = this.selection.get(this.activeEra);
     const entry = this.resolve(this.activeEra, trackId);
     if (!entry.url) return { trackId, reason: "unavailable" };
-    const error = this.cache.error(entry.url);
+    const error = this.loadError(entry);
     return error ? { trackId, reason: error.kind } : null;
   }
 
@@ -1053,7 +1355,7 @@ export class AudioEngine {
       activeEraId: this.activeEra,
       selectedTrackId,
       selectedKind: entry.kind,
-      loadedTrackId: entry.url && this.cache.state(entry.url) === "ready" ? selectedTrackId : null,
+      loadedTrackId: this.loadState(entry) === "ready" ? selectedTrackId : null,
       playingTrackId: this.eraVoices.get(this.activeEra)?.trackId ?? null,
       error: this.fatal ? { trackId: null, reason: this.fatal } : this.targetError(),
     };

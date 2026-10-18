@@ -54,7 +54,7 @@ number encodes the position. NEXT / PREVIOUS wrap inside the era's five (5 → 1
 |---|---|---|---|---|
 | A02-01 ★ | Tunde King | Aronke Macaulay | 1937 | Jùjú |
 | A02-02 | Tunde King | Oba Oyinbo | 1930s | Jùjú |
-| A02-03 | Tunde King | Soja Idumota | 1930s | Jùjú |
+| A02-03 | Irewolede Denge | Orin Asape Eko | — *(unconfirmed)* | *unconfirmed — pending editorial verification* |
 | A02-04 | Ayinde Bakare | Early Jùjú Recordings *(artist reference)* | 1930s–40s | Jùjú |
 | A02-05 | G.T. Onwuka | Palm-wine Recordings *(artist reference)* | 1930s | Palm-wine |
 
@@ -250,7 +250,10 @@ Alade's name well beyond Nigeria"; Rush "one of the leading voices" → "one of 
 **Open:**
 
 - Dates still open (no reliable exact year supplied): Taxi Driver, Baby Jowo, Sawale, Jaguar Nana, Shakomo, Bubble,
-  Diana, Monika, Mathematics. Approximate labels kept: Oba Oyinbo and Soja Idumota (1930s), Early Jùjú Recordings
+  Diana, Monika, Mathematics. Approximate labels kept: Oba Oyinbo (1930s), Early Jùjú Recordings
   (1930s–40s), Palm-wine Recordings (1930s), Johnny (2013/14), Ja Funmi (1982 international release).
+- A02-03 is **Irewolede Denge — Orin Asape Eko** (the supplied recording that replaced Tunde King — Soja Idumota).
+  Its date, genre ("Unconfirmed" in the data) and historical note are pending editorial verification; nothing has
+  been asserted.
 - Bubble's significance line is new and `draft`.
 - Spelling / diacritics of "ajisari" (Fuji's roots) to confirm; written without tone marks rather than guessed.
