@@ -61,23 +61,25 @@ no second AudioContext and no second unlock path — the sound control's ENABLE 
 ## 3. Production HUD
 
 ```
-ARCHIVE                                                    [ ▮▮▮ SOUND ON ]
-The Sound of Nigeria
+                                                [ ← EXIT ARCHIVE ] [ ▮▮▮ SOUND ON ]
 
-01 / 08   TRADITION
-ROOTS                  ━ ─ ─ ─ ─ ─ ─ ─        ENTER OR CLICK THE TURNTABLE TO LISTEN
-1900 — 1919                                                    SCROLL TO TRAVEL
+ROOTS                                           ENTER OR CLICK THE TURNTABLE TO LISTEN
+1900 — 1919                                                SCROLL VERTICALLY TO TRAVEL
 ```
 
-- Top left: the archive name. Top right: the sound control.
-- Bottom left: the current era — loop position, its thesis stage (TRADITION / ADAPTATION / LOCALISATION /
-  EXPORTATION, small), the era name with a thin era-accent rule, and its years. It fades in on each era change.
-- Bottom centre: eight short marks around the loop; the current one is longer and carries the era accent. They are
-  not levels: GLOBAL (08 / 08) is followed by ROOTS (01 / 08) with no "end", "complete" or "restart" language.
+Layout from the Figma file **ARCHIVE — Museum HUD**
+([ztrhQUsF0o9SRNlgaoFzY0](https://www.figma.com/design/ztrhQUsF0o9SRNlgaoFzY0)), redesigned by the owner on
+2026-10-19: four frames (desktop and phone, travel and listening). That redesign removed the archive name at the
+top left, the loop position, thesis stage and accent rule above the era name, and the eight era marks at the
+bottom centre.
+
+- Top right: the exit and sound controls.
+- Bottom left: the current era's name and years. It fades in on each era change.
 - Bottom right: **ENTER OR CLICK THE TURNTABLE TO LISTEN** (only while the focus controller would accept focus
-  for that station) and **SCROLL TO TRAVEL**, which retires once the visitor reaches a second era. On touch devices
-  (`pointer: coarse`) the hints read TAP THE TURNTABLE TO LISTEN / SWIPE TO TRAVEL.
-- During focus the bottom HUD fades out (the caption takes over); the name and sound control stay.
+  for that station) and **SCROLL VERTICALLY TO TRAVEL**, which retires once the visitor reaches a second era. On
+  touch devices (`pointer: coarse`) the hints read TAP THE TURNTABLE TO LISTEN / SWIPE TO TRAVEL.
+- During focus the bottom HUD fades out (the caption takes over); the exit and sound controls stay. The caption
+  still shows the loop position (e.g. 08 / 08) beside the era name and years.
 - Era statements are **not** repeated: the Era Visual Worlds installations already carry each era's headline,
   number and title in the hall (docs/ERA_VISUAL_WORLDS.md).
 - Every HUD region except real buttons has `pointer-events: none`, so wheel, touch and station clicks reach the
@@ -189,16 +191,15 @@ bounds to screen space at each size.
 
 The controls never leave the plate: when space is short, only the record text scrolls. Safe-area insets
 (`viewport-fit=cover`, `env(safe-area-inset-*)`) pad every edge element. Touch layouts get 44 px controls and no
-keyboard hints. Below 640 px the era marks move under the archive name. Full mobile optimisation is the next
-milestone.
+keyboard hints. Full mobile optimisation is the next milestone.
 
 ## 11. Accessibility and reduced motion
 
 - Real `<button>`s everywhere, with visible `:focus-visible` outlines, hover, active and disabled states.
   Accessible names: "Previous record", "Next record", "Close and return to the archive", "Sound on — mute (M)",
   "Enable sound".
-- Semantic landmarks: the intro is a `section` with an `h1`; the caption is an `aside` with an `h2` title. The era
-  marks are an ordered list (`aria-current="step"`). The loading bar is a `progressbar` with real values.
+- Semantic landmarks: the intro is a `section` with an `h1`; the caption is an `aside` with an `h2` title. The
+  loading bar is a `progressbar` with real values.
 - Polite live regions: the era on each change ("Era 04 of 8: EXPLOSION, 1967 to 1989") and the mounted record.
 - `prefers-reduced-motion`: the intro exit becomes a 0.2 s fade; HUD, era and caption animations are off; the caption
   slide is removed. The camera already respects it (CameraRig / travel).
