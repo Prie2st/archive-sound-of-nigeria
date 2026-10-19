@@ -157,36 +157,51 @@ export const STATION_SLOTS: readonly StationSlot[] = [
 ];
 
 /**
- * Instrument exhibits (src/data/exhibits.ts) on plinths on the sunken ring, 1.5 m outward of the route (toward the
- * walls), one in the stretch just before each era's station (seen on the approach), two for ROOTS in the GLOBAL → ROOTS
- * seam. Each spot is the route point at progress `u` (noted) + 1.5 m along the outward normal, on flat floor. Headings
- * face the hall centre, turned by `yawOffsetDeg` (−40°: three-quarters toward the arriving camera). Added 2026-10-18 (docs/HALL_LAYOUT_LOCK.md §8, docs/EXHIBITS.md); screened by `npm run check:hall` and
- * `npm run check:visuals`.
+ * Instrument exhibits (src/data/exhibits.ts) on plinths on the sunken ring, 1.5–2.2 m outward of the route (toward the
+ * walls), one in the stretch just before each era's station (seen on the approach), and the two ROOTS instruments
+ * sharing one wider plinth in the GLOBAL → ROOTS seam. Each spot is the route point at progress `u` (noted) + the
+ * noted distance along the outward normal, on flat floor (the steps come closer at the trumpet, saxophone and conga, so they
+ * stand less far out). Headings face the hall centre, turned by `yawOffsetDeg` (−40°: three-quarters toward the
+ * arriving camera). Added 2026-10-18, moved out and made smaller 2026-10-19 (docs/HALL_LAYOUT_LOCK.md §8,
+ * docs/EXHIBITS.md); screened by `npm run check:hall` and `npm run check:visuals`.
  */
 export interface ExhibitSlot {
-  exhibitId: string;
+  /** The exhibits on this plinth, in order along its local +X (two share one wider plinth). */
+  exhibitIds: readonly string[];
   position: Vec3;
   yawOffsetDeg: number;
   note: string;
 }
 
-export const EXHIBIT_PLINTH = { width: 1, depth: 1 } as const;
+/** Plinth footprint (m): `width` for one exhibit, `sharedWidth` for two side by side. */
+export const EXHIBIT_PLINTH = { width: 0.7, depth: 0.7, sharedWidth: 1.25 } as const;
 
 export const EXHIBIT_SLOTS: readonly ExhibitSlot[] = [
-  { exhibitId: "talking-drum", position: [-8.03, HALL.sunkenFloorY, -18.03], yawOffsetDeg: -40, note: "u 0.928, GLOBAL → ROOTS seam" },
-  { exhibitId: "axatse", position: [-6.62, HALL.sunkenFloorY, -18.24], yawOffsetDeg: -40, note: "u 0.941, beside the talking drum" },
-  { exhibitId: "gramophone", position: [7.57, HALL.sunkenFloorY, -18.19], yawOffsetDeg: -40, note: "u 0.059, ROOTS → RECORDING" },
-  { exhibitId: "trumpet", position: [17.83, HALL.sunkenFloorY, -9.33], yawOffsetDeg: -40, note: "u 0.170 (1.3 m out; at the RECORDING / HIGH-LIFE midpoint so focus flights clear it), RECORDING → HIGH-LIFE" },
-  { exhibitId: "saxophone", position: [19.21, HALL.sunkenFloorY, 5.63], yawOffsetDeg: -40, note: "u 0.289, HIGH-LIFE → EXPLOSION" },
-  { exhibitId: "boombox", position: [7.69, HALL.sunkenFloorY, 18.07], yawOffsetDeg: -40, note: "u 0.431, EXPLOSION → TRANSITION" },
-  { exhibitId: "guitar", position: [-7.57, HALL.sunkenFloorY, 18.19], yawOffsetDeg: -40, note: "u 0.559, TRANSITION → NAIJA" },
-  { exhibitId: "conga", position: [-19.18, HALL.sunkenFloorY, 5.67], yawOffsetDeg: -40, note: "u 0.701 (1.3 m out: the steps are closer here), NAIJA → AFROBEATS" },
-  { exhibitId: "tambourine", position: [-18.25, HALL.sunkenFloorY, -8.02], yawOffsetDeg: -40, note: "u 0.810 (1.3 m out; at the AFROBEATS / GLOBAL midpoint so focus flights clear it), AFROBEATS → GLOBAL" },
+  { exhibitIds: ["talking-drum", "axatse"], position: [-7.39, HALL.sunkenFloorY, -18.71], yawOffsetDeg: -25, note: "u 0.9345, 2.1 m out, GLOBAL → ROOTS seam (one shared plinth, turned less so its long side faces the route)" },
+  { exhibitIds: ["gramophone"], position: [7.58, HALL.sunkenFloorY, -18.89], yawOffsetDeg: -40, note: "u 0.059, 2.2 m out, ROOTS → RECORDING" },
+  { exhibitIds: ["trumpet"], position: [18.44, HALL.sunkenFloorY, -9.57], yawOffsetDeg: -40, note: "u 0.170, 1.95 m out (at the RECORDING / HIGH-LIFE midpoint so focus flights clear it), RECORDING → HIGH-LIFE" },
+  { exhibitIds: ["saxophone"], position: [19.35, HALL.sunkenFloorY, 5.67], yawOffsetDeg: -40, note: "u 0.289, 1.65 m out (the steps are closer here), HIGH-LIFE → EXPLOSION" },
+  { exhibitIds: ["boombox"], position: [7.78, HALL.sunkenFloorY, 18.76], yawOffsetDeg: -40, note: "u 0.431, 2.2 m out, EXPLOSION → TRANSITION" },
+  { exhibitIds: ["guitar"], position: [-7.58, HALL.sunkenFloorY, 18.89], yawOffsetDeg: -40, note: "u 0.559, 2.2 m out, TRANSITION → NAIJA" },
+  { exhibitIds: ["conga"], position: [-19.36, HALL.sunkenFloorY, 5.76], yawOffsetDeg: -40, note: "u 0.701, 1.5 m out (the steps are closer here), NAIJA → AFROBEATS" },
+  { exhibitIds: ["tambourine"], position: [-19.11, HALL.sunkenFloorY, -8.28], yawOffsetDeg: -40, note: "u 0.810, 2.2 m out (at the AFROBEATS / GLOBAL midpoint so focus flights clear it), AFROBEATS → GLOBAL" },
 ];
 
 /** Heading (rotation.y) of an exhibit: front (+Z) towards the hall centre, plus the slot's offset. */
 export const exhibitHeading = (slot: ExhibitSlot): number =>
   Math.atan2(-slot.position[0], -slot.position[2]) + (slot.yawOffsetDeg * Math.PI) / 180;
+
+/** Plinth footprint of a slot: wider when two exhibits share it. */
+export const exhibitPlinthSize = (slot: ExhibitSlot): { width: number; depth: number } => ({
+  width: slot.exhibitIds.length > 1 ? EXHIBIT_PLINTH.sharedWidth : EXHIBIT_PLINTH.width,
+  depth: EXHIBIT_PLINTH.depth,
+});
+
+/** Local X of each exhibit on its plinth: centred alone, or each centred in its half of a shared plinth. */
+export const exhibitOffsets = (slot: ExhibitSlot): number[] => {
+  const width = exhibitPlinthSize(slot).width, count = slot.exhibitIds.length;
+  return slot.exhibitIds.map((_, i) => -width / 2 + (width / count) * (i + 0.5));
+};
 
 // ---------------------------------------------------------------------------
 // Derived layout (curve, progress anchors, headings, view anchors)

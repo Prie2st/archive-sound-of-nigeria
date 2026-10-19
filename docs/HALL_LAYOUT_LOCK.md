@@ -194,3 +194,8 @@ heading (table top 0.635 + turntable platter origin + record thickness).
   stretch before each station and two at the GLOBAL → ROOTS seam. No locked value changed: the route, stations, view and focus anchors and the seam are
   untouched. `npm run check:hall` reports no failures (0 hall intersections, flat floor under every plinth).
   `npm run check:visuals`: route ≥ 0.60 m, focus flights ≥ 0.51 m (threshold 0.3 m), deck sightlines unchanged.
+- **2026-10-19 — exhibits smaller and farther from the route.** At the owner's request the instruments are shown at
+  about life size on 0.7 × 0.7 m plinths, and the plinths stand 1.5–2.2 m outward of the route instead of 1.3–1.5 m.
+  The talking drum and axatse now share one 1.25 m plinth. Again no locked value changed. `npm run check:hall`: 0 hall
+  intersections, flat floor under all eight plinths. `npm run check:visuals`: route ≥ 1.10 m, focus flights ≥ 0.73 m,
+  deck sightlines unchanged.

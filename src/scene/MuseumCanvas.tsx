@@ -248,7 +248,7 @@ function MuseumExperience() {
             </Suspense>
           )}
           {definition.hasHallLayout && config.stations && <Suspense fallback={null}><EraWorlds activeEra={activeEra} settings={visualSettings} quality={config.quality} /></Suspense>}
-          {definition.hasHallLayout && <Exhibits ready={isSceneReady} />}
+          {definition.hasHallLayout && <Exhibits ready={isSceneReady} quality={config.quality} />}
           {cameraMode === "travel" && <CameraRig travel={travel} focus={focus} onActiveEraChange={activeEra.set} />}
           {/* After the CameraRig: the audio listener follows the camera pose it just set. */}
           <AudioListenerBridge audio={audio} travel={travel} focus={focus} />

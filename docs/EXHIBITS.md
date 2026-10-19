@@ -1,30 +1,38 @@
 # Hall exhibits: instruments on plinths
 
-Nine third-party instrument models stand on plinths around the marble hall (added 2026-10-18). Since the same day's
-revision they stand on the sunken ring, beside the camera route, enlarged so they stand out. Each era has one in the
-stretch of route just before its station, so it is seen on the approach. ROOTS has two, at the GLOBAL → ROOTS seam.
+Nine third-party instrument models stand on eight plinths around the marble hall (added 2026-10-18). They stand on
+the sunken ring beside the camera route. Each era has one in the stretch of route just before its station, so it is
+seen on the approach. ROOTS has two, the talking drum and the axatse, sharing one wider plinth at the GLOBAL → ROOTS
+seam.
 
-Each sits 1.5 m outward of the route (toward the walls) at the noted route progress `u`. The trumpet, conga and
-tambourines are 1.3 m out (the steps come closer on the east and west sides). The trumpet and tambourines also sit at
-the midpoints between stations, where focus flights clear them. Each is turned 40° from facing the
-hall centre, three-quarters toward the arriving camera. One shared warm spotlight picks out the exhibit nearest the
-camera: full within 8 m, faded out by 12 m, with no shadow map.
+On 2026-10-19, at the owner's request, they were made smaller (about life size) and moved farther from the route. Each
+plinth sits 2.2 m outward of the route (toward the walls) at the noted route progress `u`. The steps come closer on
+the east and west sides, so the trumpet is 1.95 m out, the saxophone 1.65 m and the conga 1.5 m. The shared ROOTS
+plinth is 2.1 m out. The trumpet and tambourines sit at the midpoints between stations, where focus flights clear them.
+Each plinth is turned 40° from facing the hall centre, three-quarters toward the arriving camera. The shared ROOTS
+plinth is turned 25°, so its long side faces the route.
+
+One shared warm spotlight picks out the plinth nearest the camera: full within 8 m, faded out by 12 m. Like the
+listening desk's light, it casts a tight soft shadow map. The map is rendered only when the light moves to another
+plinth, because the exhibits never move. Shadow receivers on the floor around that plinth and on its top keep the
+contact shadows readable under the bright image-based lighting, as under the listening desk.
 
 | Era | Exhibit | Route `u` · slot (x, z) | Real size | Shown at | Plinth | Runtime file |
 |---|---|---|---|---|---|---|
-| 01 ROOTS | Talking drum | 0.928 · −8.03, −18.03 | 0.60 m | ×1.5 | 0.85 m | `talking-drum.glb` 0.36 MB, 31.7k tris |
-| 01 ROOTS | Axatse (gourd rattle) | 0.941 · −6.62, −18.24 | 0.32 m | ×2 | 0.90 m | `axatse.glb` 1.73 MB, 314k tris (not simplified, see licence) |
-| 02 RECORDING | Gramophone | 0.059 · 7.57, −18.19 | 0.70 m | ×1.5 | 0.60 m | `gramophone.glb` 0.42 MB, 4.5k tris |
-| 03 HIGH-LIFE | Trumpet | 0.170 · 17.83, −9.33 | 0.50 m | ×1.8 | 1.00 m | `trumpet.glb` 0.32 MB, 19.1k tris |
-| 04 EXPLOSION | Alto saxophone | 0.289 · 19.21, 5.63 | 0.68 m | ×1.6 | 0.50 m | `saxophone.glb` 0.24 MB, 35.2k tris |
-| 05 TRANSITION | Boombox | 0.431 · 7.69, 18.07 | 0.55 m | ×1.6 | 0.90 m | `boombox.glb` 0.07 MB, 193 tris |
-| 06 NAIJA | Acoustic guitar | 0.559 · −7.57, 18.19 | 1.02 m | ×1.4 | 0.25 m | `guitar.glb` 0.08 MB, 6.3k tris |
-| 07 AFROBEATS | Conga | 0.701 · −19.18, 5.67 | 0.76 m | ×1.5 | 0.30 m | `conga.glb` 0.27 MB, 24.4k tris |
-| 08 GLOBAL | Tambourines (pair) | 0.810 · −18.25, −8.02 | 0.52 m | ×1.8 | 1.00 m | `tambourine.glb` 0.52 MB, 20.8k tris |
+| 01 ROOTS | Talking drum | 0.9345 · −7.39, −18.71 (shared) | 0.60 m | ×1 | 0.90 m | `talking-drum.glb` 0.36 MB, 31.7k tris |
+| 01 ROOTS | Axatse (gourd rattle) | (same plinth) | 0.32 m | ×1.4 | 0.90 m | `axatse.glb` 1.73 MB, 314k tris (not simplified, see licence) |
+| 02 RECORDING | Gramophone | 0.059 · 7.58, −18.89 | 0.70 m | ×1 | 0.75 m | `gramophone.glb` 0.42 MB, 4.5k tris |
+| 03 HIGH-LIFE | Trumpet | 0.170 · 18.44, −9.57 | 0.50 m | ×1.2 | 1.00 m | `trumpet.glb` 0.32 MB, 19.1k tris |
+| 04 EXPLOSION | Alto saxophone | 0.289 · 19.35, 5.67 | 0.68 m | ×1 | 0.75 m | `saxophone.glb` 0.24 MB, 35.2k tris |
+| 05 TRANSITION | Boombox | 0.431 · 7.78, 18.76 | 0.55 m | ×1.1 | 0.95 m | `boombox.glb` 0.07 MB, 193 tris |
+| 06 NAIJA | Acoustic guitar | 0.559 · −7.58, 18.89 | 1.02 m | ×1 | 0.40 m | `guitar.glb` 0.08 MB, 6.3k tris |
+| 07 AFROBEATS | Conga | 0.701 · −19.36, 5.76 | 0.76 m | ×1 | 0.45 m | `conga.glb` 0.27 MB, 24.4k tris |
+| 08 GLOBAL | Tambourines (pair) | 0.810 · −19.11, −8.28 | 0.52 m | ×1.1 | 1.00 m | `tambourine.glb` 0.52 MB, 20.8k tris |
 
-Plinths are 1 × 1 m and off-black. Heights put each instrument's centre about 1.0–1.3 m above the sunken floor, near
-the camera's eye height (1.65 m). The GLBs stay real-world size; `display` in `src/data/exhibits.ts` scales them
-at runtime.
+Plinths are 0.7 × 0.7 m and off-black; the shared ROOTS plinth is 1.25 × 0.7 m, with each instrument centred in its
+half. Exhibits on a shared plinth stand on the tallest of their plinth heights. Heights put the small instruments at
+about table-to-chest height, below the camera's eye height (1.65 m). The GLBs stay real-world size; `display` in
+`src/data/exhibits.ts` scales them at runtime (×1 = life size).
 
 About 4 MB in total, down from 58 MB of sources.
 
@@ -32,27 +40,31 @@ About 4 MB in total, down from 58 MB of sources.
 
 - `src/data/exhibits.ts`: what each exhibit is (era, label, real size, display scale, corrective rotation,
   simplification, plinth height, credit).
-- `src/data/hallLayout.ts`: `EXHIBIT_SLOTS`, `EXHIBIT_PLINTH` and `exhibitHeading()`, i.e. where each stands. Each faces
-  the hall centre, and the gramophone is turned −30° into a three-quarter view.
+- `src/data/hallLayout.ts`: `EXHIBIT_SLOTS` (one per plinth, listing the exhibits on it), `EXHIBIT_PLINTH`,
+  `exhibitHeading()`, `exhibitPlinthSize()` and `exhibitOffsets()`, i.e. where each stands.
 - `exhibits-src/*.glb`: the untouched Sketchfab originals (Git LFS). Never edit them.
 - `scripts/build-exhibits.mjs` → `public/models/exhibits/<id>.glb`, via `npm run exhibits` (or
   `npm run exhibits -- conga guitar`). The build applies the corrective rotation, scales to real-world size with the
   origin at the bottom-centre, optionally simplifies with Meshopt, converts textures to WebP at 1024 px or less, and
   applies Meshopt geometry compression. The credit is written into the file's `asset.extras`. The tambourine source
   has a separate vertex per face, so it is rewelded and its normals recomputed before simplifying.
-- `src/scene/Exhibits.tsx`: one shared off-black plinth geometry and material, and each model loaded once with
-  `useGLTF`. They mount only after the museum is ready, so they never hold up the loader. They then ask the hall key
-  light for one more static shadow update. The shared `ExhibitSpot` spotlight follows the nearest exhibit. Exhibits more than 22 m from the camera are hidden, and none of them
-  receive pointer raycasts.
+- `src/scene/Exhibits.tsx`: one shared off-black plinth geometry and material (scaled per plinth), and each model
+  loaded once with `useGLTF`. They mount only after the museum is ready, so they never hold up the loader. They then
+  ask the hall key light for one more static shadow update. The shared `ExhibitSpot` spotlight follows the nearest
+  plinth and casts a shadow map at the station shadow size of the current quality, rendered only when it moves. One
+  pair of `ShadowMaterial` contact receivers (floor and plinth top) moves with it and fades with it. Exhibits more
+  than 22 m from the camera are hidden, and none of them receive pointer raycasts.
 
 ## Checks
 
 - `npm run check:hall` screens each plinth footprint plus 10 cm, up to the enlarged instrument's top, against the hall
-  voxels, and checks floor flatness. Result: 0 intersections and ≤ 3 mm floor deviation for all nine. (At 1.5 m out
-  on the east and west sides, the trumpet and conga plinth corners reached the first step, so they stand 1.3 m out.)
-- `npm run check:visuals` adds a conservative box per exhibit to the clearance test: route ≥ 0.60 m, focus flights
-  ≥ 0.51 m (threshold 0.3), deck sightlines 1.21 m. The trumpet and tambourines first sat where HIGH-LIFE and
-  AFROBEATS focus flights pass (0.12 and 0.16 m), so they moved to the station midpoints, where flights diverge.
+  voxels, and checks floor flatness. Result: 0 intersections and ≤ 3 mm floor deviation for all eight plinths. (At
+  2.2 m out on the east and west sides, the trumpet, saxophone and conga plinth corners reached the first step, so
+  they stand 1.5–1.95 m out.)
+- `npm run check:visuals` adds a conservative box per plinth (up to the top of its tallest instrument) to the
+  clearance test: route ≥ 1.10 m (0.60 m before the 2026-10-19 move), focus flights ≥ 0.73 m (threshold 0.3), deck
+  sightlines 1.21 m. The trumpet and tambourines first sat where HIGH-LIFE and AFROBEATS focus flights pass (0.12 and
+  0.16 m), so they stay at the station midpoints, where flights diverge.
 
 ## Credits and licences
 
