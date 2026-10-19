@@ -477,6 +477,43 @@ html.archive-prologue body {
   cursor: default;
 }
 
+/* A periodic pulse draws the eye to the one way in: a brief swell and a ring that spreads from the pill and fades,
+   then a long rest. It stops while the button is hovered, focused or pressed, and under reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .pro-enter:not(:disabled) .pro-enter__pill {
+    animation: pro-enter-pulse 3.6s var(--pro-ease) 2.4s infinite;
+  }
+
+  .pro-enter:not(:disabled):focus-visible .pro-enter__pill,
+  .pro-enter:not(:disabled):active .pro-enter__pill {
+    animation: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pro-enter:not(:disabled):hover .pro-enter__pill {
+      animation: none;
+    }
+  }
+}
+
+@keyframes pro-enter-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--cta-bg) 60%, transparent);
+  }
+  12% {
+    transform: scale(1.045);
+  }
+  26% {
+    transform: scale(1);
+  }
+  48%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 16px color-mix(in srgb, var(--cta-bg) 0%, transparent);
+  }
+}
+
 .pro--loading .pro-enter {
   opacity: 0;
   pointer-events: none;
