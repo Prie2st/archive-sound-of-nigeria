@@ -2278,9 +2278,16 @@
     font-size: clamp(4.4rem, 30vw, 9rem);
   }
 
-  /* opening */
-  .pro-opening__years { grid-column: 4 / 7; }
-  .pro-opening__premise { grid-column: 3 / 7; font-size: clamp(1.4rem, 6.4vw, 2rem); }
+  /* opening: the premise sits lower, in a narrow column from just left of centre, the years aligned with it */
+  .pro-opening__middle { margin-top: clamp(96px, 22.7svh, 220px); }
+  .pro-opening__lead {
+    justify-self: start;
+    width: min(183px, 100%);
+    margin-inline-start: calc(46.6vw - var(--pro-left));
+  }
+  .pro-opening__years,
+  .pro-opening__premise { grid-column: 1 / -1; justify-self: start; }
+  .pro-opening__premise { font-size: clamp(1.4rem, 6.4vw, 2rem); }
 
   /* systems: the image stops pinning; kakaki overlaps the drum's edge */
   .pro-systems__pin {
@@ -2313,7 +2320,9 @@
   }
 
   /* 1922 */
+  .pro-record1922__top { row-gap: 44px; }
   .pro-record1922__disc { grid-column: 2 / 7; }
+  .pro-record1922__disc .pro-media__caption { justify-items: end; text-align: right; }
   .pro-record1922__verbs { margin-top: var(--space-md); }
 
   /* the chain reads downward */
@@ -2328,16 +2337,19 @@
     border-bottom: 1px solid var(--rule);
   }
 
+  /* each step ends with its arrow down to the next (none after the last) */
   .pro-chain__arrow {
-    width: 1.4em;
-    margin: 0;
-    padding: 0;
-    transform: rotate(90deg);
-    text-align: center;
+    display: none;
   }
 
-  .pro-chain li:first-child {
-    padding-inline-start: 1.4em;
+  .pro-chain li:not(:last-child)::after {
+    content: "→";
+    display: inline-block;
+    width: 19px;
+    margin-inline-start: 4px;
+    transform: rotate(90deg);
+    text-align: center;
+    color: var(--accent);
   }
 
   /* city strip: vertical, arrows downward */
@@ -2346,12 +2358,12 @@
   }
 
   .pro-strip__item--1 {
-    grid-column: 2 / 6;
+    grid-column: 1 / 5;
     margin-bottom: 0;
   }
 
   .pro-strip__item--2 {
-    grid-column: 3 / 7;
+    grid-column: 1 / 5;
   }
 
   .pro-strip__item + .pro-strip__item::before {
@@ -2377,6 +2389,7 @@
   /* independence */
   .pro-independence__date { grid-row: 2; align-self: end; }
   .pro-independence__headline { grid-row: 3; }
+  .pro-independence__headline .pro-line { padding-inline-start: 0; }
 
   /* 1967 */
   .pro-war1967__headline { font-size: var(--t-headline); }
@@ -2406,8 +2419,14 @@
   .pro-explosion__genres {
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-between;
     align-items: baseline;
     gap: 0.22em 0.32em;
+  }
+
+  .pro-explosion__burst .pro-line:last-child {
+    padding-inline-start: 0;
+    text-align: end;
   }
 
   .pro-genre {
@@ -2431,6 +2450,8 @@
   .pro-modern { grid-column: 1 / -1; }
   .pro-modern--fuji { margin-top: 0; }
   .pro-modern__media { max-width: 82%; }
+  .pro-modernities__key .pro-line:nth-child(4) { margin-top: calc(-0.16em + 40px); }
+  .pro-modernities { padding-bottom: calc(var(--space-section) - 37px); } /* the section keeps its height */
 
   /* festac */
   .pro-festac__media .pro-media__frame { aspect-ratio: 4 / 3; }
@@ -2446,7 +2467,7 @@
   }
 
   .pro-localsound__item--2 {
-    grid-column: 2 / 6;
+    grid-column: 1 / 5;
     margin-top: 0;
   }
 
@@ -2489,6 +2510,7 @@
   }
 
   .pro-route__arrow {
+    margin-inline-start: 44px;
     transform: rotate(90deg);
   }
 
@@ -2519,6 +2541,10 @@
     margin-inline: calc(var(--pro-left) * -1) calc(var(--pro-right) * -1);
   }
 
+  .pro-afrobeats__nativeland .pro-media__caption {
+    padding-inline: var(--pro-left) var(--pro-right);
+  }
+
   .pro-afrobeats__home-copy {
     grid-row: auto;
     padding-bottom: 0;
@@ -2526,11 +2552,15 @@
 
   /* essence */
   .pro-essence__year { grid-row: 1; }
-  .pro-essence__sleeve { grid-column: 2 / 7; grid-row: 2; margin-top: -12vw; }
-  .pro-essence__copy { margin-top: var(--space-lg); }
+  .pro-essence__sleeve { grid-column: 2 / 7; grid-row: 2; margin-top: 43px; }
+  .pro-essence__copy { margin-top: 42px; }
+  .pro-essence__close { margin-top: 44px; }
+  .pro-essence { padding-bottom: 38px; }
 
   /* global */
   .pro-global__caption { display: none; }
+  .pro-global__media .pro-media__img { object-position: 20% 35% !important; }
+  .pro-global__answer { color: #efe7da; } /* over the singer, not the haze, in this crop */
   .pro-global__ayra { grid-column: 1 / 5; }
   .pro-global__contrast { margin-top: var(--space-lg); }
 
@@ -2542,7 +2572,10 @@
   .pro-thesis li:nth-child(2) { padding-left: 8%; }
   .pro-thesis li:nth-child(3) { padding-left: 16%; }
   .pro-thesis li:nth-child(4) { padding-left: 24%; }
-  .pro-thesis li:nth-child(4) i { padding-left: 2.4em; }
+  .pro-thesis li:nth-child(2) i { padding-left: 2.03em; }
+  .pro-thesis li:nth-child(3) i { padding-left: 4.93em; }
+  .pro-thesis li:nth-child(3) span { margin-left: 0.55em; }
+  .pro-thesis li:nth-child(4) i { padding-left: 7.39em; }
 
   /* finale */
   .pro-finale__figures dd { font-size: clamp(2.6rem, 15vw, 5rem); }

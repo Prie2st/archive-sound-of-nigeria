@@ -184,9 +184,22 @@ all its lines and the thesis appears whole. All content and hierarchy are kept.
 
 ## 8. Phones (≤ 760 px) and mid widths
 
-Six columns, recomposed rather than shrunk:
+Six columns, recomposed rather than shrunk. Since 2026-10-19 the phone layout follows the mobile Figma
+("ARCHIVE — Mobile Homepage", frame "FULL PAGE / Mobile homepage / 390 px", node 3:2). Section heights match it,
+except GLOBAL, which keeps the scroll runway its line-by-line headline needs.
+- the opening premise and years sit lower, in a 183 px column starting just left of centre;
+- 1922: 44 px under the year, the caption right-aligned under the disc, each chain step ending with its ↓;
 - the talking drum stops pinning, and the kakaki sits beside the lead;
-- the city strip turns vertical with ↓;
+- the city strip turns vertical with ↓, flush left (each item four columns);
+- the independence headline is flush left;
+- EXPLODES. is set flush right and each row of the genre cloud spreads across the width;
+- THAT WAS / THE POINT. gets 40 px more space (the section keeps its height);
+- the third local-sound sleeve returns to the left edge;
+- in the digital route, the arrows sit under the middle of LAGOS;
+- the Nativeland caption keeps the page margin;
+- Essence: the sleeve sits under the year (no overlap), the key line 44 px after the credit, the section 830 px tall;
+- the GLOBAL stage crops to Tems (object-position 20% 35%), with the answer line in cream over her;
+- the thesis arrows follow the diagonal and LOCALISATION steps further across;
 - the regions stack;
 - the genre field becomes an in-flow cloud (no drift);
 - EVERYTHING EXPLODES. comes before the genre cloud;
